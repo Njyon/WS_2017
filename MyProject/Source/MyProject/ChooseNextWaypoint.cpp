@@ -14,9 +14,10 @@
 	 APawn* controlledPawn = aIController->GetPawn();
 	 UPatrolRoute* patrolRoute = controlledPawn->FindComponentByClass<UPatrolRoute>();
 
+	 FString name = ownerComp.GetOwner()->GetName();
+
 	 if (!ensure(patrolRoute)) 
 	 { 
-		 FString name = ownerComp.GetOwner()->GetName();
 		 UE_LOG(LogTemp, Error, TEXT("[AI]Name = %s has no Patrol Route!"), *name);
 
 		 return EBTNodeResult::Failed;
@@ -26,7 +27,6 @@
 	 TArray<AActor*> patrolPoints = patrolRoute->GetPatrolPoints();
 	 if (patrolPoints.Num() == 0)
 	 {
-		 FString name = ownerComp.GetOwner()->GetName();
 		 UE_LOG(LogTemp, Error, TEXT("[AI]Name = %s has no Patrol Route Assigned! (Patroll Route = 0)"), *name);
 
 		 return EBTNodeResult::Failed;
@@ -42,6 +42,6 @@
 	 int nextIndex = (index + 1) % patrolPoints.Num();
 	 blackboardComp->SetValueAsInt(indexKey.SelectedKeyName, nextIndex);
 
-	 UE_LOG(LogTemp, Warning, TEXT("Waypoint index: %i"), index);
+	 UE_LOG(LogTemp, Warning, TEXT("[AI]Name = %s Waypoint index: %i"), *name, index);
 	 return EBTNodeResult::Succeeded;
  }
