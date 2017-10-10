@@ -48,6 +48,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Fires a projectile.
+	UFUNCTION(BlueprintCallable, Category = "Shoot")
 	void OnFire();
 	
 	
