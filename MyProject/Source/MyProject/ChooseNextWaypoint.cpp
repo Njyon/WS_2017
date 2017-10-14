@@ -16,6 +16,7 @@
 
 	 FString name = ownerComp.GetOwner()->GetName();
 
+	 //Has no Patrol route
 	 if (!ensure(patrolRoute)) 
 	 { 
 		 UE_LOG(LogTemp, Error, TEXT("[AI]Name = %s has no Patrol Route!"), *name);
@@ -23,7 +24,7 @@
 		 return EBTNodeResult::Failed;
 	 }
 
-	 //Warn about empty Patrol routs
+	 //Warn about empty Patrol routs Targets
 	 TArray<AActor*> patrolPoints = patrolRoute->GetPatrolPoints();
 	 if (patrolPoints.Num() == 0)
 	 {
