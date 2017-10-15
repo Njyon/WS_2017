@@ -21,6 +21,14 @@ class AMyProjectCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
 
+	/** Gun mesh: 1st person view (seen only by self) */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		class USkeletalMeshComponent* FP_Gun;
+
+	/** Location on gun mesh where projectiles should spawn. */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		class USceneComponent* FP_MuzzleLocation;
+
 public:
 	AMyProjectCharacter();
 
@@ -40,17 +48,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector GunOffset;
 
+	// Fires a projectile.
+	UFUNCTION(BlueprintCallable, Category = "Shoot")
+	void Shoot();
+
+	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	TSubclassOf<class AGun> GunBlueprint;
+		class USoundBase* FireSound;
 
-private:
+	/** AnimMontage to play each time we fire */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		class UAnimMontage* FireAnimation;
 
-	AGun* Gun;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		class UAnimInstance* AnimInstance;
+
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AMyProjectProjectile> ProjectileClass;
 
 protected:
-
-	/** Resets HMD orientation and position in VR. */
-	void OnResetVR();
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
