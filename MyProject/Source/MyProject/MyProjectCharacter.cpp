@@ -1,5 +1,6 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
+///Unreal Stuff
 #include "MyProjectCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -7,12 +8,12 @@
 #include "GameFramework/InputSettings.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
-#include "MyProject/MyProjectProjectile.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
 #include "PhysicsEngine/BodyInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ConstructorHelpers.h"
+///Our Stuff
 #include "MyProject/MyProjectProjectile.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
@@ -177,40 +178,6 @@ void AMyProjectCharacter::Tick(float deltaTime)
 void AMyProjectCharacter::LMBPressed()
 {
 	isLMBPressed = true;
-	// try and fire a projectile
-	if (ProjectileClass != NULL)
-	{
-		UWorld* const World = GetWorld();
-		if (World != NULL)
-		{
-			//	const FRotator SpawnRotation = FP_MuzzleLocation->GetComponentRotation();
-			//	// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-			//	const FVector SpawnLocation = FP_MuzzleLocation->GetComponentLocation();
-
-			//	//Set Spawn Collision Handling Override
-			//	FActorSpawnParameters ActorSpawnParams;
-			//	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			//	// spawn the projectile at the muzzle
-			//	World->SpawnActor<AMyProjectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-		}
-	}
-
-	// try and play the sound if specified
-	if (FireSound != NULL)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != NULL)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
 }
 
 void AMyProjectCharacter::LMBReleased()
@@ -287,7 +254,7 @@ void AMyProjectCharacter::SpawnBullet()
 
 	FVector endRaycastPos = camPos + camForwardVec; // Get a EndPosition for the Raycast
 
-	FCollisionQueryParams fireTraceParams = FCollisionQueryParams(FName(TEXT("CamTrace")), true, this);
+	FCollisionQueryParams fireTraceParams = FCollisionQueryParams(FName(TEXT("CamTrace")), true, this);		// Params for the RayCast
 	fireTraceParams.bTraceComplex = false;
 	fireTraceParams.bTraceAsyncScene = false;
 	fireTraceParams.bReturnPhysicalMaterial = false;
@@ -301,20 +268,42 @@ void AMyProjectCharacter::SpawnBullet()
 		ECC_Pawn, 
 		fireTraceParams);
 
-	if (hitResult.IsValidBlockingHit() == true)
+	if (hitResult.IsValidBlockingHit() == true)																		// Does the RayHit?
 	{
-		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(
-			FP_MuzzleLocation->GetComponentTransform().GetLocation(),
-			hitResult.ImpactPoint);
+		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
+			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
+			hitResult.ImpactPoint);																					// Get Impact Point in World
 
-		FActorSpawnParameters spawnInfo;
-		spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		spawnInfo.Owner = this;
-		spawnInfo.Instigator = this;
+		FActorSpawnParameters spawnInfo;																			// Spawn Info
+		spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always
+		spawnInfo.Owner = this;																						// Owner of Spawned Actor is this Class
+		spawnInfo.Instigator = this;																				// if you spawn a projectile and pass over instigator as say, your pawn. then when the projectile wants to do damage, you can pass it over to the damage function. So you know who fire the projectile, you can then decide if you want friendly fire, and all sorts of things can be done after you know this bit of info.
 
-		//static ConstructorHelpers::FObjectFinder<UBlueprint> projectile(TEXT("Blueprint'/Game/Dynamic/Player/Behaviour/PlayerProjectile'"));
+		AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
+			playerProjectile,															// SubClass
+			FP_MuzzleLocation->GetComponentTransform().GetLocation(),					// SpawnLocation
+			newRotation,																// SpawnRotation
+			spawnInfo);																	// Set Spawn Info
+	}
 
-		MyProjectProjectile* projectile = world->SpawnActor<MyProjectProjectile>(playerProjectile, FP_MuzzleLocation->GetComponentTransform().GetLocation(), newRotation, spawnInfo);
+	////////////////////////////////////////////////
+	////////////	 Play Sound and Animation
+	////////////////////////////////////////////////
+
+	// try and play the sound if specified
+	if (FireSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (FireAnimation != NULL)
+	{
+		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
 	}
 }
 

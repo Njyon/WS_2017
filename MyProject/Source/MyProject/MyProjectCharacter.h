@@ -1,9 +1,12 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-
+///Unreal Stuff
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+///Our Stuff
+#include "MyProject/MyProjectProjectile.h"
+///GERENRATED HURENSOHN
 #include "MyProjectCharacter.generated.h"
 
 class UInputComponent;
@@ -77,7 +80,7 @@ public:								////// PUBLIC //////
 
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-		TSubclassOf<class AMyProjectProjectile> ProjectileClass;
+		TSubclassOf<class AMyProjectProjectile> playerProjectile;
 
 										// UFUNCTION //
 
@@ -109,8 +112,6 @@ private:								////// PRIVATE //////
 	///Class
 	class UCharacterMovementComponent* movementComponent; // Movement Component
 	class UWorld* world;
-	class MyProjectProjectile* projectile;
-	TSubclassOf<MyProjectProjectile> playerProjectile;
 
 											// UFUNCTION //
 
