@@ -82,6 +82,13 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AMyProjectProjectile> playerProjectile;
 
+										// Sounds //
+	/*UPROPERTY(BlueprintReadOnly, Category = Audio)
+		USoundCue* ShootAudioCue;
+
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		UAudioComponent* ShootAudioComponent;*/
+
 										// UFUNCTION //
 
 	/// Input
@@ -120,6 +127,7 @@ private:								////// PRIVATE //////
 
 protected:								////// Protected //////
 	virtual void BeginPlay(); //Executes at Begin+
+	virtual void PostInitializeComponents() override; //Executes after Begin Play
 	virtual void Tick(float deltaTime) override;
 
 	/** Handles moving forward/backward */
