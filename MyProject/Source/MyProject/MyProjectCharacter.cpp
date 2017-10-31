@@ -13,8 +13,8 @@
 #include "PhysicsEngine/BodyInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ConstructorHelpers.h"
-
 #include "Engine.h"
+#include "Components/TimelineComponent.h"
 ///Our Stuff
 #include "MyProject/MyProjectProjectile.h"
 
@@ -64,7 +64,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 
 	movementComponent = GetCharacterMovement();
 	world = GetWorld();
+	
+	wallDetector = CreateDefaultSubobject<UBoxComponent>(TEXT("WallDetector"));
+	wallDetector->SetupAttachment(RootComponent);
+	wallDetector->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCharacter::OnWallDetected);
+	wallDetector->OnComponentEndOverlap.AddDynamic(this, &AMyProjectCharacter::EndWallDetected);
 
+	wallrunTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("WallrunTimeline"));
 }
 
 			//////////////////////////////////////
@@ -81,6 +87,25 @@ void AMyProjectCharacter::BeginPlay()
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 	this->movementComponent->SetPlaneConstraintEnabled(true);
+
+	// Declare Delegate function to be binded with wallrunFloatReturn(float value)
+	FOnTimelineFloat InterpFunction;
+
+	// Declare Delegate function to be binded with wallrunFinished()
+	FOnTimelineEvent WallrunTimelineUpdate;
+
+	InterpFunction.BindUFunction(this, FName("WallrunFloatReturn"));
+	WallrunTimelineUpdate.BindUFunction(this, FName("WallrunUpdate"));
+
+	// Check if Curve asset it valid
+	if (this->wallrunCurve)
+	{
+		wallrunTimeline->AddInterpFloat(this->wallrunCurve, InterpFunction, FName("wallrunTimeline"));
+		wallrunTimeline->SetTimelinePostUpdateFunc(WallrunTimelineUpdate);
+
+		wallrunTimeline->SetLooping(true);
+		wallrunTimeline->SetIgnoreTimeDilation(false);
+	}
 }
 
 			//////////////////////////////////////
@@ -92,12 +117,12 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	// set up gameplay key bindings
 	check(playerInputComponent);
 
-	//playerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	//playerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-
+	/// Input Jump
+	playerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyProjectCharacter::Jump);
+	playerInputComponent->BindAction("Jump", IE_Released, this, &AMyProjectCharacter::EndJumping);
+	/// Input WASD
 	playerInputComponent->BindAxis("MoveForward", this, &AMyProjectCharacter::MoveForward);
 	playerInputComponent->BindAxis("MoveRight", this, &AMyProjectCharacter::MoveRight);
-
 	/// Input Left Mouse Button
 	playerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyProjectCharacter::LMBPressed);
 	playerInputComponent->BindAction("Fire", IE_Released, this, &AMyProjectCharacter::LMBReleased);
@@ -178,6 +203,20 @@ void AMyProjectCharacter::Tick(float deltaTime)
 			//////////	    Input       //////////
 			//////////////////////////////////////
 
+							// Mouse //
+
+void AMyProjectCharacter::TurnAtRate(float rate)
+{
+	// calculate delta for this frame from the rate information
+	AddControllerYawInput(rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AMyProjectCharacter::LookUpAtRate(float rate)
+{
+	// calculate delta for this frame from the rate information
+	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
 void AMyProjectCharacter::LMBPressed()
 {
 	isLMBPressed = true;
@@ -204,9 +243,7 @@ void AMyProjectCharacter::RMBReleased()
 	UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time to Noraml
 }
 
-				//////////////////////////////////////
-				//////////	  Functions     //////////
-				//////////////////////////////////////
+						// Keyboard WASD //
 
 void AMyProjectCharacter::MoveForward(float value)
 {
@@ -228,17 +265,46 @@ void AMyProjectCharacter::MoveRight(float value)
 	}
 }
 
-void AMyProjectCharacter::TurnAtRate(float rate)
+						// Keyboard SpaceBar //
+
+/// Jump
+void AMyProjectCharacter::Jump()
 {
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	if (this->movementComponent->IsMovingOnGround() == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		this->LaunchCharacter(									// Launch Character (Jump Up)
+			FVector(0.0f, 0.0f, 1000.0f),						// Where to Launch
+			false,												// XY Override
+			true												// Z Override
+		);
+	}
 }
 
-void AMyProjectCharacter::LookUpAtRate(float rate)
+void AMyProjectCharacter::EndJumping()
 {
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	this->StopJumping();
 }
+
+void AMyProjectCharacter::Landed(const FHitResult& hit) 
+{
+	Super::Landed(hit);
+
+	this->MakeNoise(				// Make Noise for AI Perception
+		1.0f,						// Loudness
+		this,						// Instigator (PAWN)
+		hit.Location,				// Noise Location
+		0.0f						// Max Range
+	);
+
+}
+
+
+				//////////////////////////////////////
+				//////////	  Functions     //////////
+				//////////////////////////////////////
+
 void AMyProjectCharacter::BulletCooldown()
 {
 	this->isBulletFired = false;
@@ -288,7 +354,7 @@ void AMyProjectCharacter::SpawnBullet()
 			newRotation,																// SpawnRotation
 			spawnInfo);																	// Set Spawn Info
 	}
-	else																		// Does the RayHit?
+	else																				// Ray does not hit anything
 	{
 		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
@@ -327,4 +393,42 @@ void AMyProjectCharacter::SpawnBullet()
 	}
 }
 
+						//////////////////////////////////////
+						//////////	  Collision     //////////
+						//////////////////////////////////////
 
+void AMyProjectCharacter::OnWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
+{
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling())
+	{
+		this->onWall = true;
+		this->wallCollisionCounter = 0;
+		this->wallCollisionCounter++;
+		FVector playerDirection = FirstPersonCameraComponent->GetForwardVector();
+		FVector playerRightVector = FirstPersonCameraComponent->GetRightVector();
+
+		wallrunTimeline->Play();
+
+		
+	}
+}
+
+void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
+{
+
+}
+
+
+						//////////////////////////////////////
+						//////////	   Timeline     //////////
+						//////////////////////////////////////
+
+void AMyProjectCharacter::WallrunFloatReturn(float value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("FUCK 2"));
+}
+
+void AMyProjectCharacter::WallrunUpdate()
+{
+	UE_LOG(LogTemp, Warning, TEXT("FUCK"));
+}

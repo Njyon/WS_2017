@@ -36,6 +36,14 @@ class AMyProjectCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, Category = Mesh)
 		class USceneComponent* FP_MuzzleLocation;
 
+	UPROPERTY()
+		class UTimelineComponent* wallrunTimeline;
+
+	// Box collision to Detect Walls
+	UPROPERTY(EditAnywhere, Category = Detectors)
+		class UBoxComponent* wallDetector;
+
+
 public:								////// PUBLIC //////
 	AMyProjectCharacter();   // Konstructor
 
@@ -46,6 +54,8 @@ public:								////// PUBLIC //////
 		float fireRateSlomo = 0.05f;											//Set Fire Rate in Slomo
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FireRate)
 		float firerateNoSlomo = 0.3f;											//Set Fire Rate
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float gravitation;														// Set Gravitation
 
 	// is Slomo Active or Deactive
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Slomo)
@@ -82,6 +92,9 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AMyProjectProjectile> playerProjectile;
 
+	UPROPERTY(EditAnywhere, Category = Timeline)
+		class UCurveFloat* wallrunCurve;
+
 										// UFUNCTION //
 
 	/// Input
@@ -89,8 +102,17 @@ public:								////// PUBLIC //////
 	void LMBReleased(); // Left Mouse Button Released
 	void RMBPressed(); // Right Mouse Button Pressed
 	void RMBReleased(); // Right Mouse Button Released
+	void Jump();
+	void EndJumping();
+
+	virtual void Landed(const FHitResult& hit) override;
 
 	
+	UFUNCTION()
+		void WallrunFloatReturn(float value);
+
+	UFUNCTION()
+		void WallrunUpdate();
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -101,11 +123,14 @@ private:								////// PRIVATE //////
 
 											// UPROPERTY //
 	///DataType
+	int wallCollisionCounter = 0;
 	float HAxis;	// Horizontal Axis
 	float VAxis;	// Vertical Axis
 	bool isLMBPressed;
 	bool isBulletFired = false;
 	bool isShootingInNormalSpeed; // Check you switched the Time Dilation
+	bool onWall = false;
+	
 	///Struct
 	FTimerHandle timeHandle;
 	FBodyInstance* camRay; //RayCast from Camera
@@ -117,6 +142,24 @@ private:								////// PRIVATE //////
 
 	void SpawnBullet();
 	void BulletCooldown();
+
+	UFUNCTION()
+	void OnWallDetected(
+		class UPrimitiveComponent* hitComp,
+		class AActor* otherActor,
+		class UPrimitiveComponent* otherComp,
+		int32 otherBodyIndex,
+		bool fromSweep, 
+		const FHitResult & sweepResult
+	);
+
+	UFUNCTION()
+	void EndWallDetected(
+		class UPrimitiveComponent* hitComp,
+		class AActor* otherActor,
+		class UPrimitiveComponent* otherComp,
+		int32 otherBodyIndex
+	);
 
 protected:								////// Protected //////
 	virtual void BeginPlay(); //Executes at Begin+
