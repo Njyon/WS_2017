@@ -95,6 +95,14 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, Category = Timeline)
 		class UCurveFloat* wallrunCurve;
 
+	// Sounds //
+	/*UPROPERTY(BlueprintReadOnly, Category = Audio)
+	USoundCue* ShootAudioCue;
+
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+	UAudioComponent* ShootAudioComponent;*/
+
+
 										// UFUNCTION //
 
 	/// Input
