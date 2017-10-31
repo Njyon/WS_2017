@@ -13,6 +13,8 @@
 #include "PhysicsEngine/BodyInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ConstructorHelpers.h"
+
+#include "Engine.h"
 ///Our Stuff
 #include "MyProject/MyProjectProjectile.h"
 
@@ -55,7 +57,7 @@ AMyProjectCharacter::AMyProjectCharacter()
 
 	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	FP_MuzzleLocation->SetupAttachment(FP_Gun);
-	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+	FP_MuzzleLocation->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
@@ -132,11 +134,12 @@ void AMyProjectCharacter::Tick(float deltaTime)
 		else
 		{
 			///InCrease Shoot speed when Slomo is Active
-			if (isSlomoActive)
+			if (isSlomoActive == true)
 			{
 				if (world->GetTimerManager().IsTimerActive(timeHandle) == true && isShootingInNormalSpeed == true)
 				{
 					isShootingInNormalSpeed = false;
+					world->GetTimerManager().PauseTimer(timeHandle);
 					world->GetTimerManager().ClearTimer(timeHandle); // Cleartimer if u switch into Slomo mode
 				}
 				else if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
@@ -273,6 +276,23 @@ void AMyProjectCharacter::SpawnBullet()
 		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 			hitResult.ImpactPoint);																					// Get Impact Point in World
+
+		FActorSpawnParameters spawnInfo;																			// Spawn Info
+		spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always
+		spawnInfo.Owner = this;																						// Owner of Spawned Actor is this Class
+		spawnInfo.Instigator = this;																				// if you spawn a projectile and pass over instigator as say, your pawn. then when the projectile wants to do damage, you can pass it over to the damage function. So you know who fire the projectile, you can then decide if you want friendly fire, and all sorts of things can be done after you know this bit of info.
+
+		AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
+			playerProjectile,															// SubClass
+			FP_MuzzleLocation->GetComponentTransform().GetLocation(),					// SpawnLocation
+			newRotation,																// SpawnRotation
+			spawnInfo);																	// Set Spawn Info
+	}
+	else																		// Does the RayHit?
+	{
+		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
+			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
+			hitResult.TraceEnd);																					// Get Trace end in World
 
 		FActorSpawnParameters spawnInfo;																			// Spawn Info
 		spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always

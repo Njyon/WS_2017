@@ -90,7 +90,7 @@ public:								////// PUBLIC //////
 	void RMBPressed(); // Right Mouse Button Pressed
 	void RMBReleased(); // Right Mouse Button Released
 
-
+	
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
