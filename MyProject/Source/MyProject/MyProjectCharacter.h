@@ -163,6 +163,7 @@ private:								////// PRIVATE //////
 
 protected:								////// Protected //////
 	virtual void BeginPlay(); //Executes at Begin+
+	virtual void PostInitializeComponents() override; //Executes after Begin Play
 	virtual void Tick(float deltaTime) override;
 
 	/** Handles moving forward/backward */

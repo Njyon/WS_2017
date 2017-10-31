@@ -25,6 +25,20 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 AMyProjectCharacter::AMyProjectCharacter()
 {
+
+			//////////////////////////////////////
+			//////////		Sounds		//////////
+			//////////////////////////////////////
+
+	//ShootSound
+	/*static ConstructorHelpers::FObjectFinder<USoundCue> ShootCue(TEXT("'/Game/Characters/FirstPerson/Audio/Guns/FirstPersonTemplateWeaponFireShmorph_Cue'"));
+	ShootAudioCue = ShootCue.Object;
+	ShootAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootAudioComp"));
+	ShootAudioComponent->bAutoActivate = false;
+	ShootAudioComponent->SetupAttachment(RootComponent);*/
+
+			////////////End Sounds////////////////
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
@@ -107,6 +121,21 @@ void AMyProjectCharacter::BeginPlay()
 		wallrunTimeline->SetIgnoreTimeDilation(false);
 	}
 }
+
+			///////////////////////////////////////
+			/////////// Post Processing  //////////
+			///////////////////////////////////////
+
+void AMyProjectCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	/*if (ShootAudioCue->IsValidLowLevelFast())
+	{
+		ShootAudioComponent->SetSound(ShootAudioCue);
+	}*/
+}
+
 
 			//////////////////////////////////////
 			//////////	Input Bind		//////////
