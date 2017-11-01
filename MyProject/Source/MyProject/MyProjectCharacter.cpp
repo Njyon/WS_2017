@@ -37,6 +37,34 @@ AMyProjectCharacter::AMyProjectCharacter()
 	ShootAudioComponent->bAutoActivate = false;
 	ShootAudioComponent->SetupAttachment(RootComponent);
 
+	//SlideSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> SlideCue(TEXT("'/Game/Dynamic/Player/Audio/Movement/sfx_Sliding'"));
+	SlideAudioCue = SlideCue.Object;
+	SlideAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("SlideAudioComp"));
+	SlideAudioComponent->bAutoActivate = false;
+	SlideAudioComponent->SetupAttachment(RootComponent);
+
+	//WallrunSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> WallrunCue(TEXT("'/Game/Dynamic/Player/Audio/Movement/sfx_WallRun'"));
+	WallrunAudioCue = WallrunCue.Object;
+	WallrunAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WallrunAudioComp"));
+	WallrunAudioComponent->bAutoActivate = false;
+	WallrunAudioComponent->SetupAttachment(RootComponent);
+
+	//ClimbSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> ClimbCue(TEXT("'/Game/Dynamic/Player/Audio/Movement/sfx_ClimbWall'"));
+	ClimbAudioCue = ClimbCue.Object;
+	ClimbAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ClimbAudioComp"));
+	ClimbAudioComponent->bAutoActivate = false;
+	ClimbAudioComponent->SetupAttachment(RootComponent);
+
+	//SlowmoSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> SlowmoCue(TEXT("'/Game/Dynamic/Player/Audio/other/sfx_Slow-Mo'"));
+	SlowmoAudioCue = SlowmoCue.Object;
+	SlowmoAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("SlowmoAudioComp"));
+	SlowmoAudioComponent->bAutoActivate = false;
+	SlowmoAudioComponent->SetupAttachment(RootComponent);
+
 			////////////End Sounds////////////////
 
 	// Set size for collision capsule
@@ -130,9 +158,29 @@ void AMyProjectCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (ShootAudioCue->IsValidLowLevelFast())
+	if (ShootAudioCue->IsValidLowLevelFast())					//ShootSound
 	{
 		ShootAudioComponent->SetSound(ShootAudioCue);
+	}
+
+	if (SlideAudioCue->IsValidLowLevelFast())					//SlideSound
+	{	
+		SlideAudioComponent->SetSound(SlideAudioCue);
+	}
+
+	if (WallrunAudioCue->IsValidLowLevelFast())					//WallrunSound
+	{	
+		WallrunAudioComponent->SetSound(WallrunAudioCue);
+	}
+
+	if (ClimbAudioCue->IsValidLowLevelFast())					//ClimbSound
+	{	
+		ClimbAudioComponent->SetSound(ClimbAudioCue);
+	}
+
+	if (SlowmoAudioCue->IsValidLowLevelFast())					//ClimbSound
+	{	
+		SlowmoAudioComponent->SetSound(SlowmoAudioCue);
 	}
 }
 
@@ -176,6 +224,13 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 void AMyProjectCharacter::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
+
+	///Sounds
+	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
+	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
+	ShootAudioComponent->SetFloatParameter(FName("sfx_SlidingFireSlowmo"), soundTimeDilation);				//SlideSound		
+	ShootAudioComponent->SetFloatParameter(FName("sfx_WallrunFireSlowmo"), soundTimeDilation);				//WallrunSound		
+	ShootAudioComponent->SetFloatParameter(FName("sfx_ClimbWallFireSlowmo"), soundTimeDilation);			//ClimbSound
 
 	///Shoot
 	if (isLMBPressed == true)
@@ -224,6 +279,7 @@ void AMyProjectCharacter::Tick(float deltaTime)
 		{
 			isSlomoActive = false;
 			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
+			SlowmoAudioComponent->Stop();
 		}
 	}
 }
@@ -261,8 +317,8 @@ void AMyProjectCharacter::RMBPressed()
 	if (movementComponent->IsFalling() == true /* and / or Slinding */ ) // Check if you can Set Slomo to Active
 	{
 		isSlomoActive = true;
-		
 		UGameplayStatics::SetGlobalTimeDilation(world, slomoTimeDilation); // Set Time to Slomo Time Dilation
+		SlowmoAudioComponent->Play();
 	}
 }
 
@@ -270,6 +326,7 @@ void AMyProjectCharacter::RMBReleased()
 {
 	isSlomoActive = false;
 	UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time to Noraml
+	SlowmoAudioComponent->Stop();
 }
 
 						// Keyboard WASD //
@@ -381,7 +438,10 @@ void AMyProjectCharacter::SpawnBullet()
 			playerProjectile,															// SubClass
 			FP_MuzzleLocation->GetComponentTransform().GetLocation(),					// SpawnLocation
 			newRotation,																// SpawnRotation
-			spawnInfo);																	// Set Spawn Info
+			spawnInfo);	
+																// Set Spawn Info
+
+		ShootAudioComponent->Play();
 	}
 	else																				// Ray does not hit anything
 	{
@@ -399,6 +459,9 @@ void AMyProjectCharacter::SpawnBullet()
 			FP_MuzzleLocation->GetComponentTransform().GetLocation(),					// SpawnLocation
 			newRotation,																// SpawnRotation
 			spawnInfo);																	// Set Spawn Info
+
+
+		ShootAudioComponent->Play();
 	}
 
 	////////////////////////////////////////////////
