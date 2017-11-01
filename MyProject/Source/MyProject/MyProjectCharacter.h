@@ -134,6 +134,7 @@ public:								////// PUBLIC //////
 
 
 										// UFUNCTION //
+	void Damage(int damage);
 
 	/// Input
 	void LMBPressed(); // Left Mouse Button Pressed
@@ -145,7 +146,9 @@ public:								////// PUBLIC //////
 
 	virtual void Landed(const FHitResult& hit) override;
 
-	
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnDamageBPEvent(float health);
+
 	UFUNCTION()
 		void WallrunFloatReturn(float value);
 
@@ -161,8 +164,9 @@ private:								////// PRIVATE //////
 
 											// UPROPERTY //
 	///DataType
-	float soundTimeDilation;
 	int wallCollisionCounter = 0;
+	float Health = 100.0f;
+	float soundTimeDilation;
 	float HAxis;	// Horizontal Axis
 	float VAxis;	// Vertical Axis
 	bool isLMBPressed;

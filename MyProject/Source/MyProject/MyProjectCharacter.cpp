@@ -225,6 +225,8 @@ void AMyProjectCharacter::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
 
+	//UE_LOG(LogTemp, Warning, TEXT("%f"), Health);
+
 	///Sounds
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
@@ -283,6 +285,18 @@ void AMyProjectCharacter::Tick(float deltaTime)
 		}
 	}
 }
+
+			//////////////////////////////////////
+			//////////////////////////////////////
+			//////////////////////////////////////
+
+void AMyProjectCharacter::Damage(int damage)
+{
+	Health = Health - damage;
+	//UE_LOG(LogTemp, Warning, TEXT("hurt"));
+	this->OnDamageBPEvent(Health);
+}
+
 
 			//////////////////////////////////////
 			//////////	    Input       //////////
@@ -517,10 +531,10 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 
 void AMyProjectCharacter::WallrunFloatReturn(float value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("FUCK 2"));
+	//UE_LOG(LogTemp, Warning, TEXT("FUCK 2"));
 }
 
 void AMyProjectCharacter::WallrunUpdate()
 {
-	UE_LOG(LogTemp, Warning, TEXT("FUCK"));
+	//UE_LOG(LogTemp, Warning, TEXT("FUCK"));
 }

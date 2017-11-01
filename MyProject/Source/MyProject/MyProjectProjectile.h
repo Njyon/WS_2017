@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MyProjectCharacter.h"
+#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "GameFramework/Actor.h"
 #include "MyProjectProjectile.generated.h"
 
@@ -18,6 +20,9 @@ class AMyProjectProjectile : public AActor
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	class UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(EditAnywhere, Category = Projectile)
+	int projectileDamage;
 
 public:
 	AMyProjectProjectile();
