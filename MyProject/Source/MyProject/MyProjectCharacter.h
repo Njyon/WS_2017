@@ -96,11 +96,11 @@ public:								////// PUBLIC //////
 		class UCurveFloat* wallrunCurve;
 
 	// Sounds //
-	/*UPROPERTY(BlueprintReadOnly, Category = Audio)
-	USoundCue* ShootAudioCue;
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* ShootAudioCue;
 
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
-	UAudioComponent* ShootAudioComponent;*/
+		class UAudioComponent* ShootAudioComponent;
 
 
 										// UFUNCTION //

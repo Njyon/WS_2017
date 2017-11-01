@@ -31,11 +31,11 @@ AMyProjectCharacter::AMyProjectCharacter()
 			//////////////////////////////////////
 
 	//ShootSound
-	/*static ConstructorHelpers::FObjectFinder<USoundCue> ShootCue(TEXT("'/Game/Characters/FirstPerson/Audio/Guns/FirstPersonTemplateWeaponFireShmorph_Cue'"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> ShootCue(TEXT("'/Game/Dynamic/Player/Audio/Weapon/sfx_WeaponFire'"));
 	ShootAudioCue = ShootCue.Object;
 	ShootAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootAudioComp"));
 	ShootAudioComponent->bAutoActivate = false;
-	ShootAudioComponent->SetupAttachment(RootComponent);*/
+	ShootAudioComponent->SetupAttachment(RootComponent);
 
 			////////////End Sounds////////////////
 
@@ -130,10 +130,10 @@ void AMyProjectCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	/*if (ShootAudioCue->IsValidLowLevelFast())
+	if (ShootAudioCue->IsValidLowLevelFast())
 	{
 		ShootAudioComponent->SetSound(ShootAudioCue);
-	}*/
+	}
 }
 
 
