@@ -76,14 +76,28 @@ AMyProjectCharacter::AMyProjectCharacter()
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
 
-	movementComponent = GetCharacterMovement();
-	world = GetWorld();
-	
+	movementComponent = GetCharacterMovement();					// Get the CharacterMovement Component
+	world = GetWorld();											// Get World
+
+	// Main Wallrun detector
 	wallDetector = CreateDefaultSubobject<UBoxComponent>(TEXT("WallDetector"));
 	wallDetector->SetupAttachment(RootComponent);
 	wallDetector->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCharacter::OnWallDetected);
 	wallDetector->OnComponentEndOverlap.AddDynamic(this, &AMyProjectCharacter::EndWallDetected);
 
+	// Right Wallrun detector
+	wallRightDetector = CreateDefaultSubobject<UBoxComponent>(TEXT("WallRightDetector"));
+	wallRightDetector->SetupAttachment(RootComponent);
+	wallRightDetector->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCharacter::OnRightWallDetected);
+	wallRightDetector->OnComponentEndOverlap.AddDynamic(this, &AMyProjectCharacter::EndRightWallDetected);
+
+	// Left Wallrun detector
+	wallLeftDetector = CreateDefaultSubobject<UBoxComponent>(TEXT("WallLeftDetector"));
+	wallLeftDetector->SetupAttachment(RootComponent);
+	wallLeftDetector->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCharacter::OnLeftWallDetected);
+	wallLeftDetector->OnComponentEndOverlap.AddDynamic(this, &AMyProjectCharacter::EndLeftWallDetected);
+
+	// Main Wallrun Timeline
 	wallrunTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("WallrunTimeline"));
 }
 
@@ -103,23 +117,21 @@ void AMyProjectCharacter::BeginPlay()
 	this->movementComponent->SetPlaneConstraintEnabled(true);
 
 	// Declare Delegate function to be binded with wallrunFloatReturn(float value)
-	FOnTimelineFloat InterpFunction;
+	FOnTimelineFloat WallrunUpdate;
 
-	// Declare Delegate function to be binded with wallrunFinished()
-	FOnTimelineEvent WallrunTimelineUpdate;
-
-	InterpFunction.BindUFunction(this, FName("WallrunFloatReturn"));
-	WallrunTimelineUpdate.BindUFunction(this, FName("WallrunUpdate"));
+	WallrunUpdate.BindUFunction(this, FName("WallrunFloatReturn"));
 
 	// Check if Curve asset it valid
 	if (this->wallrunCurve)
 	{
-		wallrunTimeline->AddInterpFloat(this->wallrunCurve, InterpFunction, FName("wallrunTimeline"));
-		wallrunTimeline->SetTimelinePostUpdateFunc(WallrunTimelineUpdate);
+		wallrunTimeline->AddInterpFloat(this->wallrunCurve, WallrunUpdate, FName("wallrunTimeline"));
 
 		wallrunTimeline->SetLooping(true);
 		wallrunTimeline->SetIgnoreTimeDilation(false);
 	}
+
+	this->helperWallJumpNegativeFloat = this->wallJumpForce * 2;
+	this->helperWallJumpNegativeFloat = this->wallJumpForce - this->helperWallJumpNegativeFloat;
 }
 
 			///////////////////////////////////////
@@ -164,9 +176,9 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 
 	//playerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	//playerInputComponent->BindAxis("TurnRate", this, &AMyProjectCharacter::TurnAtRate);
+	playerInputComponent->BindAxis("TurnRate", this, &AMyProjectCharacter::TurnAtRate);
 	//playerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	//playerInputComponent->BindAxis("LookUpRate", this, &AMyProjectCharacter::LookUpAtRate);
+	playerInputComponent->BindAxis("LookUpRate", this, &AMyProjectCharacter::LookUpAtRate);
 }
 
 			//////////////////////////////////////
@@ -304,11 +316,44 @@ void AMyProjectCharacter::Jump()
 		this->movementComponent->GravityScale = gravitation;	// Set Gravity
 
 		this->LaunchCharacter(									// Launch Character (Jump Up)
-			FVector(0.0f, 0.0f, 1000.0f),						// Where to Launch
+			FVector(0.0f, 0.0f, this->jumpHeight),				// Where to Launch
 			false,												// XY Override
 			true												// Z Override
 		);
 	}
+	else if (this->isWallRight == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
+		FVector sideVector = this->GetActorRightVector() * this->helperWallJumpNegativeFloat;
+		FVector launchVector = sideVector + forwardVector;
+
+		this->LaunchCharacter(FVector(
+			launchVector.X,
+			launchVector.Y, 
+			this->jumpHeightOnWall),
+			false, 
+			true
+		);
+	}
+	else if (this->isWallLeft == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
+		FVector sideVector = this->GetActorRightVector() * this->wallJumpForce;
+		FVector launchVector = sideVector + forwardVector;
+
+		this->LaunchCharacter(FVector(
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeightOnWall),
+			false,
+			true
+		);
+	}
+	//else if(this->isClimb == true)
 }
 
 void AMyProjectCharacter::EndJumping()
@@ -326,6 +371,8 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 		hit.Location,				// Noise Location
 		0.0f						// Max Range
 	);
+
+	this->WallrunEnd();
 
 }
 
@@ -368,6 +415,8 @@ void AMyProjectCharacter::SpawnBullet()
 
 	if (hitResult.IsValidBlockingHit() == true)																		// Does the RayHit?
 	{
+		UE_LOG(LogTemp, Warning, TEXT("HA"));
+
 		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 			hitResult.ImpactPoint);																					// Get Impact Point in World
@@ -385,6 +434,8 @@ void AMyProjectCharacter::SpawnBullet()
 	}
 	else																				// Ray does not hit anything
 	{
+		UE_LOG(LogTemp, Warning, TEXT("FUCK"));
+
 		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 			hitResult.TraceEnd);																					// Get Trace end in World
@@ -422,29 +473,222 @@ void AMyProjectCharacter::SpawnBullet()
 	}
 }
 
+// Wallrun (MovePlayer)
+void AMyProjectCharacter::WallrunLaunch()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UPDATE"));
+
+	FVector rayStart = this->FirstPersonCameraComponent->GetComponentTransform().GetLocation();
+	FVector rayEnd = this->FirstPersonCameraComponent->GetComponentTransform().GetRotation().GetForwardVector() * 1000 + rayStart;
+
+
+	FCollisionQueryParams rayParams = FCollisionQueryParams(FName(TEXT("WallRightParam")), true, this);		// Params for the RayCast
+	rayParams.bTraceComplex = false;
+	rayParams.bTraceAsyncScene = false;
+	rayParams.bReturnPhysicalMaterial = false;
+
+	FHitResult hitResult(ForceInit);
+
+	world->LineTraceSingleByChannel(			// Raycast
+		hitResult,								// Result
+		rayStart,								// RayStart
+		rayEnd,									// RayEnd
+		ECC_Pawn,
+		rayParams);
+
+	if (this->isWallRight == true)
+	{
+		if (hitResult.IsValidBlockingHit() == true)
+		{
+			if (hitResult.GetActor()->ActorHasTag("RunWall"))	// Wallrun if you look at wall && the wall is on your Right side
+			{
+				FVector playerPosition = this->GetTransform().GetLocation();
+				this->playerDirection = this->playerDirection * 1000;
+
+				FVector launchCharacterVector = this->wallRunDirection - playerPosition;
+				launchCharacterVector = launchCharacterVector + this->playerDirection;
+
+				this->LaunchCharacter(launchCharacterVector, true, true);
+
+				GravitationOff();
+			}
+			else												// wallrun if u dont look at wall && the wall is on your Right side
+			{
+				this->playerDirection = this->playerDirection * 1000;
+				FVector launchCharacterVector = this->playerRightVector * 1000 + this->playerDirection;
+
+				this->LaunchCharacter(launchCharacterVector, true, true);
+
+				GravitationOff();
+			}
+		}
+		else
+		{
+			this->playerDirection = this->playerDirection * 1000;
+			FVector launchCharacterVector = this->playerRightVector * 1000 + this->playerDirection;
+
+			this->LaunchCharacter(launchCharacterVector, true, true);
+
+			GravitationOff();
+		}
+	}
+	else
+	{
+		if (hitResult.IsValidBlockingHit() == true)
+		{
+			if (hitResult.GetActor()->ActorHasTag("RunWall"))	// Wallrun if you look at wall && the wall is on your Left side
+			{
+				FVector playerPosition = this->GetTransform().GetLocation();
+				this->playerDirection = this->playerDirection * 1000;
+
+				FVector launchCharacterVector = this->wallRunDirection - playerPosition;
+				launchCharacterVector = launchCharacterVector + this->playerDirection;
+
+				this->LaunchCharacter(launchCharacterVector, true, true);
+
+				GravitationOff();
+			}
+			else
+			{
+				this->playerDirection = this->playerDirection * 1000;
+				FVector launchCharacterVector = this->playerRightVector * -1000 + this->playerDirection;
+
+				this->LaunchCharacter(launchCharacterVector, true, true);
+
+				GravitationOff();
+			}
+		}
+		else
+		{
+			this->playerDirection = this->playerDirection * 1000;
+			FVector launchCharacterVector = this->playerRightVector * -1000 + this->playerDirection;
+
+			this->LaunchCharacter(launchCharacterVector, true, true);
+
+			GravitationOff();
+		}
+	}
+}
+
+//// Called after LaunchCharacter
+void AMyProjectCharacter::GravitationOff()
+{
+	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 1.0f));
+	this->movementComponent->GravityScale = 0.2f;
+	this->movementComponent->AirControl = 0.0;
+
+	this->wallrunTimeline->Stop();
+
+	world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::WallrunRetriggerableDelay, this->wallrunDuration, false);
+
+}
+
+void AMyProjectCharacter::WallrunRetriggerableDelay()
+{
+	this->isOnWall = false;
+
+	if (this->wallrunDoOnce == true)
+	{
+		this->wallrunDoOnce = false;
+
+		if (this->movementComponent->IsFalling() == true)
+		{
+			this->isWallRight = false;
+			this->isWallLeft = false;
+		}
+	}
+}
+
+
+// Resets Values
+void AMyProjectCharacter::WallrunEnd()
+{
+	this->movementComponent->GravityScale = this->gravitation;
+	this->movementComponent->AirControl = this->airControll;
+	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 0.0f));
+	this->isOnWall = false;
+	this->isWallRight = false;
+	this->isWallLeft = false;
+	this->wallrunDoOnce = true;
+}
+
 						//////////////////////////////////////
 						//////////	  Collision     //////////
 						//////////////////////////////////////
 
+/// Main Start Walldetection
 void AMyProjectCharacter::OnWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
+{
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /*&& Wallclimb false */)		// Check if the Wall has the right TAG and if the player is in the air
+	{
+		this->isOnWall = true;																					// Set the Wallrun State
+		this->wallCollisionCounter = 0;																			// Set the Wallruncounter back to 0 (Colliding bug prevention) 
+		this->wallCollisionCounter++;																			// Count the Wallruncounter 1 up
+		this->playerDirection = FirstPersonCameraComponent->GetForwardVector();									// safe the Playerdirection for the CharacterLaunch
+		this->playerRightVector = FirstPersonCameraComponent->GetRightVector();									// safe the PlayersRightVector for the ChracterLaunch
+		
+		this->wallrunTimeline->Play();																			// Start the Timeline
+	}
+}
+/// Main End Walldetection
+void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
 	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling())
 	{
-		this->onWall = true;
-		this->wallCollisionCounter = 0;
-		this->wallCollisionCounter++;
-		FVector playerDirection = FirstPersonCameraComponent->GetForwardVector();
-		FVector playerRightVector = FirstPersonCameraComponent->GetRightVector();
+		this->wallrunTimeline->Stop();
 
-		wallrunTimeline->Play();
+		if (this->wallCollisionCounter >= 1)
+		{
+			this->wallCollisionCounter--;
 
-		
+			if (this->wallCollisionCounter == 0)
+			{
+				this->WallrunEnd();
+			}
+		}
 	}
 }
 
-void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
+/// Right Walldetector Begin
+void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
+{
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	{
+		this->isWallLeft = false;					// set the bool false so it only can on of them be true (safty first)
+		this->isWallRight = true;					
+
+	}
+}
+/// Right Walldetector End
+void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
+{
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	{
+		this->isWallLeft = false;					
+		this->isWallRight = false;
+
+	}
+}
+
+/// Left Walldetector Begin
+void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
 
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	{
+		this->isWallRight = false;						// set the bool false so it only can on of them be true (safty first)
+		this->isWallLeft = true;					
+	}
+}
+/// Left Walldetector End
+void AMyProjectCharacter::EndLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
+{
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	{
+		this->isWallLeft = false;
+		this->isWallRight = false;
+
+	}
 }
 
 
@@ -452,12 +696,110 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 						//////////	   Timeline     //////////
 						//////////////////////////////////////
 
-void AMyProjectCharacter::WallrunFloatReturn(float value)
+///Wallrun
+void AMyProjectCharacter::WallrunFloatReturn(float value)											// This Updates the Timeline
 {
-	UE_LOG(LogTemp, Warning, TEXT("FUCK 2"));
-}
+	if (this->isOnWall == true)
+	{
+		if (this->isWallRight == true)
+		{
 
-void AMyProjectCharacter::WallrunUpdate()
-{
-	UE_LOG(LogTemp, Warning, TEXT("FUCK"));
+			FVector rayStartFindWall = this->GetActorTransform().GetLocation();
+			FVector rayEndFindWall = this->GetActorTransform().GetRotation().GetRightVector();
+			rayEndFindWall = rayEndFindWall * 150.0f;
+			rayEndFindWall = rayEndFindWall + rayStartFindWall;
+
+			FCollisionQueryParams rayParams = FCollisionQueryParams(FName(TEXT("WallRightParam")), true, this);		// Params for the RayCast
+			rayParams.bTraceComplex = false;
+			rayParams.bTraceAsyncScene = false;
+			rayParams.bReturnPhysicalMaterial = false;
+			rayParams.bIgnoreBlocks = false;
+
+			FHitResult hitResult(ForceInit);
+
+			bool hit = world->LineTraceSingleByChannel(			// Raycast
+				hitResult,										// Result
+				rayStartFindWall,								// RayStart
+				rayEndFindWall,									// RayEnd
+				ECC_Pawn,
+				rayParams);
+			
+			if (hitResult.IsValidBlockingHit() == true)
+			{
+				if (hitResult.GetActor()->ActorHasTag("RunWall"))
+				{
+					FVector rayHitLocation = hitResult.Location;
+					FVector wallForwardVector = hitResult.GetActor()->GetTransform().GetRotation().GetForwardVector() * 10;
+					FVector wallBackwardsVector = hitResult.GetActor()->GetTransform().GetRotation().GetForwardVector() * -10;
+					FVector cameraRotation = this->FirstPersonCameraComponent->GetComponentTransform().GetRotation().GetForwardVector() * 1000 + this->FirstPersonCameraComponent->GetComponentTransform().GetLocation();
+					wallForwardVector = wallForwardVector + rayHitLocation;
+					wallBackwardsVector = wallBackwardsVector + rayHitLocation;
+
+					FVector forwardVector = cameraRotation - wallForwardVector;
+					FVector backwardsVector = cameraRotation - wallBackwardsVector;
+
+					if (forwardVector.Size() < backwardsVector.Size())
+					{
+						this->wallRunDirection = wallForwardVector;
+						this->WallrunLaunch();
+					}
+					else
+					{
+						this->wallRunDirection = wallBackwardsVector;
+						this->WallrunLaunch();
+					}
+
+				}
+			}
+		}
+		else if (this->isWallLeft == true)
+		{
+			FVector rayStart = this->GetActorTransform().GetLocation();
+			FVector rayEnd = this->GetActorTransform().GetRotation().GetRightVector();
+			rayEnd = rayEnd * -150.0f;
+			rayEnd = rayEnd + rayStart;
+
+			FCollisionQueryParams rayParams = FCollisionQueryParams(FName(TEXT("WallRightParam")), true, this);		// Params for the RayCast
+			rayParams.bTraceComplex = false;
+			rayParams.bTraceAsyncScene = false;
+			rayParams.bReturnPhysicalMaterial = false;
+			rayParams.bIgnoreBlocks = false;
+
+			FHitResult hitResult(ForceInit);
+
+			world->LineTraceSingleByChannel(	// Raycast
+				hitResult,						// Result
+				rayStart,						// RayStart
+				rayEnd,							// RayEnd
+				ECC_Pawn,
+				rayParams);
+
+			if (hitResult.IsValidBlockingHit() == true)
+			{
+				if (hitResult.GetActor()->ActorHasTag("RunWall"))
+				{
+					FVector rayHitLocation = hitResult.Location;
+					FVector wallForwardVector = hitResult.GetActor()->GetTransform().GetRotation().GetForwardVector() * 10;
+					FVector wallBackwardsVector = hitResult.GetActor()->GetTransform().GetRotation().GetForwardVector() * -10;
+					FVector cameraRotation = this->FirstPersonCameraComponent->GetComponentTransform().GetRotation().GetForwardVector() * 1000 + this->FirstPersonCameraComponent->GetComponentTransform().GetLocation();
+					wallForwardVector = wallForwardVector + rayHitLocation;
+					wallBackwardsVector = wallBackwardsVector + rayHitLocation;
+
+					FVector forwardVector = cameraRotation - wallForwardVector;
+					FVector backwardsVector = cameraRotation - wallBackwardsVector;
+
+					if (forwardVector.Size() < backwardsVector.Size())
+					{
+						this->wallRunDirection = wallForwardVector;
+						this->WallrunLaunch();
+					}
+					else
+					{
+						this->wallRunDirection = wallBackwardsVector;
+						this->WallrunLaunch();
+					}
+				}
+			}
+		}
+	}
 }

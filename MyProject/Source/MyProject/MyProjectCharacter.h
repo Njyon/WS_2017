@@ -36,12 +36,19 @@ class AMyProjectCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, Category = Mesh)
 		class USceneComponent* FP_MuzzleLocation;
 
+								//////// Timelines ////////
 	UPROPERTY()
-		class UTimelineComponent* wallrunTimeline;
+		class UTimelineComponent* wallrunTimeline;			// Wallrun main Timeline
 
-	// Box collision to Detect Walls
+								//////// Collision ////////
 	UPROPERTY(EditAnywhere, Category = Detectors)
-		class UBoxComponent* wallDetector;
+		class UBoxComponent* wallDetector;					// Wallrun main walldetector
+
+	UPROPERTY(EditAnywhere, Category = Detectors)
+		class UBoxComponent* wallRightDetector;				// Wallrun right Detector
+
+	UPROPERTY(EditAnywhere, Category = Detectors)
+		class UBoxComponent* wallLeftDetector;				// Wallrun left Detector
 
 
 public:								////// PUBLIC //////
@@ -56,6 +63,18 @@ public:								////// PUBLIC //////
 		float firerateNoSlomo = 0.3f;											//Set Fire Rate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float gravitation;														// Set Gravitation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float wallrunDuration;													// Set Wallrun Duration
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float airControll;														// Set AirControll
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float wallJumpForce;													// Set the force to Jump from the wall
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float wallJumpForceForward;												// Set the force to Jump from the wall in View direction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float jumpHeight;														// Set Jump Height
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float jumpHeightOnWall;													// Set Jump Height on Wall
 
 	// is Slomo Active or Deactive
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Slomo)
@@ -106,21 +125,18 @@ public:								////// PUBLIC //////
 										// UFUNCTION //
 
 	/// Input
-	void LMBPressed(); // Left Mouse Button Pressed
+	void LMBPressed();	// Left Mouse Button Pressed
 	void LMBReleased(); // Left Mouse Button Released
-	void RMBPressed(); // Right Mouse Button Pressed
+	void RMBPressed();	// Right Mouse Button Pressed
 	void RMBReleased(); // Right Mouse Button Released
-	void Jump();
-	void EndJumping();
+	void Jump();		// Spacebar Pressed
+	void EndJumping();	// Spacebar Released
 
-	virtual void Landed(const FHitResult& hit) override;
+	virtual void Landed(const FHitResult& hit) override;			// Character touched the ground event
 
 	
 	UFUNCTION()
 		void WallrunFloatReturn(float value);
-
-	UFUNCTION()
-		void WallrunUpdate();
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -131,26 +147,43 @@ private:								////// PRIVATE //////
 
 											// UPROPERTY //
 	///DataType
-	int wallCollisionCounter = 0;
-	float HAxis;	// Horizontal Axis
-	float VAxis;	// Vertical Axis
+	int wallCollisionCounter = 0;				// Wallruncounter (prevents bug)
+	float HAxis;								// Horizontal Axis
+	float VAxis;								// Vertical Axis
+	float helperWallJumpNegativeFloat = 0;
 	bool isLMBPressed;
 	bool isBulletFired = false;
-	bool isShootingInNormalSpeed; // Check you switched the Time Dilation
-	bool onWall = false;
+	bool isShootingInNormalSpeed;				// Check you switched the Time Dilation
+	bool isOnWall = false;						// is on wall?
+	bool isWallRight = false;					// is on wall Right?
+	bool isWallLeft = false;					// is on wall Left?
+	bool wallrunDoOnce = true;
 	
 	///Struct
-	FTimerHandle timeHandle;
-	FBodyInstance* camRay; //RayCast from Camera
+	FVector wallRunDirection;
+	FVector playerDirection;
+	FVector playerRightVector;
+	FTimerHandle timeHandle;	// needed for set Timer
+	FTimerHandle wallrunHandle;
+	FBodyInstance* camRay;		//RayCast from Camera
 	///Class
 	class UCharacterMovementComponent* movementComponent; // Movement Component
-	class UWorld* world;
+	class UWorld* world;	// Safe the world
 
 											// UFUNCTION //
 
-	void SpawnBullet();
-	void BulletCooldown();
+	void SpawnBullet();		// Spawns the bullet Blueprint
+	void BulletCooldown();	// Sets the isBulletFired bool
+	void WallrunLaunch();
+	void GravitationOff();
+	void WallrunRetriggerableDelay();
+	void WallrunEnd();
 
+	///////////////////
+	//// Collision ////
+	///////////////////
+
+	/// Main Wallrun detector Collision
 	UFUNCTION()
 	void OnWallDetected(
 		class UPrimitiveComponent* hitComp,
@@ -160,7 +193,6 @@ private:								////// PRIVATE //////
 		bool fromSweep, 
 		const FHitResult & sweepResult
 	);
-
 	UFUNCTION()
 	void EndWallDetected(
 		class UPrimitiveComponent* hitComp,
@@ -168,6 +200,43 @@ private:								////// PRIVATE //////
 		class UPrimitiveComponent* otherComp,
 		int32 otherBodyIndex
 	);
+
+	/// Right Wallrun detector Collsision
+	UFUNCTION()
+		void OnRightWallDetected(
+			class UPrimitiveComponent* hitComp,
+			class AActor* otherActor,
+			class UPrimitiveComponent* otherComp,
+			int32 otherBodyIndex,
+			bool fromSweep,
+			const FHitResult & sweepResult
+		);
+	UFUNCTION()
+		void EndRightWallDetected(
+			class UPrimitiveComponent* hitComp,
+			class AActor* otherActor,
+			class UPrimitiveComponent* otherComp,
+			int32 otherBodyIndex
+		);
+
+	/// Left Wallrun detector Collsision
+	UFUNCTION()
+		void OnLeftWallDetected(
+			class UPrimitiveComponent* hitComp,
+			class AActor* otherActor,
+			class UPrimitiveComponent* otherComp,
+			int32 otherBodyIndex,
+			bool fromSweep,
+			const FHitResult & sweepResult
+		);
+	UFUNCTION()
+		void EndLeftWallDetected(
+			class UPrimitiveComponent* hitComp,
+			class AActor* otherActor,
+			class UPrimitiveComponent* otherComp,
+			int32 otherBodyIndex
+		);
+
 
 protected:								////// Protected //////
 	virtual void BeginPlay(); //Executes at Begin+
