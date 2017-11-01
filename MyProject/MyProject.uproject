@@ -13,5 +13,8 @@
 				"Engine"
 			]
 		}
+	],
+	"AdditionalPluginDirectories": [
+		"Intermediate/Plugins"
 	]
 }
