@@ -105,6 +105,7 @@ AMyProjectCharacter::AMyProjectCharacter()
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
 
 	movementComponent = GetCharacterMovement();					// Get the CharacterMovement Component
+	capsuleComponent = GetCapsuleComponent();
 	world = GetWorld();											// Get World
 
 	// Main Wallrun detector
@@ -127,6 +128,10 @@ AMyProjectCharacter::AMyProjectCharacter()
 
 	// Main Wallrun Timeline
 	wallrunTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("WallrunTimeline"));
+
+	// Slide Timeline
+	slideheightTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("slideheightTimeline"));
+	slideradiusTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("slideradiusTimeline"));
 }
 
 			//////////////////////////////////////
@@ -143,11 +148,22 @@ void AMyProjectCharacter::BeginPlay()
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 	this->movementComponent->SetPlaneConstraintEnabled(true);
+	
 
 	// Declare Delegate function to be binded with wallrunFloatReturn(float value)
 	FOnTimelineFloat WallrunUpdate;
 
 	WallrunUpdate.BindUFunction(this, FName("WallrunFloatReturn"));
+
+	// Declare Delegate function to be binded with SlideHeightFloatReturn(float value)
+	FOnTimelineFloat SlideHeightUpdate;
+
+	SlideHeightUpdate.BindUFunction(this, FName("SlideHeightFloatReturn"));
+
+	// Declare Delegate function to be binded with SlideRadiusFloatReturn(float value)
+	FOnTimelineFloat SlideRadiusUpdate;
+
+	SlideRadiusUpdate.BindUFunction(this, FName("SlideRadiusFloatReturn"));
 
 	// Check if Curve asset it valid
 	if (this->wallrunCurve)
@@ -156,6 +172,22 @@ void AMyProjectCharacter::BeginPlay()
 
 		wallrunTimeline->SetLooping(true);
 		wallrunTimeline->SetIgnoreTimeDilation(false);
+	}
+
+	if (this->heightCurve)
+	{
+		slideheightTimeline->AddInterpFloat(this->heightCurve, SlideHeightUpdate, FName("slideheightTimeline"));
+		
+		slideheightTimeline->SetLooping(false);
+		slideheightTimeline->SetIgnoreTimeDilation(true);
+	}
+
+	if (this->radiusCurve)
+	{
+		slideradiusTimeline->AddInterpFloat(this->radiusCurve, SlideRadiusUpdate, FName("slideradiusTimeline"));
+		
+		slideradiusTimeline->SetLooping(false);
+		slideradiusTimeline->SetIgnoreTimeDilation(true);
 	}
 
 	this->helperWallJumpNegativeFloat = this->wallJumpForce * 2;
@@ -218,6 +250,9 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	/// Input Right Mouse Button
 	playerInputComponent->BindAction("Slomo", IE_Pressed, this, &AMyProjectCharacter::RMBPressed);
 	playerInputComponent->BindAction("Slomo", IE_Released, this, &AMyProjectCharacter::RMBReleased);
+	///	Input left Shift
+	playerInputComponent->BindAction("Slide", IE_Pressed, this, &AMyProjectCharacter::Slide);
+	playerInputComponent->BindAction("Slide", IE_Released, this, &AMyProjectCharacter::EndSlide);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
@@ -445,6 +480,60 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 
 	this->WallrunEnd();
 
+}
+
+					// Keyboard left Shift //
+
+
+void AMyProjectCharacter::Slide()
+{
+	acceleration = this->movementComponent->GetCurrentAcceleration();
+	ishiftButtonPressed = true;
+	if (acceleration != FVector(0,0,0))
+	{
+		sliding = true;
+		this->movementComponent->GroundFriction = 0.0f;
+		this->movementComponent->BrakingDecelerationWalking = 0.0f;
+		this->movementComponent->BrakingFrictionFactor = 0.0f;
+
+		this->playerDirection = this->playerDirection * 1000;
+		FVector launchCharacterVector = this->playerRightVector * 1000 + this->playerDirection;
+		this->LaunchCharacter(launchCharacterVector, true, true);
+		SlideCam();
+	}
+	else if (acceleration == FVector(0, 0, 0))
+	{
+		this->movementComponent->MaxAcceleration = 1500;
+		this->movementComponent->MaxWalkSpeed = 400;
+		SlideCam();
+	}
+}
+
+void AMyProjectCharacter::EndSlide()
+{
+	ishiftButtonPressed = false;
+	this->movementComponent->MaxAcceleration = 3000;
+	this->movementComponent->MaxWalkSpeed = 600;
+	sliding = false;
+	this->movementComponent->GroundFriction = 8;
+	this->movementComponent->BrakingDecelerationWalking = 2048;
+	this->movementComponent->BrakingFrictionFactor = 2;
+	RevertedSlideCam();
+}
+
+void AMyProjectCharacter::SlideCam()
+{
+	this->movementComponent->GravityScale = gravitation;
+	slideradiusTimeline->PlayFromStart();
+	slideheightTimeline->PlayFromStart();
+
+}
+
+void AMyProjectCharacter::RevertedSlideCam()
+{
+	slideradiusTimeline->ReverseFromEnd();
+	slideheightTimeline->ReverseFromEnd();
+	this->movementComponent->GravityScale = gravitation;
 }
 
 
@@ -878,5 +967,31 @@ void AMyProjectCharacter::WallrunFloatReturn(float value)											// This Upda
 				}
 			}
 		}
+	}
+}
+
+void AMyProjectCharacter::SlideHeightFloatReturn(float height)
+{
+	UE_LOG(LogTemp, Warning, TEXT("height: %f"), height);
+	if (sliding)
+	{
+		this->capsuleComponent->SetCapsuleHalfHeight(height, true);
+	}
+	else if(!sliding)
+	{
+		this->capsuleComponent->SetCapsuleHalfHeight(height, true);
+	}
+}
+
+void AMyProjectCharacter::SlideRadiusFloatReturn(float radius)
+{
+	UE_LOG(LogTemp, Warning, TEXT("radius: %f"), radius);
+	if (sliding)
+	{
+		this->capsuleComponent->SetCapsuleRadius(radius, true);
+	}
+	else if (!sliding)
+	{
+		this->capsuleComponent->SetCapsuleRadius(radius, true);
 	}
 }

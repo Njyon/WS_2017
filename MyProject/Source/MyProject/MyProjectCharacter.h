@@ -40,6 +40,12 @@ class AMyProjectCharacter : public ACharacter
 	UPROPERTY()
 		class UTimelineComponent* wallrunTimeline;			// Wallrun main Timeline
 
+	UPROPERTY()
+		class UTimelineComponent* slideheightTimeline;		//slide height Timeline
+	
+	UPROPERTY()												//slide radius Timeline
+		class UTimelineComponent* slideradiusTimeline;
+
 								//////// Collision ////////
 	UPROPERTY(EditAnywhere, Category = Detectors)
 		class UBoxComponent* wallDetector;					// Wallrun main walldetector
@@ -93,7 +99,7 @@ public:								////// PUBLIC //////
 		float BaseLookUpRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	float Health = 100.0f;
+		float Health = 100.0f;
 
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
@@ -116,6 +122,12 @@ public:								////// PUBLIC //////
 
 	UPROPERTY(EditAnywhere, Category = Timeline)
 		class UCurveFloat* wallrunCurve;
+
+	UPROPERTY(EditAnywhere, Category = Timeline)
+		class UCurveFloat* heightCurve;
+
+	UPROPERTY(EditAnywhere, Category = Timeline)
+		class UCurveFloat* radiusCurve;
 
 										// Sounds //
 
@@ -165,6 +177,8 @@ public:								////// PUBLIC //////
 	void RMBReleased(); // Right Mouse Button Released
 	void Jump();		// Spacebar Pressed
 	void EndJumping();	// Spacebar Released
+	void Slide();		// left Shift Preessed
+	void EndSlide();	// left Shift Released
 
 	virtual void Landed(const FHitResult& hit) override;			// Character touched the ground event
 
@@ -173,6 +187,12 @@ public:								////// PUBLIC //////
 
 	UFUNCTION()
 		void WallrunFloatReturn(float value);
+
+	UFUNCTION()
+		void SlideHeightFloatReturn(float height);
+
+	UFUNCTION()
+		void SlideRadiusFloatReturn(float radius);
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -195,8 +215,11 @@ private:								////// PRIVATE //////
 	bool isWallRight = false;					// is on wall Right?
 	bool isWallLeft = false;					// is on wall Left?
 	bool wallrunDoOnce = true;
+	bool ishiftButtonPressed = false;
+	bool sliding = false;
 	
 	///Struct
+	FVector acceleration;
 	FVector wallRunDirection;
 	FVector playerDirection;
 	FVector playerRightVector;
@@ -205,6 +228,7 @@ private:								////// PRIVATE //////
 	FBodyInstance* camRay;		//RayCast from Camera
 	///Class
 	class UCharacterMovementComponent* movementComponent; // Movement Component
+	class UCapsuleComponent* capsuleComponent;
 	class UWorld* world;	// Safe the world
 
 											// UFUNCTION //
@@ -215,6 +239,8 @@ private:								////// PRIVATE //////
 	void GravitationOff();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
+	void SlideCam();
+	void RevertedSlideCam();
 
 	///////////////////
 	//// Collision ////
