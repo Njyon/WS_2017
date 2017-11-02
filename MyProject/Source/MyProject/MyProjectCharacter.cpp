@@ -15,6 +15,7 @@
 #include "ConstructorHelpers.h"
 #include "Engine.h"
 #include "Components/TimelineComponent.h"
+#include "UnrealMathUtility.h"
 ///Our Stuff
 #include "MyProject/MyProjectProjectile.h"
 
@@ -127,6 +128,10 @@ AMyProjectCharacter::AMyProjectCharacter()
 
 	// Main Wallrun Timeline
 	wallrunTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("WallrunTimeline"));
+	// TiltCam Right Timeline
+	camTiltRightTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("CamTiltRightTimeline"));
+	// TiltCam Left Timeline
+	camTiltLeftTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("CamTiltLeftTimeline"));
 }
 
 			//////////////////////////////////////
@@ -139,23 +144,45 @@ void AMyProjectCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	
+	this->movementComponent->SetPlaneConstraintEnabled(true);								// Enable PlaneContraint (Used for the wallrun)
+	playerController = UGameplayStatics::GetPlayerController(world, 0);						// GetPlayerController
 
-	this->movementComponent->SetPlaneConstraintEnabled(true);
-
-	// Declare Delegate function to be binded with wallrunFloatReturn(float value)
+	
+	// Declare Delegate function to be binded with WallrunFloatReturn(float value)
 	FOnTimelineFloat WallrunUpdate;
-
 	WallrunUpdate.BindUFunction(this, FName("WallrunFloatReturn"));
+	// Declare Delegate function to be binded with TiltCamRightFloatReturn(float value)
+	FOnTimelineFloat camTiltRightUpdate;
+	camTiltRightUpdate.BindUFunction(this, FName("TiltCamRightFloatReturn"));
+	// Declare Delegate function to be binded with TiltCamLeftFloatReturn(float value)
+	FOnTimelineFloat camTiltLeftUpdate;
+	camTiltLeftUpdate.BindUFunction(this, FName("TiltCamLeftFloatReturn"));
 
-	// Check if Curve asset it valid
+	// Check if Curve asset isValid
 	if (this->wallrunCurve)
 	{
-		wallrunTimeline->AddInterpFloat(this->wallrunCurve, WallrunUpdate, FName("wallrunTimeline"));
+		wallrunTimeline->AddInterpFloat(this->wallrunCurve, WallrunUpdate, FName("wallrunTimeline"));		// Set the Curve to the Delegate
 
 		wallrunTimeline->SetLooping(true);
 		wallrunTimeline->SetIgnoreTimeDilation(false);
+	}
+	// Check if Curve asset isValid
+	if (this->tiltCamRightCurve)
+	{
+		camTiltRightTimeline->AddInterpFloat(this->tiltCamRightCurve, camTiltRightUpdate, FName("camTiltRightTimeline"));		// Set the Curve to the Delegate
+
+		camTiltRightTimeline->SetIgnoreTimeDilation(true);					// Ignores TimeDelation (TEST)
+		camTiltRightTimeline->SetPlayRate(5);
+	}
+	// Check if Curve asset isValid
+	if (this->tiltCamLeftCurve)
+	{
+		camTiltLeftTimeline->AddInterpFloat(this->tiltCamLeftCurve, camTiltLeftUpdate, FName("camTiltLeftTimeline"));			// Set the Curve to the Delegate
+
+		camTiltLeftTimeline->SetIgnoreTimeDilation(true);					// Ignores TimeDelation (TEST)
+		camTiltLeftTimeline->SetPlayRate(5);
 	}
 
 	this->helperWallJumpNegativeFloat = this->wallJumpForce * 2;
@@ -379,7 +406,8 @@ void AMyProjectCharacter::MoveRight(float value)
 
 						// Keyboard SpaceBar //
 
-/// Jump
+							//// Jump ////
+
 void AMyProjectCharacter::Jump()
 {
 	if (this->movementComponent->IsMovingOnGround() == true)
@@ -400,7 +428,7 @@ void AMyProjectCharacter::Jump()
 		FVector sideVector = this->GetActorRightVector() * this->helperWallJumpNegativeFloat;
 		FVector launchVector = sideVector + forwardVector;
 
-		this->LaunchCharacter(FVector(
+		this->LaunchCharacter(FVector(							// Jump when wall is on you right side
 			launchVector.X,
 			launchVector.Y, 
 			this->jumpHeightOnWall),
@@ -416,7 +444,7 @@ void AMyProjectCharacter::Jump()
 		FVector sideVector = this->GetActorRightVector() * this->wallJumpForce;
 		FVector launchVector = sideVector + forwardVector;
 
-		this->LaunchCharacter(FVector(
+		this->LaunchCharacter(FVector(						// Jump when wall is on your Left side
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWall),
@@ -429,7 +457,7 @@ void AMyProjectCharacter::Jump()
 
 void AMyProjectCharacter::EndJumping()
 {
-	this->StopJumping();
+	this->StopJumping();					// Unreal Function
 }
 
 void AMyProjectCharacter::Landed(const FHitResult& hit) 
@@ -486,8 +514,6 @@ void AMyProjectCharacter::SpawnBullet()
 
 	if (hitResult.IsValidBlockingHit() == true)																		// Does the RayHit?
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HA"));
-
 		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 			hitResult.ImpactPoint);																					// Get Impact Point in World
@@ -508,8 +534,6 @@ void AMyProjectCharacter::SpawnBullet()
 	}
 	else																				// Ray does not hit anything
 	{
-		UE_LOG(LogTemp, Warning, TEXT("FUCK"));
-
 		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 			hitResult.TraceEnd);																					// Get Trace end in World
@@ -553,8 +577,6 @@ void AMyProjectCharacter::SpawnBullet()
 // Wallrun (MovePlayer)
 void AMyProjectCharacter::WallrunLaunch()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UPDATE"));
-
 	FVector rayStart = this->FirstPersonCameraComponent->GetComponentTransform().GetLocation();
 	FVector rayEnd = this->FirstPersonCameraComponent->GetComponentTransform().GetRotation().GetForwardVector() * 1000 + rayStart;
 
@@ -585,7 +607,7 @@ void AMyProjectCharacter::WallrunLaunch()
 				FVector launchCharacterVector = this->wallRunDirection - playerPosition;
 				launchCharacterVector = launchCharacterVector + this->playerDirection;
 
-				this->LaunchCharacter(launchCharacterVector, true, true);
+				this->LaunchCharacter(launchCharacterVector, true, true);			// Launches Character in the Desiert Direction
 
 				GravitationOff();
 			}
@@ -594,7 +616,7 @@ void AMyProjectCharacter::WallrunLaunch()
 				this->playerDirection = this->playerDirection * 1000;
 				FVector launchCharacterVector = this->playerRightVector * 1000 + this->playerDirection;
 
-				this->LaunchCharacter(launchCharacterVector, true, true);
+				this->LaunchCharacter(launchCharacterVector, true, true);			// Launches Character in the Desiert Direction
 
 				GravitationOff();
 			}
@@ -604,7 +626,7 @@ void AMyProjectCharacter::WallrunLaunch()
 			this->playerDirection = this->playerDirection * 1000;
 			FVector launchCharacterVector = this->playerRightVector * 1000 + this->playerDirection;
 
-			this->LaunchCharacter(launchCharacterVector, true, true);
+			this->LaunchCharacter(launchCharacterVector, true, true);				// Launches Character in the Desiert Direction
 
 			GravitationOff();
 		}
@@ -621,7 +643,7 @@ void AMyProjectCharacter::WallrunLaunch()
 				FVector launchCharacterVector = this->wallRunDirection - playerPosition;
 				launchCharacterVector = launchCharacterVector + this->playerDirection;
 
-				this->LaunchCharacter(launchCharacterVector, true, true);
+				this->LaunchCharacter(launchCharacterVector, true, true);			// Launches Character in the Desiert Direction
 
 				GravitationOff();
 			}
@@ -630,7 +652,7 @@ void AMyProjectCharacter::WallrunLaunch()
 				this->playerDirection = this->playerDirection * 1000;
 				FVector launchCharacterVector = this->playerRightVector * -1000 + this->playerDirection;
 
-				this->LaunchCharacter(launchCharacterVector, true, true);
+				this->LaunchCharacter(launchCharacterVector, true, true);			// Launches Character in the Desiert Direction
 
 				GravitationOff();
 			}
@@ -640,7 +662,7 @@ void AMyProjectCharacter::WallrunLaunch()
 			this->playerDirection = this->playerDirection * 1000;
 			FVector launchCharacterVector = this->playerRightVector * -1000 + this->playerDirection;
 
-			this->LaunchCharacter(launchCharacterVector, true, true);
+			this->LaunchCharacter(launchCharacterVector, true, true);				// Launches Character in the Desiert Direction
 
 			GravitationOff();
 		}
@@ -650,9 +672,9 @@ void AMyProjectCharacter::WallrunLaunch()
 //// Called after LaunchCharacter
 void AMyProjectCharacter::GravitationOff()
 {
-	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 1.0f));
-	this->movementComponent->GravityScale = 0.2f;
-	this->movementComponent->AirControl = 0.0;
+	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 1.0f));			// Locks the Axis
+	this->movementComponent->GravityScale = 0.2f;											// can be 0.0f aswell 
+	this->movementComponent->AirControl = 0.0;												// Player Cant control in the Air
 
 	this->wallrunTimeline->Stop();
 
@@ -660,6 +682,7 @@ void AMyProjectCharacter::GravitationOff()
 
 }
 
+// The Delay ends the Wallrun, can be retrigged by switching the wall
 void AMyProjectCharacter::WallrunRetriggerableDelay()
 {
 	this->isOnWall = false;
@@ -672,12 +695,15 @@ void AMyProjectCharacter::WallrunRetriggerableDelay()
 		{
 			this->isWallRight = false;
 			this->isWallLeft = false;
+
+			this->camTiltRightTimeline->Reverse();
+			this->camTiltLeftTimeline->Reverse();
 		}
 	}
 }
 
 
-// Resets Values
+// Resets Values to Normal
 void AMyProjectCharacter::WallrunEnd()
 {
 	this->movementComponent->GravityScale = this->gravitation;
@@ -712,15 +738,15 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 {
 	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling())
 	{
-		this->wallrunTimeline->Stop();
+		this->wallrunTimeline->Stop();																			// Stops Timeline
 
 		if (this->wallCollisionCounter >= 1)
 		{
-			this->wallCollisionCounter--;
+			this->wallCollisionCounter--;																		// Decrements Counter when its higher than 0
 
 			if (this->wallCollisionCounter == 0)
 			{
-				this->WallrunEnd();
+				this->WallrunEnd();																				// Call End Wallrun
 			}
 		}
 	}
@@ -732,8 +758,13 @@ void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp
 	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
 	{
 		this->isWallLeft = false;					// set the bool false so it only can on of them be true (safty first)
-		this->isWallRight = true;					
+		this->isWallRight = true;	
 
+		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
+		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, -20.0f);
+		this->normalCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 0.0f);
+
+		this->camTiltRightTimeline->Play();
 	}
 }
 /// Right Walldetector End
@@ -744,6 +775,11 @@ void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitCom
 		this->isWallLeft = false;					
 		this->isWallRight = false;
 
+		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
+		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, -20.0f);
+		this->normalCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 0.0f);
+
+		this->camTiltRightTimeline->Reverse();
 	}
 }
 
@@ -754,7 +790,13 @@ void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp,
 	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
 	{
 		this->isWallRight = false;						// set the bool false so it only can on of them be true (safty first)
-		this->isWallLeft = true;					
+		this->isWallLeft = true;		
+
+		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
+		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 20.0f);
+		this->normalCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 0.0f);
+
+		this->camTiltLeftTimeline->Play();
 	}
 }
 /// Left Walldetector End
@@ -765,6 +807,11 @@ void AMyProjectCharacter::EndLeftWallDetected(class UPrimitiveComponent* hitComp
 		this->isWallLeft = false;
 		this->isWallRight = false;
 
+		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
+		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 20.0f);
+		this->normalCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 0.0f);
+
+		this->camTiltLeftTimeline->Reverse();
 	}
 }
 
@@ -815,7 +862,7 @@ void AMyProjectCharacter::WallrunFloatReturn(float value)											// This Upda
 					FVector forwardVector = cameraRotation - wallForwardVector;
 					FVector backwardsVector = cameraRotation - wallBackwardsVector;
 
-					if (forwardVector.Size() < backwardsVector.Size())
+					if (forwardVector.Size() < backwardsVector.Size())	// Check in witch direction the player is watching (Set the Vector that is Closer) 
 					{
 						this->wallRunDirection = wallForwardVector;
 						this->WallrunLaunch();
@@ -865,7 +912,7 @@ void AMyProjectCharacter::WallrunFloatReturn(float value)											// This Upda
 					FVector forwardVector = cameraRotation - wallForwardVector;
 					FVector backwardsVector = cameraRotation - wallBackwardsVector;
 
-					if (forwardVector.Size() < backwardsVector.Size())
+					if (forwardVector.Size() < backwardsVector.Size())	// Check in witch direction the player is watching (Set the Vector that is Closer) 
 					{
 						this->wallRunDirection = wallForwardVector;
 						this->WallrunLaunch();
@@ -878,5 +925,37 @@ void AMyProjectCharacter::WallrunFloatReturn(float value)											// This Upda
 				}
 			}
 		}
+	}
+}
+
+void AMyProjectCharacter::TiltCamRightFloatReturn(float value)
+{
+	if (this->isWallRight == true)
+	{
+		FRotator lerpCamTilt = FMath::Lerp(this->currentCamRotation, this->tiltedCamRotation, value);
+
+		this->playerController->SetControlRotation(lerpCamTilt);
+	}
+	else
+	{
+		FRotator lerpCamTilt = FMath::Lerp(this->normalCamRotation, this->currentCamRotation, value);
+
+		this->playerController->SetControlRotation(lerpCamTilt);
+	}
+}
+
+void AMyProjectCharacter::TiltCamLeftFloatReturn(float value)
+{
+	if (this->isWallLeft == true)
+	{
+		FRotator lerpCamTilt = FMath::Lerp(this->currentCamRotation, this->tiltedCamRotation, value);
+
+		this->playerController->SetControlRotation(lerpCamTilt);
+	}
+	else
+	{
+		FRotator lerpCamTilt = FMath::Lerp(this->normalCamRotation, this->currentCamRotation, value);
+
+		this->playerController->SetControlRotation(lerpCamTilt);
 	}
 }
