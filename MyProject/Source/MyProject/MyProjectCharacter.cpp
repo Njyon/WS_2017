@@ -167,12 +167,10 @@ void AMyProjectCharacter::BeginPlay()
 
 	// Declare Delegate function to be binded with SlideHeightFloatReturn(float value)
 	FOnTimelineFloat SlideHeightUpdate;
-
 	SlideHeightUpdate.BindUFunction(this, FName("SlideHeightFloatReturn"));
 
 	// Declare Delegate function to be binded with SlideRadiusFloatReturn(float value)
 	FOnTimelineFloat SlideRadiusUpdate;
-
 	SlideRadiusUpdate.BindUFunction(this, FName("SlideRadiusFloatReturn"));
 
 	// Check if Curve asset it valid
@@ -514,53 +512,60 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 
 void AMyProjectCharacter::Slide()
 {
+	UE_LOG(LogTemp, Warning, TEXT("why"));
 	acceleration = this->movementComponent->GetCurrentAcceleration();
 	ishiftButtonPressed = true;
 	if (acceleration != FVector(0,0,0))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("1"));
 		sliding = true;
 		this->movementComponent->GroundFriction = 0.0f;
 		this->movementComponent->BrakingDecelerationWalking = 0.0f;
 		this->movementComponent->BrakingFrictionFactor = 0.0f;
 
 		this->playerDirection = this->playerDirection * 1000;
-		FVector launchCharacterVector = this->playerRightVector * 1000 + this->playerDirection;
+		FVector launchCharacterVector = this->playerDirection * 1000;
 		this->LaunchCharacter(launchCharacterVector, true, true);
-		SlideCam();
+		RevertedSlideCam();
 	}
 	else if (acceleration == FVector(0, 0, 0))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("2"));
 		this->movementComponent->MaxAcceleration = 1500;
 		this->movementComponent->MaxWalkSpeed = 400;
-		SlideCam();
+		RevertedSlideCam();
 	}
 }
 
+
 void AMyProjectCharacter::EndSlide()
 {
+	UE_LOG(LogTemp, Warning, TEXT("3"));
+	sliding = false;
 	ishiftButtonPressed = false;
 	this->movementComponent->MaxAcceleration = 3000;
 	this->movementComponent->MaxWalkSpeed = 600;
-	sliding = false;
 	this->movementComponent->GroundFriction = 8;
 	this->movementComponent->BrakingDecelerationWalking = 2048;
 	this->movementComponent->BrakingFrictionFactor = 2;
-	RevertedSlideCam();
+	SlideCam();
 }
 
 void AMyProjectCharacter::SlideCam()
 {
+	UE_LOG(LogTemp, Warning, TEXT("slidecam"));
 	this->movementComponent->GravityScale = gravitation;
-	slideradiusTimeline->PlayFromStart();
-	slideheightTimeline->PlayFromStart();
+	this->slideradiusTimeline->Play();
+	this->slideheightTimeline->Play();
 
 }
 
 void AMyProjectCharacter::RevertedSlideCam()
 {
-	slideradiusTimeline->ReverseFromEnd();
-	slideheightTimeline->ReverseFromEnd();
-	this->movementComponent->GravityScale = gravitation;
+	UE_LOG(LogTemp, Warning, TEXT("revert"));
+	//this->movementComponent->GravityScale = gravitation;
+	this->slideradiusTimeline->Reverse();
+	this->slideheightTimeline->Reverse();
 }
 
 
