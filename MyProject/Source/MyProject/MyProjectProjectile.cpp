@@ -38,6 +38,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(OtherActor);
 	ATP_ThirdPersonCharacter* hittedNPC = Cast<ATP_ThirdPersonCharacter>(OtherActor);
 	// Only add impulse and destroy projectile if we hit a physics
+
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
@@ -62,4 +63,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		//ProjectileMovement->bShouldBounce = false;
 		Destroy();
 	}
+
+	if (!ProjectileMovement->bShouldBounce)
+		Destroy();
 }

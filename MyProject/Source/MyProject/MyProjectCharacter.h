@@ -44,6 +44,12 @@ class AMyProjectCharacter : public ACharacter
 	UPROPERTY()
 		class UTimelineComponent* camTiltLeftTimeline;		// Wallrun camTiltLeft Timeline
 
+	UPROPERTY()
+		class UTimelineComponent* slideheightTimeline;		//slide height Timeline
+	
+	UPROPERTY()												//slide radius Timeline
+		class UTimelineComponent* slideradiusTimeline;
+
 								//////// Collision ////////
 	UPROPERTY(EditAnywhere, Category = Detectors)
 		class UBoxComponent* wallDetector;					// Wallrun main walldetector
@@ -96,6 +102,9 @@ public:								////// PUBLIC //////
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 		float BaseLookUpRate;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float Health = 100.0f;
+
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 		FVector GunOffset;
@@ -122,6 +131,12 @@ public:								////// PUBLIC //////
 		class UCurveFloat* tiltCamRightCurve;
 	UPROPERTY(EditAnywhere, Category = Timeline)
 		class UCurveFloat* tiltCamLeftCurve;
+
+	UPROPERTY(EditAnywhere, Category = Timeline)
+		class UCurveFloat* heightCurve;
+
+	UPROPERTY(EditAnywhere, Category = Timeline)
+		class UCurveFloat* radiusCurve;
 
 										// Sounds //
 
@@ -171,11 +186,13 @@ public:								////// PUBLIC //////
 	void RMBReleased(); // Right Mouse Button Released
 	void Jump();		// Spacebar Pressed
 	void EndJumping();	// Spacebar Released
+	void Slide();		// left Shift Preessed
+	void EndSlide();	// left Shift Released
 
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void OnDamageBPEvent(float health);										// Event that gets called in Blueprint
+		void OnDamageBPEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
@@ -184,6 +201,12 @@ public:								////// PUBLIC //////
 		void TiltCamRightFloatReturn(float value);								// Updates the Camera Tilt Right
 	UFUNCTION()
 		void TiltCamLeftFloatReturn(float value);								// Updates the Camera Tilt Left
+
+	UFUNCTION()
+		void SlideHeightFloatReturn(float height);
+
+	UFUNCTION()
+		void SlideRadiusFloatReturn(float radius);
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -195,18 +218,19 @@ private:								////// PRIVATE //////
 											// UPROPERTY //
 	///DataType
 	int wallCollisionCounter = 0;							// Counts the Collision overlaps (Prevents bug)
-	float Health = 100.0f;									// Character Health
 	float soundTimeDilation;
-	float HAxis;											// Horizontal Axis
-	float VAxis;											// Vertical Axis
-	float helperWallJumpNegativeFloat = 0;					// Helper Variable (WALLJUMP)
-	bool isLMBPressed;										// Left Mouse Button Pressed?
-	bool isBulletFired = false;								// Used for the FireRate
-	bool isShootingInNormalSpeed;							// Check you switched the Time Dilation
-	bool isOnWall = false;									// is on wall?
-	bool isWallRight = false;								// is on wall Right?
-	bool isWallLeft = false;								// is on wall Left?
-	bool wallrunDoOnce = true;								// DoOnce bool
+	float HAxis;	// Horizontal Axis
+	float VAxis;	// Vertical Axis
+	float helperWallJumpNegativeFloat = 0;
+	bool isLMBPressed;
+	bool isBulletFired = false;
+	bool isShootingInNormalSpeed;				// Check you switched the Time Dilation
+	bool isOnWall = false;						// is on wall?
+	bool isWallRight = false;					// is on wall Right?
+	bool isWallLeft = false;					// is on wall Left?
+	bool wallrunDoOnce = true;
+	bool ishiftButtonPressed = false;
+	bool sliding = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for Wallrun
@@ -218,19 +242,23 @@ private:								////// PRIVATE //////
 	FTimerHandle timeHandle;								// needed for set Timer
 	FTimerHandle wallrunHandle;								// Timehandle (Delay for the Wallrun)
 	FBodyInstance* camRay;									// RayCast from Camera
+	FVector acceleration;
 	///Class
-	class UCharacterMovementComponent* movementComponent;	// Movement Component
-	class UWorld* world;									// Safe the world
+	class UCharacterMovementComponent* movementComponent; // Movement Component
+	class UCapsuleComponent* capsuleComponent;
+	class UWorld* world;	// Safe the world
 	class AController* playerController;
 
 											// UFUNCTION //
 
-	void SpawnBullet();										// Spawns the bullet Blueprint
-	void BulletCooldown();									// Sets the isBulletFired bool
-	void WallrunLaunch();									// The Wallrun (Launched when gravity is 0)
-	void GravitationOff();									// Turns Gravity off for the Wallrun
-	void WallrunRetriggerableDelay();						// Delay for the wallrun so you can only run a certain Time (Can get Retriggered by switching the wall)
-	void WallrunEnd();										// Ends the Wallrun
+	void SpawnBullet();		// Spawns the bullet Blueprint
+	void BulletCooldown();	// Sets the isBulletFired bool
+	void WallrunLaunch();
+	void GravitationOff();
+	void WallrunRetriggerableDelay();
+	void WallrunEnd();
+	void SlideCam();
+	void RevertedSlideCam();
 
 	///////////////////
 	//// Collision ////
