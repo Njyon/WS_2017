@@ -92,6 +92,9 @@ public:								////// PUBLIC //////
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 		float BaseLookUpRate;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float Health = 100.0f;
+
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 		FVector GunOffset;
@@ -166,7 +169,7 @@ public:								////// PUBLIC //////
 	virtual void Landed(const FHitResult& hit) override;			// Character touched the ground event
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void OnDamageBPEvent(float health);
+		void OnDamageBPEvent();
 
 	UFUNCTION()
 		void WallrunFloatReturn(float value);
@@ -181,7 +184,6 @@ private:								////// PRIVATE //////
 											// UPROPERTY //
 	///DataType
 	int wallCollisionCounter = 0;
-	float Health = 100.0f;
 	float soundTimeDilation;
 	float HAxis;	// Horizontal Axis
 	float VAxis;	// Vertical Axis

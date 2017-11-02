@@ -306,7 +306,7 @@ void AMyProjectCharacter::Damage(int damage)
 {
 	Health = Health - damage;
 	//UE_LOG(LogTemp, Warning, TEXT("hurt"));
-	this->OnDamageBPEvent(Health);
+	this->OnDamageBPEvent();
 }
 
 
