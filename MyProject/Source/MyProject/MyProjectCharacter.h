@@ -114,15 +114,46 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, Category = Timeline)
 		class UCurveFloat* wallrunCurve;
 
-	// Sounds //
-	/*UPROPERTY(BlueprintReadOnly, Category = Audio)
-	USoundCue* ShootAudioCue;
+										// Sounds //
+
+	//Shoot
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* ShootAudioCue;
 
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
-	UAudioComponent* ShootAudioComponent;*/
+		class UAudioComponent* ShootAudioComponent;
+
+	//Slide
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* SlideAudioCue;
+
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* SlideAudioComponent;
+
+	//Wallrun
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* WallrunAudioCue;
+
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* WallrunAudioComponent;
+
+	//Climb
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* ClimbAudioCue;
+
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* ClimbAudioComponent;
+
+	//Slowmo
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* SlowmoAudioCue;
+
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* SlowmoAudioComponent;
 
 
 										// UFUNCTION //
+	void Damage(int damage);
 
 	/// Input
 	void LMBPressed();	// Left Mouse Button Pressed
@@ -134,7 +165,9 @@ public:								////// PUBLIC //////
 
 	virtual void Landed(const FHitResult& hit) override;			// Character touched the ground event
 
-	
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnDamageBPEvent(float health);
+
 	UFUNCTION()
 		void WallrunFloatReturn(float value);
 
@@ -147,9 +180,11 @@ private:								////// PRIVATE //////
 
 											// UPROPERTY //
 	///DataType
-	int wallCollisionCounter = 0;				// Wallruncounter (prevents bug)
-	float HAxis;								// Horizontal Axis
-	float VAxis;								// Vertical Axis
+	int wallCollisionCounter = 0;
+	float Health = 100.0f;
+	float soundTimeDilation;
+	float HAxis;	// Horizontal Axis
+	float VAxis;	// Vertical Axis
 	float helperWallJumpNegativeFloat = 0;
 	bool isLMBPressed;
 	bool isBulletFired = false;

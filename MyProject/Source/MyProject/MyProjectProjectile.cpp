@@ -1,6 +1,8 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "MyProjectProjectile.h"
+#include "MyProjectCharacter.h"
+#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -33,11 +35,31 @@ AMyProjectProjectile::AMyProjectProjectile()
 
 void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(OtherActor);
+	ATP_ThirdPersonCharacter* hittedNPC = Cast<ATP_ThirdPersonCharacter>(OtherActor);
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
+		Destroy();
+	}
+
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("hit"));
+		hittedplayer->Damage(projectileDamage);
+
+		//ProjectileMovement->bShouldBounce = false;
+		Destroy();
+	}
+
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("NPChit"));
+		hittedNPC->Damage(projectileDamage);
+
+		//ProjectileMovement->bShouldBounce = false;
 		Destroy();
 	}
 }
