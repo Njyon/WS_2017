@@ -378,13 +378,13 @@ void AMyProjectCharacter::Damage(int damage)
 void AMyProjectCharacter::TurnAtRate(float rate)
 {
 	// calculate delta for this frame from the rate information
-	AddControllerYawInput(rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	AddControllerYawInput(rate /** BaseTurnRate * GetWorld()->GetDeltaSeconds()*/);
 }
 
 void AMyProjectCharacter::LookUpAtRate(float rate)
 {
 	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	AddControllerPitchInput(rate /** BaseLookUpRate * GetWorld()->GetDeltaSeconds()*/);
 }
 
 void AMyProjectCharacter::LMBPressed()
@@ -436,12 +436,6 @@ void AMyProjectCharacter::MoveForward(float value)
 		AddMovementInput(GetActorForwardVector(), value);
 		this->VAxis = value;
 	}
-	//if (value != 0.0f)
-	//{
-	//	// add movement in that direction
-	//	AddMovementInput(GetActorForwardVector(), value);
-	//	this->VAxis = value;
-	//}
 }
 
 void AMyProjectCharacter::MoveRight(float value)
@@ -461,6 +455,8 @@ void AMyProjectCharacter::MoveRight(float value)
 
 void AMyProjectCharacter::Jump()
 {
+	this->isSpacebarPressed = true;
+
 	if (this->movementComponent->IsMovingOnGround() == true)
 	{
 		this->movementComponent->GravityScale = gravitation;	// Set Gravity
@@ -503,11 +499,25 @@ void AMyProjectCharacter::Jump()
 			true
 		);
 	}
-	//else if(this->isClimb == true)
+	else if (this->isOnLadder == true)
+	{
+		this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
+		this->isOnLadder = false;
+		FVector launchVector = this->GetActorForwardVector() * this->climbEndBoost;
+
+		this->LaunchCharacter(FVector(
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeight),
+			true,
+			true
+		);
+	}
 }
 
 void AMyProjectCharacter::EndJumping()
 {
+	this->isSpacebarPressed = false;
 	this->StopJumping();					// Unreal Function
 }
 

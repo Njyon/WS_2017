@@ -65,7 +65,8 @@ public:								////// PUBLIC //////
 	AMyProjectCharacter();   // Konstructor
 
 										// UPROPERTY //
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
+		bool isSpacebarPressed = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isFlying = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
@@ -90,7 +91,9 @@ public:								////// PUBLIC //////
 		float jumpHeight;														// Set Jump Height
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float jumpHeightOnWall;													// Set Jump Height on Wall
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float climbEndBoost;													// Set Climb End Boost
+			
 	// is Slomo Active or Deactive
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Slomo)
 		bool isSlomoActive;
