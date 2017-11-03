@@ -66,6 +66,11 @@ public:								////// PUBLIC //////
 
 										// UPROPERTY //
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
+		bool isFlying = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
+		bool isOnLadder = false;
+
 	//FireRate
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FireRate)
 		float fireRateSlomo = 0.05f;											//Set Fire Rate in Slomo
@@ -332,6 +337,9 @@ protected:								////// Protected //////
 	virtual void PostInitializeComponents() override; //Executes after Begin Play
 	virtual void Tick(float DeltaSeconds) override;
 
+	// APawn interface
+	virtual void SetupPlayerInputComponent(UInputComponent* inputComponent) override;
+	// End of APawn interface
 	/** Handles moving forward/backward */
 	UFUNCTION()
 	void MoveForward(float val);
@@ -354,9 +362,6 @@ protected:								////// Protected //////
 	UFUNCTION()
 	void LookUpAtRate(float rate);
 
-	// APawn interface
-	virtual void SetupPlayerInputComponent(UInputComponent* inputComponent) override;
-	// End of APawn interface
 
 	/* 
 	 * Configures input for touchscreen devices if there is a valid touch interface for doing so 

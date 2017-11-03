@@ -265,9 +265,6 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	/// Input Jump
 	playerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyProjectCharacter::Jump);
 	playerInputComponent->BindAction("Jump", IE_Released, this, &AMyProjectCharacter::EndJumping);
-	/// Input WASD
-	playerInputComponent->BindAxis("MoveForward", this, &AMyProjectCharacter::MoveForward);
-	playerInputComponent->BindAxis("MoveRight", this, &AMyProjectCharacter::MoveRight);
 	/// Input Left Mouse Button
 	playerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyProjectCharacter::LMBPressed);
 	playerInputComponent->BindAction("Fire", IE_Released, this, &AMyProjectCharacter::LMBReleased);
@@ -282,6 +279,9 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 
+	/// Input WASD
+	playerInputComponent->BindAxis("MoveForwardKey", this, &AMyProjectCharacter::MoveForward);
+	playerInputComponent->BindAxis("StrafeKey", this, &AMyProjectCharacter::MoveRight);
 	//playerInputComponent->BindAxis("Turn", this, &APawn::Turn);
 	playerInputComponent->BindAxis("TurnRate", this, &AMyProjectCharacter::TurnAtRate);
 	playerInputComponent->BindAxis("LookUpRate", this, &AMyProjectCharacter::LookUpAtRate);
@@ -418,16 +418,35 @@ void AMyProjectCharacter::RMBReleased()
 
 void AMyProjectCharacter::MoveForward(float value)
 {
-	if (value != 0.0f)
+	UE_LOG(LogTemp, Warning, TEXT("forward"));
+	if (value != 0.0f && isOnLadder == true)
+	{
+		if (this->isFlying == false)
+		{
+			this->isFlying = true;
+			this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
+		}
+
+		AddMovementInput(GetActorUpVector(), value);
+		this->VAxis = value;
+	}
+	else if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), value);
 		this->VAxis = value;
 	}
+	//if (value != 0.0f)
+	//{
+	//	// add movement in that direction
+	//	AddMovementInput(GetActorForwardVector(), value);
+	//	this->VAxis = value;
+	//}
 }
 
 void AMyProjectCharacter::MoveRight(float value)
 {
+	UE_LOG(LogTemp, Warning, TEXT("sideways"));
 	if (value != 0.0f)
 	{
 		// add movement in that direction
