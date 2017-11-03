@@ -282,19 +282,19 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 
-	//playerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	//playerInputComponent->BindAxis("Turn", this, &APawn::Turn);
 	playerInputComponent->BindAxis("TurnRate", this, &AMyProjectCharacter::TurnAtRate);
-	//playerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	playerInputComponent->BindAxis("LookUpRate", this, &AMyProjectCharacter::LookUpAtRate);
+	//playerInputComponent->BindAxis("LookUpRate", this, &AMyProjectCharacter::LookUpAtRate);
 }
 
 			//////////////////////////////////////
 			//////////		TICK		//////////
 			//////////////////////////////////////
 
-void AMyProjectCharacter::Tick(float deltaTime)
+void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
-	Super::Tick(deltaTime);
+	Super::Tick(DeltaSeconds);
 
 	//UE_LOG(LogTemp, Warning, TEXT("%f"), Health);
 

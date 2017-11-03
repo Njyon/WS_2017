@@ -180,13 +180,21 @@ public:								////// PUBLIC //////
 	void Damage(int damage);
 
 	/// Input
+	UFUNCTION()
 	void LMBPressed();	// Left Mouse Button Pressed
+	UFUNCTION()
 	void LMBReleased(); // Left Mouse Button Released
+	UFUNCTION()
 	void RMBPressed();	// Right Mouse Button Pressed
+	UFUNCTION()
 	void RMBReleased(); // Right Mouse Button Released
+	UFUNCTION()
 	void Jump();		// Spacebar Pressed
+	UFUNCTION()
 	void EndJumping();	// Spacebar Released
+	UFUNCTION()
 	void Slide();		// left Shift Preessed
+	UFUNCTION()
 	void EndSlide();	// left Shift Released
 
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
@@ -322,24 +330,28 @@ private:								////// PRIVATE //////
 protected:								////// Protected //////
 	virtual void BeginPlay(); //Executes at Begin+
 	virtual void PostInitializeComponents() override; //Executes after Begin Play
-	virtual void Tick(float deltaTime) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	/** Handles moving forward/backward */
+	UFUNCTION()
 	void MoveForward(float val);
 
 	/** Handles stafing movement, left and right */
+	UFUNCTION()
 	void MoveRight(float val);
 
 	/**
 	 * Called via input to turn at a given rate.
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
+	UFUNCTION()
 	void TurnAtRate(float rate);
 
 	/**
 	 * Called via input to turn look up/down at a given rate.
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
+	UFUNCTION()
 	void LookUpAtRate(float rate);
 
 	// APawn interface
