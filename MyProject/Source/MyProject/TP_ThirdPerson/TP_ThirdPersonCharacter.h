@@ -19,6 +19,16 @@ class ATP_ThirdPersonCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 public:
+
+	//DataType
+	float Health = 100.0f;
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		float GetCurrentHealth();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnNPCDeathBPEvent();
+
 	ATP_ThirdPersonCharacter();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -28,6 +38,11 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void DamageEvent();
+
+	void Damage(int damage);
 
 protected:
 
