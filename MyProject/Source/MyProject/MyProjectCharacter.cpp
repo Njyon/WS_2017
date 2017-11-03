@@ -305,6 +305,28 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WallrunFireSlowmo"), soundTimeDilation);				//WallrunSound		
 	ShootAudioComponent->SetFloatParameter(FName("sfx_ClimbWallFireSlowmo"), soundTimeDilation);			//ClimbSound
 
+
+	if (isOnLadder == true && climbingSoundDoOnce == false)													//climbSound gets played and stopped
+	{
+		climbingSoundDoOnce = true;
+		ClimbAudioComponent->Play();
+	}
+	if (isOnLadder == false && climbingSoundDoOnce == true)
+	{
+		ClimbAudioComponent->Stop();
+		climbingSoundDoOnce = false;
+	}
+
+	if (isOnWall == true && WallrunSoundDoOnce == false)													//wallrunSound gets played and stopped
+	{
+		WallrunSoundDoOnce = true;
+		WallrunAudioComponent->Play();
+	}
+	if (isOnWall == false && WallrunSoundDoOnce == true)
+	{
+		WallrunAudioComponent->Stop();
+		WallrunSoundDoOnce = false;
+	}
 	///Shoot
 	if (isLMBPressed == true)
 	{
@@ -543,6 +565,7 @@ void AMyProjectCharacter::Slide()
 {
 	UE_LOG(LogTemp, Warning, TEXT("why"));
 	acceleration = this->movementComponent->GetCurrentAcceleration();
+	//isFalling = this->movementComponent->IsFalling();
 	ishiftButtonPressed = true;
 	if (acceleration != FVector(0,0,0))
 	{
@@ -556,6 +579,7 @@ void AMyProjectCharacter::Slide()
 		FVector launchCharacterVector = this->playerDirection * 1000;
 		this->LaunchCharacter(launchCharacterVector, true, true);
 		RevertedSlideCam();
+		SlideAudioComponent->Play();
 	}
 	else if (acceleration == FVector(0, 0, 0))
 	{
@@ -578,6 +602,7 @@ void AMyProjectCharacter::EndSlide()
 	this->movementComponent->BrakingDecelerationWalking = 2048;
 	this->movementComponent->BrakingFrictionFactor = 2;
 	SlideCam();
+	SlideAudioComponent->Stop();
 }
 
 void AMyProjectCharacter::SlideCam()
