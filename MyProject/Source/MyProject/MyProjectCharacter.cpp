@@ -471,7 +471,6 @@ void AMyProjectCharacter::RMBReleased()
 
 void AMyProjectCharacter::MoveForward(float value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("forward"));
 	if (value != 0.0f && isOnLadder == true)
 	{
 		if (this->isFlying == false)
@@ -493,8 +492,7 @@ void AMyProjectCharacter::MoveForward(float value)
 
 void AMyProjectCharacter::MoveRight(float value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("sideways"));
-	if (value != 0.0f)
+	if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), value);
@@ -602,13 +600,11 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 
 void AMyProjectCharacter::Slide()
 {
-	UE_LOG(LogTemp, Warning, TEXT("why"));
 	acceleration = this->movementComponent->GetCurrentAcceleration();
 	//isFalling = this->movementComponent->IsFalling();
 	ishiftButtonPressed = true;
 	if (acceleration != FVector(0,0,0))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("1"));
 		sliding = true;
 		this->movementComponent->GroundFriction = 0.0f;
 		this->movementComponent->BrakingDecelerationWalking = 0.0f;
@@ -622,7 +618,6 @@ void AMyProjectCharacter::Slide()
 	}
 	else if (acceleration == FVector(0, 0, 0))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("2"));
 		this->movementComponent->MaxAcceleration = 1500;
 		this->movementComponent->MaxWalkSpeed = 400;
 		RevertedSlideCam();
@@ -632,7 +627,6 @@ void AMyProjectCharacter::Slide()
 
 void AMyProjectCharacter::EndSlide()
 {
-	UE_LOG(LogTemp, Warning, TEXT("3"));
 	sliding = false;
 	ishiftButtonPressed = false;
 	this->movementComponent->MaxAcceleration = 3000;
@@ -646,7 +640,6 @@ void AMyProjectCharacter::EndSlide()
 
 void AMyProjectCharacter::SlideCam()
 {
-	UE_LOG(LogTemp, Warning, TEXT("slidecam"));
 	this->movementComponent->GravityScale = gravitation;
 	this->slideradiusTimeline->Play();
 	this->slideheightTimeline->Play();
@@ -655,7 +648,6 @@ void AMyProjectCharacter::SlideCam()
 
 void AMyProjectCharacter::RevertedSlideCam()
 {
-	UE_LOG(LogTemp, Warning, TEXT("revert"));
 	//this->movementComponent->GravityScale = gravitation;
 	this->slideradiusTimeline->Reverse();
 	this->slideheightTimeline->Reverse();
@@ -1148,7 +1140,6 @@ void AMyProjectCharacter::TiltCamLeftFloatReturn(float value)
 
 void AMyProjectCharacter::SlideHeightFloatReturn(float height)
 {
-	UE_LOG(LogTemp, Warning, TEXT("height: %f"), height);
 	if (sliding)
 	{
 		this->capsuleComponent->SetCapsuleHalfHeight(height, true);
@@ -1161,7 +1152,6 @@ void AMyProjectCharacter::SlideHeightFloatReturn(float height)
 
 void AMyProjectCharacter::SlideRadiusFloatReturn(float radius)
 {
-	UE_LOG(LogTemp, Warning, TEXT("radius: %f"), radius);
 	if (sliding)
 	{
 		this->capsuleComponent->SetCapsuleRadius(radius, true);
