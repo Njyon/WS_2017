@@ -46,7 +46,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		Destroy();
 	}
 
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
+	else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("hit"));
 		hittedplayer->Damage(projectileDamage);
@@ -55,7 +55,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		Destroy();
 	}
 
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
+	else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("NPChit"));
 		hittedNPC->Damage(projectileDamage);
@@ -64,6 +64,8 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		Destroy();
 	}
 
-	if (!ProjectileMovement->bShouldBounce)
+	else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
+	{
 		Destroy();
+	}
 }
