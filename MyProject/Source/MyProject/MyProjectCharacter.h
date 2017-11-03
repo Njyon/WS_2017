@@ -72,10 +72,14 @@ public:								////// PUBLIC //////
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isOnLadder = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Magazine)
+		int magazineSize;
+	UPROPERTY(BlueprintReadOnly, Category = Magazine)
+		int currentAmmo;
 	//FireRate
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FireRate)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FireRate)
 		float fireRateSlomo = 0.05f;											//Set Fire Rate in Slomo
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FireRate)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FireRate)
 		float firerateNoSlomo = 0.3f;											//Set Fire Rate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float gravitation;														// Set Gravitation
@@ -93,7 +97,15 @@ public:								////// PUBLIC //////
 		float jumpHeightOnWall;													// Set Jump Height on Wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float climbEndBoost;													// Set Climb End Boost
-			
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
+		float maxRessource;														// Set Max Ressources
+	UPROPERTY(BlueprintReadOnly, Category = Ressources)
+		float ressource;														// Set Ressources
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
+		float ressourceFillAmmount;												// Set FillAmount
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
+		float ressourceDrainAmount;												// Set Drain Amount
+
 	// is Slomo Active or Deactive
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Slomo)
 		bool isSlomoActive;
@@ -179,21 +191,23 @@ public:								////// PUBLIC //////
 
 	/// Input
 	UFUNCTION()
-	void LMBPressed();	// Left Mouse Button Pressed
+		void LMBPressed();	// Left Mouse Button Pressed
 	UFUNCTION()
-	void LMBReleased(); // Left Mouse Button Released
+		void LMBReleased(); // Left Mouse Button Released
 	UFUNCTION()
-	void RMBPressed();	// Right Mouse Button Pressed
+		void RMBPressed();	// Right Mouse Button Pressed
 	UFUNCTION()
-	void RMBReleased(); // Right Mouse Button Released
+		void RMBReleased(); // Right Mouse Button Released
 	UFUNCTION()
-	void Jump();		// Spacebar Pressed
+		void Jump();		// Spacebar Pressed
 	UFUNCTION()
-	void EndJumping();	// Spacebar Released
+		void EndJumping();	// Spacebar Released
 	UFUNCTION()
-	void Slide();		// left Shift Preessed
+		void Slide();		// left Shift Preessed
 	UFUNCTION()
-	void EndSlide();	// left Shift Released
+		void EndSlide();	// left Shift Released
+	UFUNCTION()
+		void Reload();
 
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 

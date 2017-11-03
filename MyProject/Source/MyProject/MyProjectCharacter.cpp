@@ -216,6 +216,9 @@ void AMyProjectCharacter::BeginPlay()
 
 	this->helperWallJumpNegativeFloat = this->wallJumpForce * 2;
 	this->helperWallJumpNegativeFloat = this->wallJumpForce - this->helperWallJumpNegativeFloat;
+
+	this->ressource = this->maxRessource;
+	this->currentAmmo = this->magazineSize;
 }
 
 			///////////////////////////////////////
@@ -274,6 +277,8 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	///	Input left Shift
 	playerInputComponent->BindAction("Slide", IE_Pressed, this, &AMyProjectCharacter::Slide);
 	playerInputComponent->BindAction("Slide", IE_Released, this, &AMyProjectCharacter::EndSlide);
+	/// Reload
+	playerInputComponent->BindAction("Reload", IE_Pressed, this, &AMyProjectCharacter::Reload);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
@@ -311,7 +316,12 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		if (this->isBulletFired == false)
 		{
 			this->isBulletFired = true;
-			SpawnBullet();		// Shoot a Bullet
+
+			if (this->currentAmmo > 0)
+			{
+				SpawnBullet();		// Shoot a Bullet
+				currentAmmo -= 1;
+			}
 		}
 		else
 		{
@@ -348,13 +358,31 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	///Slomo
 	if (isSlomoActive == true)
 	{
+		this->ressource -= world->GetDeltaSeconds() * this->ressourceDrainAmount;
+
 		if (movementComponent->IsFalling() == false && this->sliding == false)  // check if Character is in "Action"
 		{
 			isSlomoActive = false;
 			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
 			SlowmoAudioComponent->Stop();
 		}
+		else if (this->ressource < 0)
+		{
+			isSlomoActive = false;
+			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
+			SlowmoAudioComponent->Stop();
+		}
 	}
+
+	//Ressource
+	if (this->ressource < 100)
+	{
+		this->ressource += world->GetDeltaSeconds() * this->ressourceFillAmmount;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
+
+	UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
 }
 
 			//////////////////////////////////////
@@ -401,9 +429,12 @@ void AMyProjectCharacter::RMBPressed()
 {
 	if (movementComponent->IsFalling() == true || this->sliding == true) // Check if you can Set Slomo to Active
 	{
-		isSlomoActive = true;
-		UGameplayStatics::SetGlobalTimeDilation(world, slomoTimeDilation); // Set Time to Slomo Time Dilation
-		SlowmoAudioComponent->Play();
+		if (this->ressource > 0)
+		{
+			isSlomoActive = true;
+			UGameplayStatics::SetGlobalTimeDilation(world, slomoTimeDilation); // Set Time to Slomo Time Dilation
+			SlowmoAudioComponent->Play();
+		}
 	}
 }
 
@@ -446,6 +477,14 @@ void AMyProjectCharacter::MoveRight(float value)
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), value);
 		this->HAxis = value;
+	}
+}
+
+void AMyProjectCharacter::Reload()
+{
+	if (this->currentAmmo < this->magazineSize)
+	{
+		this->currentAmmo = this->magazineSize;
 	}
 }
 
