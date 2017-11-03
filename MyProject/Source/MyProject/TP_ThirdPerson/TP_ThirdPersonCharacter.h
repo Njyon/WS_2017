@@ -39,6 +39,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void DamageEvent();
+
 	void Damage(int damage);
 
 protected:

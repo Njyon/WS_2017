@@ -83,6 +83,7 @@ float  ATP_ThirdPersonCharacter::GetCurrentHealth()
 
 void ATP_ThirdPersonCharacter::Damage(int damage)
 {
+	DamageEvent();
 	Health = Health - damage;
 
 	if(Health <= 0)						

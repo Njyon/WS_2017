@@ -348,7 +348,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	///Slomo
 	if (isSlomoActive == true)
 	{
-		if (movementComponent->IsFalling() == false /* and / or Sliding  */ )  // check if Character is in "Action"
+		if (movementComponent->IsFalling() == false && this->sliding == false)  // check if Character is in "Action"
 		{
 			isSlomoActive = false;
 			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
@@ -399,7 +399,7 @@ void AMyProjectCharacter::LMBReleased()
 
 void AMyProjectCharacter::RMBPressed()
 {
-	if (movementComponent->IsFalling() == true /* and / or Slinding */ ) // Check if you can Set Slomo to Active
+	if (movementComponent->IsFalling() == true || this->sliding == true) // Check if you can Set Slomo to Active
 	{
 		isSlomoActive = true;
 		UGameplayStatics::SetGlobalTimeDilation(world, slomoTimeDilation); // Set Time to Slomo Time Dilation

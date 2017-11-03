@@ -151,38 +151,28 @@ public:								////// PUBLIC //////
 	//Shoot
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* ShootAudioCue;
-
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* ShootAudioComponent;
-
 	//Slide
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* SlideAudioCue;
-
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* SlideAudioComponent;
-
 	//Wallrun
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* WallrunAudioCue;
-
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* WallrunAudioComponent;
-
 	//Climb
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* ClimbAudioCue;
-
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* ClimbAudioComponent;
-
 	//Slowmo
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* SlowmoAudioCue;
-
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* SlowmoAudioComponent;
-
 
 										// UFUNCTION //
 	void Damage(int damage);
