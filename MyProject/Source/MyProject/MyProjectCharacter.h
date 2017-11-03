@@ -251,6 +251,9 @@ private:								////// PRIVATE //////
 	bool wallrunDoOnce = true;
 	bool ishiftButtonPressed = false;
 	bool sliding = false;
+	bool isFalling = false;
+	bool climbingSoundDoOnce = false;
+	bool WallrunSoundDoOnce = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for Wallrun
