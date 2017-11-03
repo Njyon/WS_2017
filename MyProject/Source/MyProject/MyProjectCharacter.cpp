@@ -32,35 +32,35 @@ AMyProjectCharacter::AMyProjectCharacter()
 			//////////////////////////////////////
 
 	//ShootSound
-	static ConstructorHelpers::FObjectFinder<USoundCue> ShootCue(TEXT("'/Game/Dynamic/Player/Audio/Weapon/sfx_WeaponFire'"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> ShootCue(TEXT("'/Game/Sound/SFX/Weapon/sfx_WeaponFire'"));
 	ShootAudioCue = ShootCue.Object;
 	ShootAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootAudioComp"));
 	ShootAudioComponent->bAutoActivate = false;
 	ShootAudioComponent->SetupAttachment(RootComponent);
 
 	//SlideSound
-	static ConstructorHelpers::FObjectFinder<USoundCue> SlideCue(TEXT("'/Game/Dynamic/Player/Audio/Movement/sfx_Sliding'"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> SlideCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Sliding'"));
 	SlideAudioCue = SlideCue.Object;
 	SlideAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("SlideAudioComp"));
 	SlideAudioComponent->bAutoActivate = false;
 	SlideAudioComponent->SetupAttachment(RootComponent);
 
 	//WallrunSound
-	static ConstructorHelpers::FObjectFinder<USoundCue> WallrunCue(TEXT("'/Game/Dynamic/Player/Audio/Movement/sfx_WallRun'"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> WallrunCue(TEXT("'/Game/Sound/SFX/Movement/sfx_WallRun'"));
 	WallrunAudioCue = WallrunCue.Object;
 	WallrunAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WallrunAudioComp"));
 	WallrunAudioComponent->bAutoActivate = false;
 	WallrunAudioComponent->SetupAttachment(RootComponent);
 
 	//ClimbSound
-	static ConstructorHelpers::FObjectFinder<USoundCue> ClimbCue(TEXT("'/Game/Dynamic/Player/Audio/Movement/sfx_ClimbWall'"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> ClimbCue(TEXT("'/Game/Sound/SFX/Movement/sfx_ClimbWall'"));
 	ClimbAudioCue = ClimbCue.Object;
 	ClimbAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ClimbAudioComp"));
 	ClimbAudioComponent->bAutoActivate = false;
 	ClimbAudioComponent->SetupAttachment(RootComponent);
 
 	//SlowmoSound
-	static ConstructorHelpers::FObjectFinder<USoundCue> SlowmoCue(TEXT("'/Game/Dynamic/Player/Audio/other/sfx_Slow-Mo'"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> SlowmoCue(TEXT("'/Game/Sound/SFX/other/sfx_Slow-Mo'"));
 	SlowmoAudioCue = SlowmoCue.Object;
 	SlowmoAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("SlowmoAudioComp"));
 	SlowmoAudioComponent->bAutoActivate = false;
