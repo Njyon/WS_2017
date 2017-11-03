@@ -76,6 +76,25 @@ void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATP_ThirdPersonCharacter::OnResetVR);
 }
 
+float  ATP_ThirdPersonCharacter::GetCurrentHealth()
+{
+	return Health;
+}
+
+void ATP_ThirdPersonCharacter::Damage(int damage)
+{
+	Health = Health - damage;
+
+	if(Health <= 0)						
+	{
+		UE_LOG(LogTemp, Warning, TEXT("dead"));
+		AController* controller = this->GetController();
+		controller->PawnPendingDestroy(this);
+		SetActorEnableCollision(false);
+		OnNPCDeathBPEvent();
+	}
+}
+
 
 void ATP_ThirdPersonCharacter::OnResetVR()
 {
