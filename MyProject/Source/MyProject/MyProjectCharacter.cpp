@@ -17,7 +17,6 @@
 #include "Components/TimelineComponent.h"
 #include "UnrealMathUtility.h"
 ///Our Stuff
-#include "MyProject/MyProjectProjectile.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
