@@ -609,9 +609,17 @@ void AMyProjectCharacter::Slide()
 		this->movementComponent->BrakingDecelerationWalking = 0.0f;
 		this->movementComponent->BrakingFrictionFactor = 0.0f;
 
-		this->playerDirection = this->playerDirection * 1000;
-		FVector launchCharacterVector = this->playerDirection * 1000;
-		this->LaunchCharacter(launchCharacterVector, true, true);
+		FVector launchCharacterVector = this->FirstPersonCameraComponent->GetForwardVector();
+		launchCharacterVector = launchCharacterVector * 1000;
+
+		this->LaunchCharacter(FVector(
+			launchCharacterVector.X,
+			launchCharacterVector.Y,
+			0.0f),
+			true,
+			false
+		);
+
 		RevertedSlideCam();
 		SlideAudioComponent->Play();
 	}

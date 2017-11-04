@@ -105,6 +105,11 @@ public:								////// PUBLIC //////
 		float ressourceFillAmmount;												// Set FillAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float ressourceDrainAmount;												// Set Drain Amount
+	UPROPERTY(BlueprintReadOnly, Category = Getter)
+		float HAxis;															// Horizontal Axis
+	UPROPERTY(BlueprintReadOnly, Category = Getter)
+		float VAxis;															// Vertical Axis
+
 
 	// is Slomo Active or Deactive
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Slomo)
@@ -239,8 +244,6 @@ private:								////// PRIVATE //////
 	///DataType
 	int wallCollisionCounter = 0;							// Counts the Collision overlaps (Prevents bug)
 	float soundTimeDilation;
-	float HAxis;	// Horizontal Axis
-	float VAxis;	// Vertical Axis
 	float helperWallJumpNegativeFloat = 0;
 	bool isLMBPressed;
 	bool isBulletFired = false;
