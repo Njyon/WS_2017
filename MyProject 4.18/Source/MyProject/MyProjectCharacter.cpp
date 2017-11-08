@@ -65,6 +65,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 	SlowmoAudioComponent->bAutoActivate = false;
 	SlowmoAudioComponent->SetupAttachment(RootComponent);
 
+	//WalkSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> WalkCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Walking'"));
+	WalkAudioCue = WalkCue.Object;
+	WalkAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WalkAudioComp"));
+	WalkAudioComponent->bAutoActivate = false;
+	WalkAudioComponent->SetupAttachment(RootComponent);
+
 			////////////End Sounds////////////////
 
 	// Set size for collision capsule
@@ -248,9 +255,13 @@ void AMyProjectCharacter::PostInitializeComponents()
 		ClimbAudioComponent->SetSound(ClimbAudioCue);
 	}
 
-	if (SlowmoAudioCue->IsValidLowLevelFast())					//ClimbSound
+	if (SlowmoAudioCue->IsValidLowLevelFast())					//SlowmoSound
 	{	
 		SlowmoAudioComponent->SetSound(SlowmoAudioCue);
+	}
+	if (WalkAudioCue->IsValidLowLevelFast())					//WalkSound
+	{
+		WalkAudioComponent->SetSound(WalkAudioCue);
 	}
 }
 
@@ -305,9 +316,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	///Sounds
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
-	ShootAudioComponent->SetFloatParameter(FName("sfx_SlidingFireSlowmo"), soundTimeDilation);				//SlideSound		
-	ShootAudioComponent->SetFloatParameter(FName("sfx_WallrunFireSlowmo"), soundTimeDilation);				//WallrunSound		
-	ShootAudioComponent->SetFloatParameter(FName("sfx_ClimbWallFireSlowmo"), soundTimeDilation);			//ClimbSound
+	SlideAudioComponent->SetFloatParameter(FName("sfx_SlidingSlowmo"), soundTimeDilation);				//SlideSound		
+	WallrunAudioComponent->SetFloatParameter(FName("sfx_WallrunSlowmo"), soundTimeDilation);				//WallrunSound		
+	ClimbAudioComponent->SetFloatParameter(FName("sfx_ClimbWallSlowmo"), soundTimeDilation);			//ClimbSound
+	ShootAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);			//WalkSound
 
 
 	if (isOnLadder == true && climbingSoundDoOnce == false)													//climbSound gets played and stopped
@@ -486,6 +498,36 @@ void AMyProjectCharacter::MoveForward(float value)
 	}
 	else if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
 	{
+		if (WalkAudioComponent->IsPlaying() == false)
+		{
+			//FVector rayStart = this->GetActorLocation();
+			//FVector rayEnd = rayStart + this->GetActorUpVector() * -100;
+
+
+			//FCollisionQueryParams rayParams = FCollisionQueryParams(FName(TEXT("WalkParam")), true, this);		// Params for the RayCast
+			//rayParams.bTraceComplex = false;
+			//rayParams.bTraceAsyncScene = false;
+			//rayParams.bReturnPhysicalMaterial = false;
+
+			//FHitResult hitMat(ForceInit);
+
+			//world->LineTraceSingleByChannel(			// Raycast
+			//	hitMat,								// Result
+			//	rayStart,								// RayStart
+			//	rayEnd,									// RayEnd
+			//	ECC_Pawn,
+			//	rayParams);
+
+			//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
+			
+			/*FString Material = FString::FromInt(hitMat.PhysMaterial);
+			if (hitMat.PhysMaterial = Stone)
+			{*/
+				WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+			//}
+
+			WalkAudioComponent->Play();
+		}
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), value);
 		this->VAxis = value;
