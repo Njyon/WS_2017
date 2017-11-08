@@ -342,6 +342,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			{
 				SpawnBullet();		// Shoot a Bullet
 				currentAmmo -= 1;
+				OnAmmoChange();
 			}
 		}
 		else
@@ -380,6 +381,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	if (isSlomoActive == true)
 	{
 		this->ressource -= world->GetDeltaSeconds() * this->ressourceDrainAmount;
+		OnResourceChange();
 
 		if (movementComponent->IsFalling() == false && this->sliding == false)  // check if Character is in "Action"
 		{
@@ -399,6 +401,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	if (this->ressource < 100)
 	{
 		this->ressource += world->GetDeltaSeconds() * this->ressourceFillAmmount;
+		OnResourceChange();
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
@@ -504,6 +507,7 @@ void AMyProjectCharacter::Reload()
 	if (this->currentAmmo < this->magazineSize)
 	{
 		this->currentAmmo = this->magazineSize;
+		OnAmmoChange();
 	}
 }
 

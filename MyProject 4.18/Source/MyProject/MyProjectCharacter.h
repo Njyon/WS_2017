@@ -105,11 +105,10 @@ public:								////// PUBLIC //////
 		float ressourceFillAmmount = 20;											// Set FillAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float ressourceDrainAmount = 1000;											// Set Drain Amount
-		float ressourceDrainAmount;												// Set Drain Amount
 	UPROPERTY(BlueprintReadOnly, Category = Getter)
-		float HAxis;															// Horizontal Axis
+		float HAxis;																// Horizontal Axis
 	UPROPERTY(BlueprintReadOnly, Category = Getter)
-		float VAxis;															// Vertical Axis
+		float VAxis;																// Vertical Axis
 
 
 	// is Slomo Active or Deactive
@@ -219,6 +218,10 @@ public:								////// PUBLIC //////
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnDamageBPEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnAmmoChange();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnResourceChange();
 
 	/// Timeline Floats
 	UFUNCTION()
