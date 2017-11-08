@@ -72,39 +72,39 @@ public:								////// PUBLIC //////
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isOnLadder = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Magazine)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		int magazineSize;
-	UPROPERTY(BlueprintReadOnly, Category = Magazine)
+	UPROPERTY(BlueprintReadOnly, Category = Gun)
 		int currentAmmo;
 	//FireRate
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FireRate)
-		float fireRateSlomo = 0.05f;											//Set Fire Rate in Slomo
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FireRate)
-		float firerateNoSlomo = 0.3f;											//Set Fire Rate
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
+		float fireRateSlomo = 0.05f;												//Set Fire Rate in Slomo
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
+		float firerateNoSlomo = 0.3f;												//Set Fire Rate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float gravitation;														// Set Gravitation
+		float gravitation = 2;														// Set Gravitation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float wallrunDuration;													// Set Wallrun Duration
+		float wallrunDuration = 1.5f;												// Set Wallrun Duration
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float airControll;														// Set AirControll
+		float airControll = 0.2f;													// Set AirControll
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float wallJumpForce;													// Set the force to Jump from the wall
+		float wallJumpForce = 375;													// Set the force to Jump from the wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float wallJumpForceForward;												// Set the force to Jump from the wall in View direction
+		float wallJumpForceForward = 10;											// Set the force to Jump from the wall in View direction
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float jumpHeight;														// Set Jump Height
+		float jumpHeight = 1000;													// Set Jump Height
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float jumpHeightOnWall;													// Set Jump Height on Wall
+		float jumpHeightOnWall = 600;												// Set Jump Height on Wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float climbEndBoost;													// Set Climb End Boost
+		float climbEndBoost = -500;													// Set Climb End Boost
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
-		float maxRessource;														// Set Max Ressources
+		float maxRessource = 100;													// Set Max Ressources
 	UPROPERTY(BlueprintReadOnly, Category = Ressources)
-		float ressource;														// Set Ressources
+		float ressource;															// Set Ressources
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
-		float ressourceFillAmmount;												// Set FillAmount
+		float ressourceFillAmmount = 20;											// Set FillAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
-		float ressourceDrainAmount;												// Set Drain Amount
+		float ressourceDrainAmount = 1000;											// Set Drain Amount
 
 	// is Slomo Active or Deactive
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Slomo)
@@ -115,18 +115,18 @@ public:								////// PUBLIC //////
 		float slomoTimeDilation = 0.05f;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float Health = 100.0f;
 
 	/** Gun muzzle's offset from the characters location */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		FVector GunOffset;
 
 	/** Sound to play each time we fire */
