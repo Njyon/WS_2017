@@ -185,6 +185,11 @@ public:								////// PUBLIC //////
 		class USoundCue* SlowmoAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* SlowmoAudioComponent;
+	//Walk
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* WalkAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* WalkAudioComponent;
 
 										// UFUNCTION //
 	void Damage(int damage);
