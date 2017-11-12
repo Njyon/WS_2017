@@ -65,6 +65,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 	SlowmoAudioComponent->bAutoActivate = false;
 	SlowmoAudioComponent->SetupAttachment(RootComponent);
 
+	//WalkSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> WalkCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Walking'"));
+	WalkAudioCue = WalkCue.Object;
+	WalkAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WalkAudioComp"));
+	WalkAudioComponent->bAutoActivate = false;
+	WalkAudioComponent->SetupAttachment(RootComponent);
+
 			////////////End Sounds////////////////
 
 	// Set size for collision capsule
@@ -248,9 +255,13 @@ void AMyProjectCharacter::PostInitializeComponents()
 		ClimbAudioComponent->SetSound(ClimbAudioCue);
 	}
 
-	if (SlowmoAudioCue->IsValidLowLevelFast())					//ClimbSound
+	if (SlowmoAudioCue->IsValidLowLevelFast())					//SlowmoSound
 	{	
 		SlowmoAudioComponent->SetSound(SlowmoAudioCue);
+	}
+	if (WalkAudioCue->IsValidLowLevelFast())					//WalkSound
+	{
+		WalkAudioComponent->SetSound(WalkAudioCue);
 	}
 }
 
@@ -305,9 +316,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	///Sounds
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
-	ShootAudioComponent->SetFloatParameter(FName("sfx_SlidingFireSlowmo"), soundTimeDilation);				//SlideSound		
-	ShootAudioComponent->SetFloatParameter(FName("sfx_WallrunFireSlowmo"), soundTimeDilation);				//WallrunSound		
-	ShootAudioComponent->SetFloatParameter(FName("sfx_ClimbWallFireSlowmo"), soundTimeDilation);			//ClimbSound
+	SlideAudioComponent->SetFloatParameter(FName("sfx_SlidingSlowmo"), soundTimeDilation);				//SlideSound		
+	WallrunAudioComponent->SetFloatParameter(FName("sfx_WallrunSlowmo"), soundTimeDilation);				//WallrunSound		
+	ClimbAudioComponent->SetFloatParameter(FName("sfx_ClimbWallSlowmo"), soundTimeDilation);			//ClimbSound
+	ShootAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);			//WalkSound
 
 
 	if (isOnLadder == true && climbingSoundDoOnce == false)													//climbSound gets played and stopped
@@ -342,6 +354,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			{
 				SpawnBullet();		// Shoot a Bullet
 				currentAmmo -= 1;
+				OnAmmoChange();
 			}
 		}
 		else
@@ -380,6 +393,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	if (isSlomoActive == true)
 	{
 		this->ressource -= world->GetDeltaSeconds() * this->ressourceDrainAmount;
+		OnResourceChange();
 
 		if (movementComponent->IsFalling() == false && this->sliding == false)  // check if Character is in "Action"
 		{
@@ -399,6 +413,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	if (this->ressource < 100)
 	{
 		this->ressource += world->GetDeltaSeconds() * this->ressourceFillAmmount;
+		OnResourceChange();
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
@@ -483,6 +498,38 @@ void AMyProjectCharacter::MoveForward(float value)
 	}
 	else if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
 	{
+		if (WalkAudioComponent->IsPlaying() == false)
+		{
+			FVector rayStart = this->GetActorLocation();
+			FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
+
+
+			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+			rayParams.bTraceComplex = false;
+			rayParams.bTraceAsyncScene = true;
+			rayParams.bReturnPhysicalMaterial = true;
+
+			FHitResult hitMat(ForceInit);
+
+			if (world->LineTraceSingleByChannel(hitMat,	rayStart, rayEnd, ECC_Pawn, rayParams))
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
+
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
+
+				if (hitMat.PhysMaterial->SurfaceType == 0)
+				{
+					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+				}
+
+				WalkAudioComponent->Play();
+			}
+
+			else
+			{
+				WalkAudioComponent->Stop();
+			}
+		}
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), value);
 		this->VAxis = value;
@@ -504,6 +551,7 @@ void AMyProjectCharacter::Reload()
 	if (this->currentAmmo < this->magazineSize)
 	{
 		this->currentAmmo = this->magazineSize;
+		OnAmmoChange();
 	}
 }
 
@@ -609,9 +657,17 @@ void AMyProjectCharacter::Slide()
 		this->movementComponent->BrakingDecelerationWalking = 0.0f;
 		this->movementComponent->BrakingFrictionFactor = 0.0f;
 
-		this->playerDirection = this->playerDirection * 1000;
-		FVector launchCharacterVector = this->playerDirection * 1000;
-		this->LaunchCharacter(launchCharacterVector, true, true);
+		FVector launchCharacterVector = this->FirstPersonCameraComponent->GetForwardVector();
+		launchCharacterVector = launchCharacterVector * 1000;
+
+		this->LaunchCharacter(FVector(
+			launchCharacterVector.X,
+			launchCharacterVector.Y,
+			0.0f),
+			true,
+			false
+		);
+
 		RevertedSlideCam();
 		SlideAudioComponent->Play();
 	}
