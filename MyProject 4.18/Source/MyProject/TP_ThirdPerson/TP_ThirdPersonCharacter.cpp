@@ -115,24 +115,24 @@ void ATP_ThirdPersonCharacter::Walking()
 
 		FHitResult hitMat(ForceInit);
 
-		if (world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_Pawn, rayParams))
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
+		WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+		//if (world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_Pawn, rayParams))
+		//{
+		//	//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
 
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
+		//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
 
-			if (hitMat.PhysMaterial->SurfaceType == 0)
-			{
-				WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
-			}
+		//	if (hitMat.PhysMaterial->SurfaceType == 0)
+		//	{
+		//	}
 
-			WalkAudioComponent->Play();
-		}
+		//	WalkAudioComponent->Play();
+		//}
 
-		else
-		{
-			WalkAudioComponent->Stop();
-		}
+		//else
+		//{
+		//	WalkAudioComponent->Stop();
+		//}
 	}
 }
 
