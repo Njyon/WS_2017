@@ -7,6 +7,8 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "ConstructorHelpers.h"
+#include "Engine.h"
 #include "GameFramework/SpringArmComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -14,6 +16,8 @@
 
 ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 {
+
+	world = GetWorld();
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -31,6 +35,14 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
+
+	//Sounds
+	//Shoot
+	static ConstructorHelpers::FObjectFinder<USoundCue> WalkCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Walking'"));
+	WalkAudioCue = WalkCue.Object;
+	WalkAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WalkAudioComp"));
+	WalkAudioComponent->bAutoActivate = false;
+	WalkAudioComponent->SetupAttachment(RootComponent);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -64,6 +76,58 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 //	// VR headset functionality
 //	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATP_ThirdPersonCharacter::OnResetVR);
 //}
+
+void ATP_ThirdPersonCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (WalkAudioCue->IsValidLowLevelFast())					//ShootSound
+	{
+		WalkAudioComponent->SetSound(WalkAudioCue);
+	}
+}
+
+void ATP_ThirdPersonCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+}
+
+void ATP_ThirdPersonCharacter::Walking()
+{
+	if (WalkAudioComponent->IsPlaying() == false)
+	{
+		FVector rayStart = this->GetActorLocation();
+		FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
+
+
+		FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+		rayParams.bTraceComplex = false;
+		rayParams.bTraceAsyncScene = true;
+		rayParams.bReturnPhysicalMaterial = true;
+
+		FHitResult hitMat(ForceInit);
+
+		if (world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_Pawn, rayParams))
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
+
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
+
+			if (hitMat.PhysMaterial->SurfaceType == 0)
+			{
+				WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+			}
+
+			WalkAudioComponent->Play();
+		}
+
+		else
+		{
+			WalkAudioComponent->Stop();
+		}
+	}
+}
 
 float  ATP_ThirdPersonCharacter::GetCurrentHealth()
 {
