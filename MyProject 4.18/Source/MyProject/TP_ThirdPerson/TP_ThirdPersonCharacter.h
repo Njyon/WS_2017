@@ -35,9 +35,22 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void DamageEvent();
 
+	UFUNCTION(Blueprintcallable)
+		void Walking();
+
 	void Damage(int damage);
 
+								//Sound
+
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* WalkAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* WalkAudioComponent;
+
 protected:
+
+	virtual void PostInitializeComponents() override; //Executes after Begin Play
+	virtual void Tick(float DeltaSeconds) override;
 
 //	/** Resets HMD orientation in VR. */
 //	void OnResetVR();
@@ -70,5 +83,8 @@ protected:
 //	// APawn interface
 //	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 //	// End of APawn interface
+
+private:
+	class UWorld* world;
 };
 
