@@ -14,7 +14,11 @@ class ATP_ThirdPersonCharacter : public ACharacter
 public:
 
 	//DataType
-	float Health = 100.0f;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = health)
+		float Health = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = health)
+		float MaxHealth = 100.0f;
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 		float GetCurrentHealth();
@@ -49,6 +53,7 @@ public:
 
 protected:
 
+	virtual void BeginPlay(); //Executes at Begin+
 	virtual void PostInitializeComponents() override; //Executes after Begin Play
 	virtual void Tick(float DeltaSeconds) override;
 

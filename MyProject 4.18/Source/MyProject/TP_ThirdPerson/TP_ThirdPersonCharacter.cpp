@@ -48,6 +48,13 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+void ATP_ThirdPersonCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Health = MaxHealth;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -145,8 +152,9 @@ void ATP_ThirdPersonCharacter::Damage(int damage)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("dead"));
 		AController* controller = this->GetController();
-		controller->PawnPendingDestroy(this);
+		//controller->PawnPendingDestroy(this);
 		SetActorEnableCollision(false);
+		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		OnNPCDeathBPEvent();
 	}
 }
