@@ -42,14 +42,23 @@ public:
 	UFUNCTION(Blueprintcallable)
 		void Walking();
 
+	UFUNCTION(Blueprintcallable)
+		void Shooting();
+
 	void Damage(int damage);
 
 								//Sound
-
+	//Walk
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* WalkAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* WalkAudioComponent;
+
+	//Shoot
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* ShootAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* ShootAudioComponent;
 
 protected:
 

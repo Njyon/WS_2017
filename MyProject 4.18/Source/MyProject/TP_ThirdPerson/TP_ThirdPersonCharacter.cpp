@@ -37,12 +37,19 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	//Sounds
-	//Shoot
+	//WalkSound
 	static ConstructorHelpers::FObjectFinder<USoundCue> WalkCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Walking'"));
 	WalkAudioCue = WalkCue.Object;
 	WalkAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WalkAudioComp"));
 	WalkAudioComponent->bAutoActivate = false;
 	WalkAudioComponent->SetupAttachment(RootComponent);
+
+	//ShootSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> ShootCue(TEXT("'/Game/Sound/SFX/Weapon/sfx_WeaponFire'"));
+	ShootAudioCue = ShootCue.Object;
+	ShootAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootAudioComp"));
+	ShootAudioComponent->bAutoActivate = false;
+	ShootAudioComponent->SetupAttachment(RootComponent);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -88,9 +95,14 @@ void ATP_ThirdPersonCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (WalkAudioCue->IsValidLowLevelFast())					//ShootSound
+	if (WalkAudioCue->IsValidLowLevelFast())					//WalkSound
 	{
 		WalkAudioComponent->SetSound(WalkAudioCue);
+	}
+
+	if (ShootAudioCue->IsValidLowLevelFast())					//ShootSound
+	{
+		ShootAudioComponent->SetSound(ShootAudioCue);
 	}
 }
 
@@ -134,6 +146,11 @@ void ATP_ThirdPersonCharacter::Walking()
 		//	WalkAudioComponent->Stop();
 		//}
 	}
+}
+
+void ATP_ThirdPersonCharacter::Shooting()
+{
+	ShootAudioComponent->Play();
 }
 
 float  ATP_ThirdPersonCharacter::GetCurrentHealth()
