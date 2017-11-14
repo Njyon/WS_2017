@@ -43,6 +43,9 @@ public:
 		void Walking();
 
 	UFUNCTION(Blueprintcallable)
+		void StopWalking();
+
+	UFUNCTION(Blueprintcallable)
 		void Shooting();
 
 	void Damage(int damage);
