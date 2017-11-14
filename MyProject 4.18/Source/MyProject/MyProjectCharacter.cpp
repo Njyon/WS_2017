@@ -987,7 +987,7 @@ void AMyProjectCharacter::WallrunEnd()
 /// Main Start Walldetection
 void AMyProjectCharacter::OnWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /*&& Wallclimb false */)		// Check if the Wall has the right TAG and if the player is in the air
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)		// Check if the Wall has the right TAG and if the player is in the air
 	{
 		this->isOnWall = true;																					// Set the Wallrun State
 		this->wallCollisionCounter = 0;																			// Set the Wallruncounter back to 0 (Colliding bug prevention) 
@@ -1001,7 +1001,7 @@ void AMyProjectCharacter::OnWallDetected(class UPrimitiveComponent* hitComp, cla
 /// Main End Walldetection
 void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling())
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->wallrunTimeline->Stop();																			// Stops Timeline
 
@@ -1020,7 +1020,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 /// Right Walldetector Begin
 void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;					// set the bool false so it only can on of them be true (safty first)
 		this->isWallRight = true;	
@@ -1035,7 +1035,7 @@ void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp
 /// Right Walldetector End
 void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;					
 		this->isWallRight = false;
@@ -1052,7 +1052,7 @@ void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitCom
 void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
 
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallRight = false;						// set the bool false so it only can on of them be true (safty first)
 		this->isWallLeft = true;		
@@ -1067,7 +1067,7 @@ void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp,
 /// Left Walldetector End
 void AMyProjectCharacter::EndLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;
 		this->isWallRight = false;
