@@ -116,9 +116,9 @@ void ATP_ThirdPersonCharacter::Walking()
 {
 	if (WalkAudioComponent->IsPlaying() == false)
 	{
-		FVector rayStart = this->GetActorLocation();
+		FVector rayStart = this->GetActorLocation().UpVector * 10;
 		FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
-
+		UE_LOG(LogTemp, Warning, TEXT("walk1"));
 
 		FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
 		rayParams.bTraceComplex = false;
@@ -126,16 +126,17 @@ void ATP_ThirdPersonCharacter::Walking()
 		rayParams.bReturnPhysicalMaterial = true;
 
 		FHitResult hitMat(ForceInit);
-			UE_LOG(LogTemp, Warning, TEXT("walk"));
 
 		if (world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_Pawn, rayParams))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("walk2"));
 			//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
 
 			if (hitMat.PhysMaterial->SurfaceType == 0)
 			{
+					UE_LOG(LogTemp, Warning, TEXT("walk3"));
 					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
 			}
 

@@ -416,9 +416,9 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		OnResourceChange();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
+	//UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
 
-	UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
+	//UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
 }
 
 			//////////////////////////////////////
