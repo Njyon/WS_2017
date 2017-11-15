@@ -500,33 +500,35 @@ void AMyProjectCharacter::MoveForward(float value)
 	{
 		if (WalkAudioComponent->IsPlaying() == false)
 		{
-			//FVector rayStart = this->GetActorLocation();
-			//FVector rayEnd = rayStart + this->GetActorUpVector() * -100;
+			FVector rayStart = this->GetActorLocation();
+			FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
 
 
-			//FCollisionQueryParams rayParams = FCollisionQueryParams(FName(TEXT("WalkParam")), true, this);		// Params for the RayCast
-			//rayParams.bTraceComplex = false;
-			//rayParams.bTraceAsyncScene = false;
-			//rayParams.bReturnPhysicalMaterial = false;
+			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+			rayParams.bTraceComplex = false;
+			rayParams.bTraceAsyncScene = true;
+			rayParams.bReturnPhysicalMaterial = true;
 
-			//FHitResult hitMat(ForceInit);
+			FHitResult hitMat(ForceInit);
 
-			//world->LineTraceSingleByChannel(			// Raycast
-			//	hitMat,								// Result
-			//	rayStart,								// RayStart
-			//	rayEnd,									// RayEnd
-			//	ECC_Pawn,
-			//	rayParams);
+			if (world->LineTraceSingleByChannel(hitMat,	rayStart, rayEnd, ECC_Pawn, rayParams))
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
 
-			//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
-			
-			/*FString Material = FString::FromInt(hitMat.PhysMaterial);
-			if (hitMat.PhysMaterial = Stone)
-			{*/
-				WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
-			//}
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
 
-			WalkAudioComponent->Play();
+				if (hitMat.PhysMaterial->SurfaceType == 0)
+				{
+					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+				}
+
+				WalkAudioComponent->Play();
+			}
+
+			else
+			{
+				WalkAudioComponent->Stop();
+			}
 		}
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), value);
@@ -538,6 +540,38 @@ void AMyProjectCharacter::MoveRight(float value)
 {
 	if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
 	{
+		if (WalkAudioComponent->IsPlaying() == false)
+		{
+			FVector rayStart = this->GetActorLocation();
+			FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
+
+
+			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+			rayParams.bTraceComplex = false;
+			rayParams.bTraceAsyncScene = true;
+			rayParams.bReturnPhysicalMaterial = true;
+
+			FHitResult hitMat(ForceInit);
+
+			if (world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_Pawn, rayParams))
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
+
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
+
+				if (hitMat.PhysMaterial->SurfaceType == 0)
+				{
+					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+				}
+
+				WalkAudioComponent->Play();
+			}
+
+			else
+			{
+				WalkAudioComponent->Stop();
+			}
+		}
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), value);
 		this->HAxis = value;

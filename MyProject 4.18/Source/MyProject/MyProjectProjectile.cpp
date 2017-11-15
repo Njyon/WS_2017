@@ -41,7 +41,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
 
 		Destroy();
 	}
@@ -57,8 +57,17 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 	else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("NPChit"));
-		hittedNPC->Damage(projectileDamage);
+		UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
+		if (Hit.BoneName == "head")
+		{
+			headshotdamage = projectileDamage * headshotMultiplier;
+			hittedNPC->Damage(headshotdamage);
+		}
+
+		else
+		{
+			hittedNPC->Damage(projectileDamage);
+		}
 
 		//ProjectileMovement->bShouldBounce = false;
 		Destroy();
