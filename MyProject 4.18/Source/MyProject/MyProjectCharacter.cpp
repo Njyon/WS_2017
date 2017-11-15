@@ -507,19 +507,22 @@ void AMyProjectCharacter::MoveForward(float value)
 			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
 			rayParams.bTraceComplex = false;
 			rayParams.bTraceAsyncScene = true;
+			rayParams.AddIgnoredActor(this);
 			rayParams.bReturnPhysicalMaterial = true;
 
 			FHitResult hitMat(ForceInit);
+			world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
 
-			if (world->LineTraceSingleByChannel(hitMat,	rayStart, rayEnd, ECC_Pawn, rayParams))
+			if (hitMat.IsValidBlockingHit() == true)
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
-
-				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
-
-				if (hitMat.PhysMaterial->SurfaceType == 0)
+				if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 				{
 					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+				}
+
+				else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
 				}
 
 				WalkAudioComponent->Play();
