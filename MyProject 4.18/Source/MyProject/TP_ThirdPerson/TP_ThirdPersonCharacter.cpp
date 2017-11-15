@@ -116,36 +116,33 @@ void ATP_ThirdPersonCharacter::Walking()
 {
 	if (WalkAudioComponent->IsPlaying() == false)
 	{
-		FVector rayStart = this->GetActorLocation().UpVector * 10;
+		FVector rayStart = this->GetActorLocation();
 		FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
-		UE_LOG(LogTemp, Warning, TEXT("walk1"));
+
 
 		FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
 		rayParams.bTraceComplex = false;
 		rayParams.bTraceAsyncScene = true;
+		rayParams.AddIgnoredActor(this);
 		rayParams.bReturnPhysicalMaterial = true;
 
 		FHitResult hitMat(ForceInit);
+		GetWorld()->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
 
-		if (world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_Pawn, rayParams))
+		if (hitMat.IsValidBlockingHit() == true)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("walk2"));
-			//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
-
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
-
-			if (hitMat.PhysMaterial->SurfaceType == 0)
+			UE_LOG(LogTemp, Warning, TEXT("what"));
+			if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 			{
-					UE_LOG(LogTemp, Warning, TEXT("walk3"));
-					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+				WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+			}
+
+			else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+			{
+				WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
 			}
 
 			WalkAudioComponent->Play();
-		}
-
-		else
-		{
-			WalkAudioComponent->Stop();
 		}
 	}
 }
