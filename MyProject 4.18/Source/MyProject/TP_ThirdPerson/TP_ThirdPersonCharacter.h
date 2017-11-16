@@ -14,7 +14,11 @@ class ATP_ThirdPersonCharacter : public ACharacter
 public:
 
 	//DataType
-	float Health = 100.0f;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = health)
+		float Health = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = health)
+		float MaxHealth = 100.0f;
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 		float GetCurrentHealth();
@@ -35,9 +39,35 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void DamageEvent();
 
+	UFUNCTION(Blueprintcallable)
+		void Walking();
+
+	UFUNCTION(Blueprintcallable)
+		void StopWalking();
+
+	UFUNCTION(Blueprintcallable)
+		void Shooting();
+
 	void Damage(int damage);
 
+								//Sound
+	//Walk
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* WalkAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* WalkAudioComponent;
+
+	//Shoot
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* ShootAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* ShootAudioComponent;
+
 protected:
+
+	virtual void BeginPlay(); //Executes at Begin+
+	virtual void PostInitializeComponents() override; //Executes after Begin Play
+	virtual void Tick(float DeltaSeconds) override;
 
 //	/** Resets HMD orientation in VR. */
 //	void OnResetVR();
@@ -70,5 +100,8 @@ protected:
 //	// APawn interface
 //	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 //	// End of APawn interface
+
+private:
+	class UWorld* world;
 };
 
