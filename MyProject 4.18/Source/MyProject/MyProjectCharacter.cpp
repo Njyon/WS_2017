@@ -72,6 +72,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 	WalkAudioComponent->bAutoActivate = false;
 	WalkAudioComponent->SetupAttachment(RootComponent);
 
+	//JumpSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> JumpCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Jump'"));
+	JumpAudioCue = JumpCue.Object;
+	JumpAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("JumpAudioComp"));
+	JumpAudioComponent->bAutoActivate = false;
+	JumpAudioComponent->SetupAttachment(RootComponent);
+	
 			////////////End Sounds////////////////
 
 	// Set size for collision capsule
@@ -263,6 +270,10 @@ void AMyProjectCharacter::PostInitializeComponents()
 	{
 		WalkAudioComponent->SetSound(WalkAudioCue);
 	}
+	if (JumpAudioCue->IsValidLowLevelFast())					//JumpSound
+	{	
+		JumpAudioComponent->SetSound(JumpAudioCue);
+	}
 }
 
 
@@ -313,13 +324,14 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 
 	//UE_LOG(LogTemp, Warning, TEXT("%f"), Health);
 
-	///Sounds
+	///Sounds Slowmo
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
 	SlideAudioComponent->SetFloatParameter(FName("sfx_SlidingSlowmo"), soundTimeDilation);				//SlideSound		
 	WallrunAudioComponent->SetFloatParameter(FName("sfx_WallrunSlowmo"), soundTimeDilation);				//WallrunSound		
 	ClimbAudioComponent->SetFloatParameter(FName("sfx_ClimbWallSlowmo"), soundTimeDilation);			//ClimbSound
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);			//WalkSound
+	ShootAudioComponent->SetFloatParameter(FName("sfx_JumpSlowmo"), soundTimeDilation);			//JumpSound
 
 
 	if (isOnLadder == true && climbingSoundDoOnce == false)													//climbSound gets played and stopped
@@ -607,6 +619,38 @@ void AMyProjectCharacter::Jump()
 			false,												// XY Override
 			true												// Z Override
 		);
+
+		//JumpSound
+
+		if (JumpAudioComponent->IsPlaying() == false)
+		{
+			FVector rayStart = this->GetActorLocation();
+			FVector rayEnd = rayStart + this->GetActorUpVector() * -500;
+
+
+			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+			rayParams.bTraceComplex = false;
+			rayParams.bTraceAsyncScene = true;
+			rayParams.AddIgnoredActor(this);
+			rayParams.bReturnPhysicalMaterial = true;
+
+			FHitResult hitMat(ForceInit);
+			world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
+
+			if (hitMat.IsValidBlockingHit() == true)
+			{
+				if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				{
+					JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 1);
+				}
+
+				else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 0);
+				}
+				JumpAudioComponent->Play();
+			}
+		}
 	}
 	else if (this->isWallRight == true)
 	{
@@ -623,6 +667,9 @@ void AMyProjectCharacter::Jump()
 			false, 
 			true
 		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
 	}
 	else if (this->isWallLeft == true)
 	{
@@ -639,6 +686,9 @@ void AMyProjectCharacter::Jump()
 			false,
 			true
 		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
 	}
 	else if (this->isOnLadder == true)
 	{
@@ -653,6 +703,9 @@ void AMyProjectCharacter::Jump()
 			true,
 			true
 		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 3);
+		JumpAudioComponent->Play();
 	}
 }
 
