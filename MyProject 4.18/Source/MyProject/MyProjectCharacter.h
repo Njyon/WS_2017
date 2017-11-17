@@ -34,7 +34,9 @@ class AMyProjectCharacter : public ACharacter
 
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(EditAnywhere, Category = Mesh)
-		class USceneComponent* FP_MuzzleLocation;
+		class USceneComponent* FP_MuzzleLocationRight;
+	UPROPERTY(EditAnywhere, Category = Mesh)
+		class USceneComponent* FP_MuzzleLocationLeft;
 
 								//////// Timelines ////////
 	UPROPERTY()
@@ -195,6 +197,11 @@ public:								////// PUBLIC //////
 		class USoundCue* WalkAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* WalkAudioComponent;
+	//Jump
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* JumpAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* JumpAudioComponent;
 
 										// UFUNCTION //
 	void Damage(int damage);
@@ -266,6 +273,7 @@ private:								////// PRIVATE //////
 	bool isFalling = false;
 	bool climbingSoundDoOnce = false;
 	bool WallrunSoundDoOnce = false;
+	bool isShootingLeft = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for Wallrun

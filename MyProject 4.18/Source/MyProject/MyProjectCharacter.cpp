@@ -72,6 +72,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 	WalkAudioComponent->bAutoActivate = false;
 	WalkAudioComponent->SetupAttachment(RootComponent);
 
+	//JumpSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> JumpCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Jump'"));
+	JumpAudioCue = JumpCue.Object;
+	JumpAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("JumpAudioComp"));
+	JumpAudioComponent->bAutoActivate = false;
+	JumpAudioComponent->SetupAttachment(RootComponent);
+	
 			////////////End Sounds////////////////
 
 	// Set size for collision capsule
@@ -104,9 +111,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 	FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
 	FP_Gun->SetupAttachment(RootComponent);
 
-	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
-	FP_MuzzleLocation->SetupAttachment(FP_Gun);
-	FP_MuzzleLocation->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	FP_MuzzleLocationRight = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationRight"));
+	FP_MuzzleLocationRight->SetupAttachment(FP_Gun);
+	FP_MuzzleLocationRight->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+
+	FP_MuzzleLocationLeft = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationLeft"));
+	FP_MuzzleLocationLeft->SetupAttachment(FP_Gun);
+	FP_MuzzleLocationLeft->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
@@ -263,6 +274,10 @@ void AMyProjectCharacter::PostInitializeComponents()
 	{
 		WalkAudioComponent->SetSound(WalkAudioCue);
 	}
+	if (JumpAudioCue->IsValidLowLevelFast())					//JumpSound
+	{	
+		JumpAudioComponent->SetSound(JumpAudioCue);
+	}
 }
 
 
@@ -313,13 +328,14 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 
 	//UE_LOG(LogTemp, Warning, TEXT("%f"), Health);
 
-	///Sounds
+	///Sounds Slowmo
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
 	SlideAudioComponent->SetFloatParameter(FName("sfx_SlidingSlowmo"), soundTimeDilation);				//SlideSound		
 	WallrunAudioComponent->SetFloatParameter(FName("sfx_WallrunSlowmo"), soundTimeDilation);				//WallrunSound		
 	ClimbAudioComponent->SetFloatParameter(FName("sfx_ClimbWallSlowmo"), soundTimeDilation);			//ClimbSound
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);			//WalkSound
+	ShootAudioComponent->SetFloatParameter(FName("sfx_JumpSlowmo"), soundTimeDilation);			//JumpSound
 
 
 	if (isOnLadder == true && climbingSoundDoOnce == false)													//climbSound gets played and stopped
@@ -416,9 +432,9 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		OnResourceChange();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
+	//UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
 
-	UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
+	//UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
 }
 
 			//////////////////////////////////////
@@ -507,19 +523,22 @@ void AMyProjectCharacter::MoveForward(float value)
 			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
 			rayParams.bTraceComplex = false;
 			rayParams.bTraceAsyncScene = true;
+			rayParams.AddIgnoredActor(this);
 			rayParams.bReturnPhysicalMaterial = true;
 
 			FHitResult hitMat(ForceInit);
+			world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
 
-			if (world->LineTraceSingleByChannel(hitMat,	rayStart, rayEnd, ECC_Pawn, rayParams))
+			if (hitMat.IsValidBlockingHit() == true)
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
-
-				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
-
-				if (hitMat.PhysMaterial->SurfaceType == 0)
+				if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 				{
 					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+				}
+
+				else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
 				}
 
 				WalkAudioComponent->Play();
@@ -604,6 +623,38 @@ void AMyProjectCharacter::Jump()
 			false,												// XY Override
 			true												// Z Override
 		);
+
+		//JumpSound
+
+		if (JumpAudioComponent->IsPlaying() == false)
+		{
+			FVector rayStart = this->GetActorLocation();
+			FVector rayEnd = rayStart + this->GetActorUpVector() * -500;
+
+
+			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+			rayParams.bTraceComplex = false;
+			rayParams.bTraceAsyncScene = true;
+			rayParams.AddIgnoredActor(this);
+			rayParams.bReturnPhysicalMaterial = true;
+
+			FHitResult hitMat(ForceInit);
+			world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
+
+			if (hitMat.IsValidBlockingHit() == true)
+			{
+				if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				{
+					JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 1);
+				}
+
+				else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 0);
+				}
+				JumpAudioComponent->Play();
+			}
+		}
 	}
 	else if (this->isWallRight == true)
 	{
@@ -620,6 +671,9 @@ void AMyProjectCharacter::Jump()
 			false, 
 			true
 		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
 	}
 	else if (this->isWallLeft == true)
 	{
@@ -636,6 +690,9 @@ void AMyProjectCharacter::Jump()
 			false,
 			true
 		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
 	}
 	else if (this->isOnLadder == true)
 	{
@@ -650,6 +707,9 @@ void AMyProjectCharacter::Jump()
 			true,
 			true
 		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 3);
+		JumpAudioComponent->Play();
 	}
 }
 
@@ -779,8 +839,11 @@ void AMyProjectCharacter::SpawnBullet()
 
 	if (hitResult.IsValidBlockingHit() == true)																		// Does the RayHit?
 	{
+		if (!isShootingLeft)
+		{
+		isShootingLeft = true;
 		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
-			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
+			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 			hitResult.ImpactPoint);																					// Get Impact Point in World
 
 		FActorSpawnParameters spawnInfo;																			// Spawn Info
@@ -790,17 +853,40 @@ void AMyProjectCharacter::SpawnBullet()
 
 		AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
 			playerProjectile,															// SubClass
-			FP_MuzzleLocation->GetComponentTransform().GetLocation(),					// SpawnLocation
+			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),				// SpawnLocation
 			newRotation,																// SpawnRotation
-			spawnInfo);	
-																// Set Spawn Info
+			spawnInfo);																	// Set Spawn Info
+		}
+
+		else if (isShootingLeft)
+		{
+			isShootingLeft = false;
+			FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
+				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
+				hitResult.ImpactPoint);																					// Get Impact Point in World
+
+			FActorSpawnParameters spawnInfo;																			// Spawn Info
+			spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always
+			spawnInfo.Owner = this;																						// Owner of Spawned Actor is this Class
+			spawnInfo.Instigator = this;																				// if you spawn a projectile and pass over instigator as say, your pawn. then when the projectile wants to do damage, you can pass it over to the damage function. So you know who fire the projectile, you can then decide if you want friendly fire, and all sorts of things can be done after you know this bit of info.
+
+			AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
+				playerProjectile,															// SubClass
+				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),				// SpawnLocation
+				newRotation,																// SpawnRotation
+				spawnInfo);																	// Set Spawn Info
+		}
+
 
 		ShootAudioComponent->Play();
 	}
 	else																				// Ray does not hit anything
 	{
+		if (!isShootingLeft)
+		{
+		isShootingLeft = true;
 		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
-			FP_MuzzleLocation->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
+			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 			hitResult.TraceEnd);																					// Get Trace end in World
 
 		FActorSpawnParameters spawnInfo;																			// Spawn Info
@@ -810,9 +896,29 @@ void AMyProjectCharacter::SpawnBullet()
 
 		AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
 			playerProjectile,															// SubClass
-			FP_MuzzleLocation->GetComponentTransform().GetLocation(),					// SpawnLocation
+			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),				// SpawnLocation
 			newRotation,																// SpawnRotation
 			spawnInfo);																	// Set Spawn Info
+		}
+
+		else if (isShootingLeft)
+		{
+			isShootingLeft = false;
+			FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
+				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
+				hitResult.TraceEnd);																					// Get Trace end in World
+
+			FActorSpawnParameters spawnInfo;																			// Spawn Info
+			spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always
+			spawnInfo.Owner = this;																						// Owner of Spawned Actor is this Class
+			spawnInfo.Instigator = this;																				// if you spawn a projectile and pass over instigator as say, your pawn. then when the projectile wants to do damage, you can pass it over to the damage function. So you know who fire the projectile, you can then decide if you want friendly fire, and all sorts of things can be done after you know this bit of info.
+
+			AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
+				playerProjectile,															// SubClass
+				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),				// SpawnLocation
+				newRotation,																// SpawnRotation
+				spawnInfo);																	// Set Spawn Info
+		}
 
 
 		ShootAudioComponent->Play();
@@ -987,7 +1093,7 @@ void AMyProjectCharacter::WallrunEnd()
 /// Main Start Walldetection
 void AMyProjectCharacter::OnWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /*&& Wallclimb false */)		// Check if the Wall has the right TAG and if the player is in the air
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)		// Check if the Wall has the right TAG and if the player is in the air
 	{
 		this->isOnWall = true;																					// Set the Wallrun State
 		this->wallCollisionCounter = 0;																			// Set the Wallruncounter back to 0 (Colliding bug prevention) 
@@ -1001,7 +1107,7 @@ void AMyProjectCharacter::OnWallDetected(class UPrimitiveComponent* hitComp, cla
 /// Main End Walldetection
 void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling())
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->wallrunTimeline->Stop();																			// Stops Timeline
 
@@ -1020,7 +1126,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 /// Right Walldetector Begin
 void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;					// set the bool false so it only can on of them be true (safty first)
 		this->isWallRight = true;	
@@ -1035,7 +1141,7 @@ void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp
 /// Right Walldetector End
 void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;					
 		this->isWallRight = false;
@@ -1052,7 +1158,7 @@ void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitCom
 void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
 
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallRight = false;						// set the bool false so it only can on of them be true (safty first)
 		this->isWallLeft = true;		
@@ -1067,7 +1173,7 @@ void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp,
 /// Left Walldetector End
 void AMyProjectCharacter::EndLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() /* && Wallclimb false */)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;
 		this->isWallRight = false;

@@ -8,36 +8,49 @@
 #include "GameFramework/Actor.h"
 #include "MyProjectProjectile.generated.h"
 
+UENUM()
+enum class collisionSwitch
+{
+	player,
+	npc
+};
+
 UCLASS(config=Game)
 class AMyProjectProjectile : public AActor
 {
 	GENERATED_BODY()
 
-	/** Sphere collision component */
-	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	class USphereComponent* CollisionComp;
+		/** Sphere collision component */
+		UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+		class USphereComponent* CollisionComp;
 
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	class UProjectileMovementComponent* ProjectileMovement;
+		class UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-	int projectileDamage = 50;
+		int projectileDamage = 50;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-	float headshotMultiplier = 2.0f;
+		float headshotMultiplier = 2.0f;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
 	float forceImpulse = 100.0f;
 
 	int headshotdamage;
 
+
 public:
 	AMyProjectProjectile();
 
+
+	UPROPERTY(EditAnywhere, Category = CollisionSwitch)
+		collisionSwitch state;
+
+
 	/** called when projectile hits something */
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+		void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	/** Returns CollisionComp subobject **/
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
