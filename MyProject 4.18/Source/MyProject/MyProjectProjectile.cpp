@@ -39,42 +39,59 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	ATP_ThirdPersonCharacter* hittedNPC = Cast<ATP_ThirdPersonCharacter>(OtherActor);
 	// Only add impulse and destroy projectile if we hit a physics
 
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+	switch (state)
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
-
-		Destroy();
-	}
-
-	else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("hit"));
-		hittedplayer->Damage(projectileDamage);
-
-		//ProjectileMovement->bShouldBounce = false;
-		Destroy();
-	}
-
-	else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
-		if (Hit.BoneName == "head")
+		if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 		{
-			headshotdamage = projectileDamage * headshotMultiplier;
-			hittedNPC->Damage(headshotdamage);
+			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
+
+			Destroy();
+		}
+		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
+			if (Hit.BoneName == "head")
+			{
+				headshotdamage = projectileDamage * headshotMultiplier;
+				hittedNPC->Damage(headshotdamage);
+			}
+
+			else
+			{
+				hittedNPC->Damage(projectileDamage);
+			}
+
+			//ProjectileMovement->bShouldBounce = false;
+			Destroy();
+		}
+		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
+		{
+			Destroy();
 		}
 
-		else
+		break;
+
+	case collisionSwitch::npc:
+
+		if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 		{
-			hittedNPC->Damage(projectileDamage);
+			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
+
+			Destroy();
+		}
+		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("hit"));
+			hittedplayer->Damage(projectileDamage);
+
+			//ProjectileMovement->bShouldBounce = false;
+			Destroy();
+		}
+		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
+		{
+			Destroy();
 		}
 
-		//ProjectileMovement->bShouldBounce = false;
-		Destroy();
-	}
-
-	else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
-	{
-		Destroy();
+		break;
 	}
 }
