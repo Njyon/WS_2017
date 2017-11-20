@@ -326,7 +326,18 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	//UE_LOG(LogTemp, Warning, TEXT("%f"), Health);
+
+	if (Health <= MaxHealth)
+	{
+		if (world->GetTimerManager().IsTimerActive(healthrecharge) == false)
+		{
+			world->GetTimerManager().SetTimer(healthrecharge, this, &AMyProjectCharacter::Healthrecharge, this->healthRechargeDelay, false);
+		}
+	}
+	if (Health > MaxHealth)
+	{
+		Health = MaxHealth;
+	}
 
 	///Sounds Slowmo
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
@@ -444,8 +455,13 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 void AMyProjectCharacter::Damage(int damage)
 {
 	Health = Health - damage;
-	//UE_LOG(LogTemp, Warning, TEXT("hurt"));
 	this->OnDamageBPEvent();
+}
+
+void AMyProjectCharacter::Healthrecharge()
+{
+	Health += healthPerDelay;
+	OnHealthRechargeBPEvent();
 }
 
 

@@ -131,6 +131,12 @@ public:								////// PUBLIC //////
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float Health = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float MaxHealth = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float healthRechargeDelay = 0.3f;											// Healthrechargedelay
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float healthPerDelay = 20.0f;												// Healthrecharge
 
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -205,6 +211,7 @@ public:								////// PUBLIC //////
 
 										// UFUNCTION //
 	void Damage(int damage);
+	void Healthrecharge();
 
 	/// Input
 	UFUNCTION()
@@ -230,6 +237,8 @@ public:								////// PUBLIC //////
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnDamageBPEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnHealthRechargeBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnAmmoChange();
 	UFUNCTION(BlueprintImplementableEvent)
@@ -284,6 +293,7 @@ private:								////// PRIVATE //////
 	FRotator normalCamRotation;
 	FTimerHandle timeHandle;								// needed for set Timer
 	FTimerHandle wallrunHandle;								// Timehandle (Delay for the Wallrun)
+	FTimerHandle healthrecharge;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
 	///Class
