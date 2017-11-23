@@ -145,14 +145,27 @@ AMyProjectCharacter::AMyProjectCharacter()
 	wallLeftDetector->OnComponentEndOverlap.AddDynamic(this, &AMyProjectCharacter::EndLeftWallDetected);
 
 	// Main Wallrun Timeline
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> WallCurve(TEXT("'/Game/Blueprints/Curves/WallRun'"));
+	wallrunCurve = WallCurve.Object;
 	wallrunTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("WallrunTimeline"));
 
 	// Slide Timeline
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> HeightCurve(TEXT("'/Game/Blueprints/Curves/heightCurve'"));
+	heightCurve = HeightCurve.Object;
 	slideheightTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("slideheightTimeline"));
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> RadiusCurve(TEXT("'/Game/Blueprints/Curves/radiusCurve'"));
+	radiusCurve = RadiusCurve.Object;
 	slideradiusTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("slideradiusTimeline"));
+
 	// TiltCam Right Timeline
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> TiltRightCurve(TEXT("'/Game/Blueprints/Curves/TiltCamRight'"));
+	tiltCamRightCurve = TiltRightCurve.Object;
 	camTiltRightTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("CamTiltRightTimeline"));
+
 	// TiltCam Left Timeline
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> TiltLeftCurve(TEXT("'/Game/Blueprints/Curves/TiltCamLeft'"));
+	tiltCamLeftCurve = TiltLeftCurve.Object;
 	camTiltLeftTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("CamTiltLeftTimeline"));
 }
 
@@ -326,7 +339,18 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	//UE_LOG(LogTemp, Warning, TEXT("%f"), Health);
+
+	if (Health <= MaxHealth)
+	{
+		if (world->GetTimerManager().IsTimerActive(healthrecharge) == false)
+		{
+			world->GetTimerManager().SetTimer(healthrecharge, this, &AMyProjectCharacter::Healthrecharge, this->healthRechargeDelay, false);
+		}
+	}
+	if (Health > MaxHealth)
+	{
+		Health = MaxHealth;
+	}
 
 	///Sounds Slowmo
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
@@ -444,8 +468,13 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 void AMyProjectCharacter::Damage(int damage)
 {
 	Health = Health - damage;
-	//UE_LOG(LogTemp, Warning, TEXT("hurt"));
 	this->OnDamageBPEvent();
+}
+
+void AMyProjectCharacter::Healthrecharge()
+{
+	Health += healthPerDelay;
+	OnHealthRechargeBPEvent();
 }
 
 
