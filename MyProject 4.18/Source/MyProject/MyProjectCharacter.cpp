@@ -2,18 +2,16 @@
 
 ///Unreal Stuff
 #include "MyProjectCharacter.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/InputComponent.h"
-#include "GameFramework/InputSettings.h"
-#include "Animation/AnimInstance.h"
-#include "Kismet/GameplayStatics.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "TimerManager.h"
-#include "PhysicsEngine/BodyInstance.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "ConstructorHelpers.h"
-#include "Engine.h"
+//#include "Camera/CameraComponent.h"
+//#include "Components/CapsuleComponent.h"
+//#include "Components/InputComponent.h"
+//#include "GameFramework/InputSettings.h"
+//#include "Animation/AnimInstance.h"
+//#include "Kismet/GameplayStatics.h"
+//#include "GameFramework/CharacterMovementComponent.h"
+//#include "TimerManager.h"
+//#include "PhysicsEngine/BodyInstance.h"
+//#include "ConstructorHelpers.h"
 //#include "Components/TimelineComponent.h"
 //#include "UnrealMathUtility.h"
 ///Our Stuff
@@ -469,6 +467,13 @@ void AMyProjectCharacter::Damage(int damage)
 {
 	Health = Health - damage;
 	this->OnDamageBPEvent();
+
+	/*if (Health <= 0.0f)
+	{
+		TeleportTo(FVector(0, 0, 0), FRotator(this->currentCamRotation), false, true);
+		Health = MaxHealth;
+		currentAmmo = magazineSize;
+	}*/
 }
 
 void AMyProjectCharacter::Healthrecharge()
@@ -750,7 +755,7 @@ void AMyProjectCharacter::EndJumping()
 
 void AMyProjectCharacter::Landed(const FHitResult& hit) 
 {
-	Super::Landed(hit);
+	//Super::Landed(hit);
 
 	this->MakeNoise(				// Make Noise for AI Perception
 		1.0f,						// Loudness

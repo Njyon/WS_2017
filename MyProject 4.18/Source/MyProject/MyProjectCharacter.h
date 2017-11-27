@@ -2,10 +2,11 @@
 
 #pragma once
 ///Unreal Stuff
-#include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Engine.h"
+//#include "GameFramework/Character.h"
 ///Our Stuff
 #include "MyProject/MyProjectProjectile.h"
+#include "Kismet/KismetMathLibrary.h"
 ///GERENRATED HURENSOHN
 #include "MyProjectCharacter.generated.h"
 

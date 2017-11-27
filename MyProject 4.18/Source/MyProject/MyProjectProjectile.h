@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyProjectCharacter.h"
-#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "GameFramework/Actor.h"
 #include "MyProjectProjectile.generated.h"
 
