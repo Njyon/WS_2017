@@ -14,8 +14,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ConstructorHelpers.h"
 #include "Engine.h"
-#include "Components/TimelineComponent.h"
-#include "UnrealMathUtility.h"
+//#include "Components/TimelineComponent.h"
+//#include "UnrealMathUtility.h"
 ///Our Stuff
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
