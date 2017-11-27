@@ -1,15 +1,14 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "TP_ThirdPersonCharacter.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/InputComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
+//#include "HeadMountedDisplayFunctionLibrary.h"
+//#include "Camera/CameraComponent.h"
+//#include "Components/CapsuleComponent.h"
+//#include "Components/InputComponent.h"
+//#include "GameFramework/CharacterMovementComponent.h"
+//#include "GameFramework/Controller.h"
 #include "ConstructorHelpers.h"
-#include "Engine.h"
-#include "GameFramework/SpringArmComponent.h"
+//#include "GameFramework/SpringArmComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATP_ThirdPersonCharacter
