@@ -35,12 +35,16 @@ class AMyProjectProjectile : public AActor
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		float forceImpulse = 100.0f;
 
+	UPROPERTY(EditAnywhere, Category = Projectile)
+		float ressourceRefill = 20.0f;
+
 	int headshotdamage;
 
 
 public:
 	AMyProjectProjectile();
 
+	class AMyProjectCharacter* player;
 
 	UPROPERTY(EditAnywhere, Category = CollisionSwitch)
 		collisionSwitch state;
