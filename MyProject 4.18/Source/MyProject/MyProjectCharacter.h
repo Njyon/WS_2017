@@ -244,6 +244,10 @@ public:								////// PUBLIC //////
 		void OnAmmoChange();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnResourceChange();
+	UFUNCTION(BlueprintCallable)
+		void SlideCam();
+	UFUNCTION(BlueprintCallable)
+		void RevertedSlideCam();
 
 	/// Timeline Floats
 	UFUNCTION()
@@ -311,8 +315,7 @@ private:								////// PRIVATE //////
 	void GravitationOff();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
-	void SlideCam();
-	void RevertedSlideCam();
+	
 
 	///////////////////
 	//// Collision ////
