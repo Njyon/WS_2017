@@ -661,6 +661,7 @@ void AMyProjectCharacter::Reload()
 {
 	if (this->currentAmmo < this->magazineSize)
 	{
+		OnReloadBPEvent();
 		this->currentAmmo = this->magazineSize;
 		OnAmmoChange();
 	}

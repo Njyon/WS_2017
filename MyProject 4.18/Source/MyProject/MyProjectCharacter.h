@@ -264,6 +264,8 @@ public:								////// PUBLIC //////
 		void SlideCam();
 	UFUNCTION(BlueprintCallable)
 		void RevertedSlideCam();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnReloadBPEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
