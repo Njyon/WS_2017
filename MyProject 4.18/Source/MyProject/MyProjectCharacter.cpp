@@ -471,6 +471,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	if (this->ressource > 100)
 	{
 		ressource = 100;
+		FullStamina();
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
