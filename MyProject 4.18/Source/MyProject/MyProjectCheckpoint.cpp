@@ -10,21 +10,33 @@ AMyProjectCheckpoint::AMyProjectCheckpoint()
 	PrimaryActorTick.bCanEverTick = false;
 
 	// Use a sphere as a simple collision representation
-	//CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("SphereComp"));
-	//CollisionComp.bGenerateOverlapEvents = true;
-	//CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectProjectile::OnHit);		// set up a notification for when this component hits something blocking
+	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCheckpoint::OnOverlap);
+	
 	
 
 	// Set as root component
-	//RootComponent = CollisionComp;
+	RootComponent = CollisionComp;
 
 }
 
-//void AMyProjectCheckpoint::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-//{
-//	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(OtherActor);
-//	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
-//	{
-//		
-//	}
-//}
+void AMyProjectCheckpoint::BeginPlay()
+{
+	Super::BeginPlay();
+
+	vector = GetActorLocation();
+	rotator = GetActorRotation();
+}
+
+  void AMyProjectCheckpoint::OnOverlap(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResult)
+{
+	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(otherActor);
+	if ((otherActor != NULL) && (otherActor != this) && (otherComp != NULL) && hittedplayer != NULL)
+	{
+		if (!hasUsed)
+		{
+			hittedplayer->SetRespawn(vector, rotator);
+			this->hasUsed = true;
+		}
+	}
+}

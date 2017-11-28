@@ -67,6 +67,11 @@ class AMyProjectCharacter : public ACharacter
 public:								////// PUBLIC //////
 	AMyProjectCharacter();   // Konstructor
 
+										//Variables//
+	UPROPERTY(EditAnywhere, Category = Spawn)
+	FVector spawnPoint;
+	FRotator spawnRotation;
+
 										// UPROPERTY //
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isSpacebarPressed = false;
@@ -212,6 +217,7 @@ public:								////// PUBLIC //////
 
 										// UFUNCTION //
 	void Damage(int damage);
+	void SetRespawn(FVector spawnVector, FRotator spawnRotator);
 	void Healthrecharge();
 
 	/// Input

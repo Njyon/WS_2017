@@ -19,7 +19,7 @@ class AMyProjectProjectile : public AActor
 	GENERATED_BODY()
 
 		/** Sphere collision component */
-		UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 		class USphereComponent* CollisionComp;
 
 	/** Projectile movement component */
@@ -33,7 +33,7 @@ class AMyProjectProjectile : public AActor
 		float headshotMultiplier = 2.0f;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-	float forceImpulse = 100.0f;
+		float forceImpulse = 100.0f;
 
 	int headshotdamage;
 

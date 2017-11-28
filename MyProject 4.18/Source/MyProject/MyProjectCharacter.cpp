@@ -468,12 +468,18 @@ void AMyProjectCharacter::Damage(int damage)
 	Health = Health - damage;
 	this->OnDamageBPEvent();
 
-	/*if (Health <= 0.0f)
+	if (Health <= 0.0f)
 	{
-		TeleportTo(FVector(0, 0, 0), FRotator(this->currentCamRotation), false, true);
+		TeleportTo(spawnPoint, spawnRotation, false, true);
 		Health = MaxHealth;
 		currentAmmo = magazineSize;
-	}*/
+	}
+}
+
+void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
+{
+	spawnRotation = spawnRotator;
+	spawnPoint = spawnVector;
 }
 
 void AMyProjectCharacter::Healthrecharge()
