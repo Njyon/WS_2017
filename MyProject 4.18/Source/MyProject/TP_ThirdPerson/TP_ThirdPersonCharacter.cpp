@@ -130,7 +130,7 @@ void ATP_ThirdPersonCharacter::Walking()
 
 		if (hitMat.IsValidBlockingHit() == true)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("what"));
+			//UE_LOG(LogTemp, Warning, TEXT("what"));
 			if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 			{
 				WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);

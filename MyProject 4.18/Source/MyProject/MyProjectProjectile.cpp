@@ -31,6 +31,7 @@ AMyProjectProjectile::AMyProjectProjectile()
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
+
 }
 
 void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -54,7 +55,13 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			if (Hit.BoneName == "head")
 			{
 				headshotdamage = projectileDamage * headshotMultiplier;
+				this->player->RessoourceRefill(ressourceRefill);
 				hittedNPC->Damage(headshotdamage);
+			}
+
+			else if (Hit.BoneName == "None")
+			{
+				Destroy();
 			}
 
 			else
@@ -69,6 +76,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		{
 			Destroy();
 		}
+		
 
 		break;
 
