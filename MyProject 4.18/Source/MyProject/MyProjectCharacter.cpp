@@ -477,6 +477,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	if (this->ressource > 100)
 	{
 		ressource = 100;
+		FullStamina();
 	}
 
 	if (this->ressource <= 0)
