@@ -397,6 +397,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 				currentAmmo -= 1;
 				OnAmmoChange();
 			}
+			else
+			{
+				Reload();
+			}
 		}
 		else
 		{
