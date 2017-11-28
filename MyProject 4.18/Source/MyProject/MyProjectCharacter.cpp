@@ -473,6 +473,11 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		ressource = 100;
 	}
 
+	if (this->ressource <= 0)
+	{
+		EndSprint();
+	}
+
 	//UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
