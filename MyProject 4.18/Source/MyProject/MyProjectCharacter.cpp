@@ -176,6 +176,7 @@ void AMyProjectCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	spawnPoint = GetActorLocation();
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 	
@@ -313,6 +314,9 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	///	Input left Shift
 	playerInputComponent->BindAction("Slide", IE_Pressed, this, &AMyProjectCharacter::Slide);
 	playerInputComponent->BindAction("Slide", IE_Released, this, &AMyProjectCharacter::EndSlide);
+	///Sprint
+	playerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMyProjectCharacter::Sprint);
+	playerInputComponent->BindAction("Sprint", IE_Released, this, &AMyProjectCharacter::EndSprint);
 	/// Reload
 	playerInputComponent->BindAction("Reload", IE_Pressed, this, &AMyProjectCharacter::Reload);
 
@@ -394,6 +398,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 				currentAmmo -= 1;
 				OnAmmoChange();
 			}
+			else
+			{
+				Reload();
+			}
 		}
 		else
 		{
@@ -444,7 +452,14 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			isSlomoActive = false;
 			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
 			SlowmoAudioComponent->Stop();
+			EndSprint();
 		}
+	}
+
+	if (canSprint)
+	{
+		this->ressource -= world->GetDeltaSeconds() * this->sprintDrainAmount;
+		OnResourceChange();
 	}
 
 	//Ressource
@@ -452,6 +467,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		this->ressource += world->GetDeltaSeconds() * this->ressourceFillAmmount;
 		OnResourceChange();
+	}
+	if (this->ressource > 100)
+	{
+		ressource = 100;
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
@@ -468,12 +487,19 @@ void AMyProjectCharacter::Damage(int damage)
 	Health = Health - damage;
 	this->OnDamageBPEvent();
 
-	/*if (Health <= 0.0f)
+	if (Health <= 0.0f)
 	{
-		TeleportTo(FVector(0, 0, 0), FRotator(this->currentCamRotation), false, true);
+		TeleportTo(spawnPoint, spawnRotation, false, true);
 		Health = MaxHealth;
-		currentAmmo = magazineSize;
-	}*/
+		Reload();
+		this->OnDamageBPEvent();
+	}
+}
+
+void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
+{
+	spawnRotation = spawnRotator;
+	spawnPoint = spawnVector;
 }
 
 void AMyProjectCharacter::Healthrecharge()
@@ -584,8 +610,8 @@ void AMyProjectCharacter::MoveForward(float value)
 			}
 		}
 		// add movement in that direction
-		AddMovementInput(GetActorForwardVector(), value);
-		this->VAxis = value;
+			AddMovementInput(GetActorForwardVector(), value);
+			this->VAxis = value;
 	}
 }
 
@@ -832,6 +858,18 @@ void AMyProjectCharacter::RevertedSlideCam()
 	//this->movementComponent->GravityScale = gravitation;
 	this->slideradiusTimeline->Reverse();
 	this->slideheightTimeline->Reverse();
+}
+
+void AMyProjectCharacter::Sprint()
+{
+	this->movementComponent->MaxWalkSpeed = sprintSpeed;
+	canSprint = true;
+}
+
+void AMyProjectCharacter::EndSprint()
+{
+	this->movementComponent->MaxWalkSpeed = walkSpeed;
+	canSprint = false;
 }
 
 
