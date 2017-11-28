@@ -12,27 +12,35 @@ class MYPROJECT_API AMyProjectCheckpoint : public AActor
 {
 	GENERATED_BODY()
 	
-	/** Sphere collision component */
-	/*UPROPERTY(VisibleDefaultsOnly, Category = Checkpoint)
-	class UBoxComponent* CollisionComp;*/
+	
+	UPROPERTY(VisibleDefaultsOnly, Category = Checkpoint)
+	class UBoxComponent* CollisionComp;
 
 public:	
 	// Sets default values for this actor's properties
 	AMyProjectCheckpoint();
 
-	//UFUNCTION()
-	//	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	FVector vector;
+	FRotator rotator;
+	bool hasUsed = false;
 
 	///** Returns CollisionComp subobject **/
-	//FORCEINLINE class UBoxComponent* GetCollisionComp() const { return CollisionComp; }
+	FORCEINLINE class UBoxComponent* GetCollisionComp() const { return CollisionComp; }
 
 protected:
 	// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
+private:
+	UFUNCTION()
+		void OnOverlap(
+			class UPrimitiveComponent* hitComp,
+			class AActor* otherActor,
+			class UPrimitiveComponent* otherComp,
+			int32 otherBodyIndex,
+			bool fromSweep,
+			const FHitResult & sweepResult
+		);
 
 	
 	

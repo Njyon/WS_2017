@@ -67,6 +67,11 @@ class AMyProjectCharacter : public ACharacter
 public:								////// PUBLIC //////
 	AMyProjectCharacter();   // Konstructor
 
+										//Variables//
+	UPROPERTY(EditAnywhere, Category = Spawn)
+	FVector spawnPoint;
+	FRotator spawnRotation;
+
 										// UPROPERTY //
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isSpacebarPressed = false;
@@ -108,10 +113,16 @@ public:								////// PUBLIC //////
 		float ressourceFillAmmount = 20;											// Set FillAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float ressourceDrainAmount = 1000;											// Set Drain Amount
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
+		float sprintDrainAmount = 25;												// Set Drain Amount Sprint
 	UPROPERTY(BlueprintReadOnly, Category = Getter)
 		float HAxis;																// Horizontal Axis
 	UPROPERTY(BlueprintReadOnly, Category = Getter)
 		float VAxis;																// Vertical Axis
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		int sprintSpeed = 1200;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		int walkSpeed = 600;
 
 
 	// is Slomo Active or Deactive
@@ -212,6 +223,7 @@ public:								////// PUBLIC //////
 
 										// UFUNCTION //
 	void Damage(int damage);
+	void SetRespawn(FVector spawnVector, FRotator spawnRotator);
 	void Healthrecharge();
 
 	/// Input
@@ -228,9 +240,13 @@ public:								////// PUBLIC //////
 	UFUNCTION()
 		void EndJumping();	// Spacebar Released
 	UFUNCTION()
-		void Slide();		// left Shift Preessed
+		void Slide();		// left Shift Pressed
 	UFUNCTION()
 		void EndSlide();	// left Shift Released
+	UFUNCTION()
+		void Sprint();		// left Shift Pressed
+	UFUNCTION()
+		void EndSprint();	// left Shift Released
 	UFUNCTION()
 		void Reload();
 
@@ -244,6 +260,12 @@ public:								////// PUBLIC //////
 		void OnAmmoChange();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnResourceChange();
+	UFUNCTION(BlueprintCallable)
+		void SlideCam();
+	UFUNCTION(BlueprintCallable)
+		void RevertedSlideCam();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnReloadBPEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
@@ -284,6 +306,7 @@ private:								////// PRIVATE //////
 	bool climbingSoundDoOnce = false;
 	bool WallrunSoundDoOnce = false;
 	bool isShootingLeft = false;
+	bool canSprint = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for Wallrun
@@ -311,8 +334,7 @@ private:								////// PRIVATE //////
 	void GravitationOff();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
-	void SlideCam();
-	void RevertedSlideCam();
+	
 
 	///////////////////
 	//// Collision ////
