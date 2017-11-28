@@ -462,6 +462,12 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		OnResourceChange();
 	}
 
+	if (sliding)
+	{
+		this->ressource -= world->GetDeltaSeconds() * this->sprintDrainAmount;
+		OnResourceChange();
+	}
+
 	//Ressource
 	if (this->ressource < 100)
 	{
@@ -499,6 +505,11 @@ void AMyProjectCharacter::Damage(int damage)
 		Reload();
 		this->OnDamageBPEvent();
 	}
+}
+
+void AMyProjectCharacter::RessoourceRefill(float amount)
+{
+	ressource = ressource + amount;
 }
 
 void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
@@ -934,6 +945,8 @@ void AMyProjectCharacter::SpawnBullet()
 			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),				// SpawnLocation
 			newRotation,																// SpawnRotation
 			spawnInfo);																	// Set Spawn Info
+			
+		projectile->player = this;
 		}
 
 		else if (isShootingLeft)

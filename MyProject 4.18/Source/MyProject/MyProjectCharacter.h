@@ -112,9 +112,11 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float ressourceFillAmmount = 20;											// Set FillAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
-		float ressourceDrainAmount = 1000;											// Set Drain Amount
+		float ressourceDrainAmount = 250;											// Set Drain Amount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float sprintDrainAmount = 25;												// Set Drain Amount Sprint
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
+		float slideDrainAmount = 25;												// Set Drain Amount Sprint
 	UPROPERTY(BlueprintReadOnly, Category = Getter)
 		float HAxis;																// Horizontal Axis
 	UPROPERTY(BlueprintReadOnly, Category = Getter)
@@ -225,6 +227,7 @@ public:								////// PUBLIC //////
 	void Damage(int damage);
 	void SetRespawn(FVector spawnVector, FRotator spawnRotator);
 	void Healthrecharge();
+	void RessoourceRefill(float amount);
 
 	/// Input
 	UFUNCTION()
