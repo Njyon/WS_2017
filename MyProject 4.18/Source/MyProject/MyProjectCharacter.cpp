@@ -313,6 +313,9 @@ void AMyProjectCharacter::SetupPlayerInputComponent(class UInputComponent* playe
 	///	Input left Shift
 	playerInputComponent->BindAction("Slide", IE_Pressed, this, &AMyProjectCharacter::Slide);
 	playerInputComponent->BindAction("Slide", IE_Released, this, &AMyProjectCharacter::EndSlide);
+	///Sprint
+	playerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMyProjectCharacter::Sprint);
+	playerInputComponent->BindAction("Sprint", IE_Released, this, &AMyProjectCharacter::EndSprint);
 	/// Reload
 	playerInputComponent->BindAction("Reload", IE_Pressed, this, &AMyProjectCharacter::Reload);
 
@@ -444,7 +447,14 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			isSlomoActive = false;
 			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
 			SlowmoAudioComponent->Stop();
+			EndSprint();
 		}
+	}
+
+	if (canSprint)
+	{
+		this->ressource -= world->GetDeltaSeconds() * this->sprintDrainAmount;
+		OnResourceChange();
 	}
 
 	//Ressource
@@ -452,6 +462,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		this->ressource += world->GetDeltaSeconds() * this->ressourceFillAmmount;
 		OnResourceChange();
+	}
+	if (this->ressource > 100)
+	{
+		ressource = 100;
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
@@ -590,8 +604,8 @@ void AMyProjectCharacter::MoveForward(float value)
 			}
 		}
 		// add movement in that direction
-		AddMovementInput(GetActorForwardVector(), value);
-		this->VAxis = value;
+			AddMovementInput(GetActorForwardVector(), value);
+			this->VAxis = value;
 	}
 }
 
@@ -838,6 +852,18 @@ void AMyProjectCharacter::RevertedSlideCam()
 	//this->movementComponent->GravityScale = gravitation;
 	this->slideradiusTimeline->Reverse();
 	this->slideheightTimeline->Reverse();
+}
+
+void AMyProjectCharacter::Sprint()
+{
+	this->movementComponent->MaxWalkSpeed = sprintSpeed;
+	canSprint = true;
+}
+
+void AMyProjectCharacter::EndSprint()
+{
+	this->movementComponent->MaxWalkSpeed = walkSpeed;
+	canSprint = false;
 }
 
 

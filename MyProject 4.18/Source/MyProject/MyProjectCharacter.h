@@ -113,10 +113,16 @@ public:								////// PUBLIC //////
 		float ressourceFillAmmount = 20;											// Set FillAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float ressourceDrainAmount = 1000;											// Set Drain Amount
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
+		float sprintDrainAmount = 25;												// Set Drain Amount Sprint
 	UPROPERTY(BlueprintReadOnly, Category = Getter)
 		float HAxis;																// Horizontal Axis
 	UPROPERTY(BlueprintReadOnly, Category = Getter)
 		float VAxis;																// Vertical Axis
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		int sprintSpeed = 1200;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		int walkSpeed = 600;
 
 
 	// is Slomo Active or Deactive
@@ -234,9 +240,13 @@ public:								////// PUBLIC //////
 	UFUNCTION()
 		void EndJumping();	// Spacebar Released
 	UFUNCTION()
-		void Slide();		// left Shift Preessed
+		void Slide();		// left Shift Pressed
 	UFUNCTION()
 		void EndSlide();	// left Shift Released
+	UFUNCTION()
+		void Sprint();		// left Shift Pressed
+	UFUNCTION()
+		void EndSprint();	// left Shift Released
 	UFUNCTION()
 		void Reload();
 
@@ -290,6 +300,7 @@ private:								////// PRIVATE //////
 	bool climbingSoundDoOnce = false;
 	bool WallrunSoundDoOnce = false;
 	bool isShootingLeft = false;
+	bool canSprint = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for Wallrun
