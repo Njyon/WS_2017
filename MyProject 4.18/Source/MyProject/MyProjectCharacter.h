@@ -273,6 +273,8 @@ public:								////// PUBLIC //////
 		void OnReloadBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void FullStamina();
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayDeathAnim();
 
 	/// Timeline Floats
 	UFUNCTION()

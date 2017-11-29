@@ -511,6 +511,7 @@ void AMyProjectCharacter::Damage(int damage)
 
 	if (Health <= 0.0f)
 	{
+		this->PlayDeathAnim();
 		world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 	}
 }
