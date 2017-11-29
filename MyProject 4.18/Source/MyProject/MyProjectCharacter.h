@@ -341,6 +341,7 @@ private:								////// PRIVATE //////
 	void GravitationOff();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
+	void Respawn();
 	
 
 	///////////////////
