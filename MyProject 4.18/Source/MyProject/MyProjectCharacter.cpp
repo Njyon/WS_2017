@@ -109,6 +109,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 	FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
 	FP_Gun->SetupAttachment(RootComponent);
 
+	FP_Gun_1 = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun_l"));
+	FP_Gun_1->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
+	FP_Gun_1->bCastDynamicShadow = false;
+	FP_Gun_1->CastShadow = false;
+	FP_Gun_1->SetupAttachment(Mesh1P, TEXT("GripPoint_l"));
+	FP_Gun_1->SetupAttachment(RootComponent);
+
 	FP_MuzzleLocationRight = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationRight"));
 	FP_MuzzleLocationRight->SetupAttachment(FP_Gun);
 	FP_MuzzleLocationRight->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
@@ -179,6 +186,7 @@ void AMyProjectCharacter::BeginPlay()
 	spawnPoint = GetActorLocation();
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	FP_Gun_1->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint_l"));
 	
 	this->movementComponent->SetPlaneConstraintEnabled(true);								// Enable PlaneContraint (Used for the wallrun)
 	playerController = UGameplayStatics::GetPlayerController(world, 0);						// GetPlayerController

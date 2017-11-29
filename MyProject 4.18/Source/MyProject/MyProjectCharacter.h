@@ -32,6 +32,8 @@ class AMyProjectCharacter : public ACharacter
 	/** Gun mesh: 1st person view (seen only by self) */
 	UPROPERTY(EditAnywhere, Category = Mesh)
 		class USkeletalMeshComponent* FP_Gun;
+	UPROPERTY(EditAnywhere, Category = Mesh)
+		class USkeletalMeshComponent* FP_Gun_1;
 
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(EditAnywhere, Category = Mesh)
