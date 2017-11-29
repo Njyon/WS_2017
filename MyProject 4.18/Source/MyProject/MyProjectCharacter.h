@@ -83,7 +83,7 @@ public:								////// PUBLIC //////
 		bool isOnLadder = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
-		int magazineSize;
+		int magazineSize = 12;
 	UPROPERTY(BlueprintReadOnly, Category = Gun)
 		int currentAmmo;
 	//FireRate
@@ -315,6 +315,7 @@ private:								////// PRIVATE //////
 	bool climbingSoundDoOnce = false;
 	bool isShootingLeft = false;
 	bool canSprint = false;
+	bool dead = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for Wallrun
