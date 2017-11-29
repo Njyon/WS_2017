@@ -375,15 +375,17 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		climbingSoundDoOnce = false;
 	}
 
-	if (isOnWall == true && WallrunSoundDoOnce == false)													//wallrunSound gets played and stopped
+	if (isOnWall == true && WallrunAudioComponent->IsPlaying() == false)													//wallrunSound gets played and stopped
 	{
-		WallrunSoundDoOnce = true;
+		//UE_LOG(LogTemp, Warning, TEXT("1"));
+		//WallrunSoundDoOnce = true;
 		WallrunAudioComponent->Play();
 	}
-	if (isOnWall == false && WallrunSoundDoOnce == true)
+	if (isOnWall == false)
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("2"));
 		WallrunAudioComponent->Stop();
-		WallrunSoundDoOnce = false;
+		
 	}
 	///Shoot
 	if (isLMBPressed == true)
@@ -498,6 +500,7 @@ void AMyProjectCharacter::Damage(int damage)
 {
 	Health = Health - damage;
 	this->OnDamageBPEvent();
+	UE_LOG(LogTemp, Warning, TEXT("Damage"));
 
 	if (Health <= 0.0f)
 	{
