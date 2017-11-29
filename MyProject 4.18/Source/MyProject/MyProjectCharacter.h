@@ -309,7 +309,7 @@ private:								////// PRIVATE //////
 	bool sliding = false;
 	bool isFalling = false;
 	bool climbingSoundDoOnce = false;
-	bool WallrunSoundDoOnce = false;
+	//bool WallrunSoundDoOnce = false;
 	bool isShootingLeft = false;
 	bool canSprint = false;
 	
