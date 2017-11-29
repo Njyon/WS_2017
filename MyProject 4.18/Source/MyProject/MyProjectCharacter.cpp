@@ -121,7 +121,7 @@ AMyProjectCharacter::AMyProjectCharacter()
 	FP_MuzzleLocationRight->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	FP_MuzzleLocationLeft = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationLeft"));
-	FP_MuzzleLocationLeft->SetupAttachment(FP_Gun);
+	FP_MuzzleLocationLeft->SetupAttachment(FP_Gun_1);
 	FP_MuzzleLocationLeft->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	// Default offset from the character location for projectiles to spawn
@@ -508,14 +508,10 @@ void AMyProjectCharacter::Damage(int damage)
 {
 	Health = Health - damage;
 	this->OnDamageBPEvent();
-	UE_LOG(LogTemp, Warning, TEXT("Damage"));
 
 	if (Health <= 0.0f)
 	{
-		TeleportTo(spawnPoint, spawnRotation, false, true);
-		Health = MaxHealth;
-		Reload();
-		this->OnDamageBPEvent();
+		world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 	}
 }
 
@@ -905,6 +901,17 @@ void AMyProjectCharacter::EndSprint()
 				//////////////////////////////////////
 				//////////	  Functions     //////////
 				//////////////////////////////////////
+
+void AMyProjectCharacter::Respawn()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("Respawn"));
+
+	TeleportTo(spawnPoint, spawnRotation, false, true);
+	Health = MaxHealth;
+	Reload();
+	this->OnDamageBPEvent();
+}
 
 void AMyProjectCharacter::BulletCooldown()
 {
