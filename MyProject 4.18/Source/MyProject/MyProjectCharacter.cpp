@@ -618,12 +618,26 @@ void AMyProjectCharacter::MoveForward(float value)
 			{
 				if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 				{
-					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+					if (canSprint)
+					{
+						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 2);
+					}
+					else
+					{
+						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+					}
 				}
 
 				else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
 				{
-					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
+					if (canSprint)
+					{
+						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 3);
+					}
+					else
+					{
+						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
+					}
 				}
 
 				WalkAudioComponent->Play();
