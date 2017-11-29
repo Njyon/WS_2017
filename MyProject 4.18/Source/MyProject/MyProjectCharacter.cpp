@@ -511,8 +511,12 @@ void AMyProjectCharacter::Damage(int damage)
 
 	if (Health <= 0.0f)
 	{
-		this->PlayDeathAnim();
-		world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+		if (dead == false)
+		{
+			dead = true;
+			this->PlayDeathAnim();
+			world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+		}
 	}
 }
 
@@ -919,13 +923,11 @@ void AMyProjectCharacter::EndSprint()
 
 void AMyProjectCharacter::Respawn()
 {
-
-	UE_LOG(LogTemp, Warning, TEXT("Respawn"));
-
 	TeleportTo(spawnPoint, spawnRotation, false, true);
 	Health = MaxHealth;
 	Reload();
 	this->OnDamageBPEvent();
+	dead = false;
 }
 
 void AMyProjectCharacter::BulletCooldown()
