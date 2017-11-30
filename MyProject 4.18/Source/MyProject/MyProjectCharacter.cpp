@@ -350,20 +350,6 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 
-	if (Health <= MaxHealth)
-	{
-		if (!isHit)
-		{
-			if (world->GetTimerManager().IsTimerActive(healthrecharge) == false)
-			{
-				world->GetTimerManager().SetTimer(healthrecharge, this, &AMyProjectCharacter::Healthrecharge, this->healthRechargeDelay, false);
-			}
-		}
-	}
-	if (Health > MaxHealth)
-	{
-		Health = MaxHealth;
-	}
 
 	///Sounds Slowmo
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
@@ -501,6 +487,20 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	//UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->ressource);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
+	if (Health <= MaxHealth)
+	{
+		if (!isHit)
+		{
+			if (world->GetTimerManager().IsTimerActive(healthrecharge) == false)
+			{
+				world->GetTimerManager().SetTimer(healthrecharge, this, &AMyProjectCharacter::Healthrecharge, this->healthRechargeDelay, false);
+			}
+		}
+	}
+	if (Health > MaxHealth)
+	{
+		Health = MaxHealth;
+	}
 }
 
 			//////////////////////////////////////
@@ -514,7 +514,7 @@ void AMyProjectCharacter::Damage(int damage)
 		Health = Health - damage;
 		this->OnDamageBPEvent();
 		isHit = true;
-		world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::GotHit, this->lastTimeHitDelay, false);
+		world->GetTimerManager().SetTimer(delay, this, &AMyProjectCharacter::GotHit, this->lastTimeHitDelay, false);
 
 		if (Health <= 0.0f)
 		{

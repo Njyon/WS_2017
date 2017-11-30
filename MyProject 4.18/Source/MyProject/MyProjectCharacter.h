@@ -331,6 +331,7 @@ private:								////// PRIVATE //////
 	FRotator normalCamRotation;
 	FTimerHandle timeHandle;								// needed for set Timer
 	FTimerHandle wallrunHandle;								// Timehandle (Delay for the Wallrun)
+	FTimerHandle delay;
 	FTimerHandle healthrecharge;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
