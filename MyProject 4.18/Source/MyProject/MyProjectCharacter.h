@@ -154,7 +154,9 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float healthRechargeDelay = 1.0f;											// Healthrechargedelay
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		float healthPerDelay = 15.0f;												// Healthrecharge
+		float healthPerDelay = 15.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float lastTimeHitDelay = 1.0f;												// Healthrecharge
 
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -318,6 +320,7 @@ private:								////// PRIVATE //////
 	bool isShootingLeft = false;
 	bool canSprint = false;
 	bool dead = false;
+	bool isHit = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for Wallrun
@@ -346,6 +349,7 @@ private:								////// PRIVATE //////
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
 	void Respawn();
+	void GotHit();
 	
 
 	///////////////////
