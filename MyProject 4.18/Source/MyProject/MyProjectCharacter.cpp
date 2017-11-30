@@ -506,16 +506,19 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 
 void AMyProjectCharacter::Damage(int damage)
 {
-	Health = Health - damage;
-	this->OnDamageBPEvent();
-
-	if (Health <= 0.0f)
+	if (godMode == false)
 	{
-		if (dead == false)
+		Health = Health - damage;
+		this->OnDamageBPEvent();
+
+		if (Health <= 0.0f)
 		{
-			dead = true;
-			this->PlayDeathAnim();
-			world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+			if (dead == false)
+			{
+				dead = true;
+				this->PlayDeathAnim();
+				world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+			}
 		}
 	}
 }
