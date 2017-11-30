@@ -38,6 +38,8 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 {
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(OtherActor);
 	ATP_ThirdPersonCharacter* hittedNPC = Cast<ATP_ThirdPersonCharacter>(OtherActor);
+
+	
 	// Only add impulse and destroy projectile if we hit a physics
 
 	switch (state)
@@ -51,26 +53,37 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
-			if (Hit.BoneName == "head")
+			if (Hit.GetComponent() != NULL)
 			{
-				headshotdamage = projectileDamage * headshotMultiplier;
-				this->player->RessoourceRefill(ressourceRefill);
-				hittedNPC->Damage(headshotdamage);
-			}
+				//UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
+				/*if (Hit.BoneName == "head" || Hit.BoneName == "neck_01" || Hit.BoneName == "spine_03")*/
+				if (Hit.GetComponent()->ComponentHasTag("Head"))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("hit head"));
+					headshotdamage = projectileDamage * headshotMultiplier;
+					//this->player->RessoourceRefill(ressourceRefill);
+					hittedNPC->Damage(headshotdamage);
+				}
 
-			else if (Hit.BoneName == "None")
-			{
+				/*else if (Hit.BoneName == "None")
+				{
+					Destroy();
+				}*/
+
+				else if (Hit.GetComponent()->ComponentHasTag("Body")/* || Hit.GetComponent()->ComponentHasTag("LLeg") || Hit.GetComponent()->ComponentHasTag("RLeg")*/)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("hit body"));
+					hittedNPC->Damage(projectileDamage);
+				}
+
+				else
+				{
+					Destroy();
+				}
+
+				//ProjectileMovement->bShouldBounce = false;
 				Destroy();
 			}
-
-			else
-			{
-				hittedNPC->Damage(projectileDamage);
-			}
-
-			//ProjectileMovement->bShouldBounce = false;
-			Destroy();
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 		{
