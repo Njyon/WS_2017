@@ -30,7 +30,7 @@ class AMyProjectProjectile : public AActor
 		int projectileDamage = 50;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-		float headshotMultiplier = 2.0f;
+		int headshotMultiplier = 2;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		float forceImpulse = 100.0f;

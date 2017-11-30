@@ -11,6 +11,24 @@ class ATP_ThirdPersonCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	//UPROPERTY(EditAnywhere, Category = Detectors)
+	//	class UBoxComponent* head;						// head
+
+	//UPROPERTY(EditAnywhere, Category = Detectors)
+	//	class UBoxComponent* upperBody;					//Upper Body
+
+	////UPROPERTY(EditAnywhere, Category = Detectors)
+	////	class UBoxComponent* armLeft;					// Left Arm
+
+	////UPROPERTY(EditAnywhere, Category = Detectors)
+	////	class UBoxComponent* armRight;					// Right Arm
+
+	//UPROPERTY(EditAnywhere, Category = Detectors)
+	//	class UBoxComponent* legLeft;					// Left Leg
+
+	//UPROPERTY(EditAnywhere, Category = Detectors)
+	//	class UBoxComponent* legRight;					// Right Leg
+
 public:
 
 	//DataType

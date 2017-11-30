@@ -20,6 +20,19 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
+	/*head = CreateDefaultSubobject<UBoxComponent>(TEXT("Head"));
+	head->SetupAttachment(this->GetOwner()->Find("SkeletalMesh"), TEXT("Head"));
+
+	upperBody = CreateDefaultSubobject<UBoxComponent>(TEXT("UpperBody"));
+	upperBody->SetupAttachment(this->GetOwner()->FindFunction("SkeletalMesh"), TEXT("Body"));
+
+	legLeft = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftLeg"));
+	legLeft->SetupAttachment(this->GetOwner()->FindFunction("SkeletalMesh"), TEXT("LLeg"));
+
+	legRight = CreateDefaultSubobject<UBoxComponent>(TEXT("RightLeg"));
+	legRight->SetupAttachment(this->GetOwner()->FindFunction("SkeletalMesh"), TEXT("RLeg"));*/
+
+
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
