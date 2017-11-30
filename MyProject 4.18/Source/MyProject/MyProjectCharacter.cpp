@@ -352,9 +352,12 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 
 	if (Health <= MaxHealth)
 	{
-		if (world->GetTimerManager().IsTimerActive(healthrecharge) == false)
+		if (!isHit)
 		{
-			world->GetTimerManager().SetTimer(healthrecharge, this, &AMyProjectCharacter::Healthrecharge, this->healthRechargeDelay, false);
+			if (world->GetTimerManager().IsTimerActive(healthrecharge) == false)
+			{
+				world->GetTimerManager().SetTimer(healthrecharge, this, &AMyProjectCharacter::Healthrecharge, this->healthRechargeDelay, false);
+			}
 		}
 	}
 	if (Health > MaxHealth)
@@ -510,6 +513,8 @@ void AMyProjectCharacter::Damage(int damage)
 	{
 		Health = Health - damage;
 		this->OnDamageBPEvent();
+		isHit = true;
+		world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::GotHit, this->lastTimeHitDelay, false);
 
 		if (Health <= 0.0f)
 		{
@@ -521,6 +526,11 @@ void AMyProjectCharacter::Damage(int damage)
 			}
 		}
 	}
+}
+
+void AMyProjectCharacter::GotHit()
+{
+	isHit = false;
 }
 
 void AMyProjectCharacter::RessoourceRefill(float amount)
