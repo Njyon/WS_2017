@@ -522,7 +522,7 @@ void AMyProjectCharacter::Damage(int damage)
 			{
 				dead = true;
 				this->PlayDeathAnim();
-				world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+				world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 			}
 		}
 	}
@@ -936,10 +936,10 @@ void AMyProjectCharacter::EndSprint()
 
 void AMyProjectCharacter::Respawn()
 {
-	TeleportTo(spawnPoint, spawnRotation, false, true);
 	Health = MaxHealth;
 	Reload();
 	this->OnDamageBPEvent();
+	TeleportTo(spawnPoint, spawnRotation, false, true);
 	dead = false;
 }
 
@@ -1189,7 +1189,7 @@ void AMyProjectCharacter::GravitationOff()
 
 	this->wallrunTimeline->Stop();
 
-	world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::WallrunRetriggerableDelay, this->wallrunDuration, false);
+	world->GetTimerManager().SetTimer(wallrunHandle, this, &AMyProjectCharacter::WallrunRetriggerableDelay, this->wallrunDuration, false);
 
 }
 

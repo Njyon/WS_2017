@@ -333,6 +333,7 @@ private:								////// PRIVATE //////
 	FTimerHandle wallrunHandle;								// Timehandle (Delay for the Wallrun)
 	FTimerHandle delay;
 	FTimerHandle healthrecharge;
+	FTimerHandle respawn;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
 	///Class
