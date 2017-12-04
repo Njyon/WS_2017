@@ -1,7 +1,6 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "MyProjectProjectile.h"
-#include "MyProjectCharacter.h"
 #include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
@@ -34,6 +33,11 @@ AMyProjectProjectile::AMyProjectProjectile()
 
 }
 
+void AMyProjectProjectile::Initialize(AMyProjectCharacter* character)
+{
+	source = character;
+}
+
 void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(OtherActor);
@@ -50,23 +54,17 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			if (Hit.GetComponent() != NULL)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
-				/*if (Hit.BoneName == "head" || Hit.BoneName == "neck_01" || Hit.BoneName == "spine_03")*/
 				if (Hit.GetComponent()->ComponentHasTag("Head"))
 				{
-					UE_LOG(LogTemp, Warning, TEXT("hit head"));
+					//UE_LOG(LogTemp, Warning, TEXT("hit head"));
 					headshotdamage = projectileDamage * headshotMultiplier;
-					//this->player->RessoourceRefill(ressourceRefill);
+					source->RessoourceRefill(ressourceRefill);
 					hittedNPC->Damage(headshotdamage);
 				}
 
-				/*else if (Hit.BoneName == "None")
-				{
-					Destroy();
-				}*/
-
 				else if (Hit.GetComponent()->ComponentHasTag("Body")/* || Hit.GetComponent()->ComponentHasTag("LLeg") || Hit.GetComponent()->ComponentHasTag("RLeg")*/)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("hit body"));
+					//UE_LOG(LogTemp, Warning, TEXT("hit body"));
 					hittedNPC->Damage(projectileDamage);
 				}
 

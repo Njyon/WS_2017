@@ -349,8 +349,6 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-
-
 	///Sounds Slowmo
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
@@ -507,48 +505,6 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			//////////////////////////////////////
 			//////////////////////////////////////
 
-void AMyProjectCharacter::Damage(int damage)
-{
-	if (godMode == false)
-	{
-		Health = Health - damage;
-		this->OnDamageBPEvent();
-		isHit = true;
-		world->GetTimerManager().SetTimer(delay, this, &AMyProjectCharacter::GotHit, this->lastTimeHitDelay, false);
-
-		if (Health <= 0.0f)
-		{
-			if (dead == false)
-			{
-				dead = true;
-				this->PlayDeathAnim();
-				world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
-			}
-		}
-	}
-}
-
-void AMyProjectCharacter::GotHit()
-{
-	isHit = false;
-}
-
-void AMyProjectCharacter::RessoourceRefill(float amount)
-{
-	ressource = ressource + amount;
-}
-
-void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
-{
-	spawnRotation = spawnRotator;
-	spawnPoint = spawnVector;
-}
-
-void AMyProjectCharacter::Healthrecharge()
-{
-	Health += healthPerDelay;
-	OnHealthRechargeBPEvent();
-}
 
 
 			//////////////////////////////////////
@@ -854,6 +810,63 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 					// Keyboard left Shift //
 
 
+
+				//////////////////////////////////////
+				//////////	  Functions     //////////
+				//////////////////////////////////////
+
+void AMyProjectCharacter::Damage(int damage)
+{
+	if (godMode == false)
+	{
+		Health = Health - damage;
+		this->OnDamageBPEvent();
+		isHit = true;
+		world->GetTimerManager().SetTimer(delay, this, &AMyProjectCharacter::GotHit, this->lastTimeHitDelay, false);
+
+		if (Health <= 0.0f)
+		{
+			if (dead == false)
+			{
+				dead = true;
+				this->PlayDeathAnim();
+				world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+			}
+		}
+	}
+}
+
+void AMyProjectCharacter::GotHit()
+{
+	isHit = false;
+}
+
+void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
+{
+	spawnRotation = spawnRotator;
+	spawnPoint = spawnVector;
+}
+
+void AMyProjectCharacter::Respawn()
+{
+	Health = MaxHealth;
+	Reload();
+	this->OnDamageBPEvent();
+	TeleportTo(spawnPoint, spawnRotation, false, true);
+	dead = false;
+}
+
+void AMyProjectCharacter::Healthrecharge()
+{
+	Health += healthPerDelay;
+	OnHealthRechargeBPEvent();
+}
+
+void AMyProjectCharacter::RessoourceRefill(float amount)
+{
+	ressource = ressource + amount;
+}
+
 void AMyProjectCharacter::Slide()
 {
 	acceleration = this->movementComponent->GetCurrentAcceleration();
@@ -887,7 +900,6 @@ void AMyProjectCharacter::Slide()
 		RevertedSlideCam();
 	}
 }
-
 
 void AMyProjectCharacter::EndSlide()
 {
@@ -927,20 +939,6 @@ void AMyProjectCharacter::EndSprint()
 {
 	this->movementComponent->MaxWalkSpeed = walkSpeed;
 	canSprint = false;
-}
-
-
-				//////////////////////////////////////
-				//////////	  Functions     //////////
-				//////////////////////////////////////
-
-void AMyProjectCharacter::Respawn()
-{
-	Health = MaxHealth;
-	Reload();
-	this->OnDamageBPEvent();
-	TeleportTo(spawnPoint, spawnRotation, false, true);
-	dead = false;
 }
 
 void AMyProjectCharacter::BulletCooldown()
@@ -995,7 +993,7 @@ void AMyProjectCharacter::SpawnBullet()
 			newRotation,																// SpawnRotation
 			spawnInfo);																	// Set Spawn Info
 			
-		projectile->player = this;
+		projectile->Initialize(this);
 		}
 
 		else if (isShootingLeft)
@@ -1014,7 +1012,8 @@ void AMyProjectCharacter::SpawnBullet()
 				playerProjectile,															// SubClass
 				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),				// SpawnLocation
 				newRotation,																// SpawnRotation
-				spawnInfo);																	// Set Spawn Info
+				spawnInfo);
+			projectile->Initialize(this);
 		}
 
 
@@ -1038,7 +1037,8 @@ void AMyProjectCharacter::SpawnBullet()
 			playerProjectile,															// SubClass
 			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),				// SpawnLocation
 			newRotation,																// SpawnRotation
-			spawnInfo);																	// Set Spawn Info
+			spawnInfo);
+		projectile->Initialize(this);// Set Spawn Info
 		}
 
 		else if (isShootingLeft)
@@ -1057,7 +1057,8 @@ void AMyProjectCharacter::SpawnBullet()
 				playerProjectile,															// SubClass
 				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),				// SpawnLocation
 				newRotation,																// SpawnRotation
-				spawnInfo);																	// Set Spawn Info
+				spawnInfo);	
+			projectile->Initialize(this);// Set Spawn Info
 		}
 
 

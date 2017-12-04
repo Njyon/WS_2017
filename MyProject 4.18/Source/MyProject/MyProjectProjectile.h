@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "MyProjectCharacter.h"
 #include "MyProjectProjectile.generated.h"
 
 UENUM()
@@ -40,14 +41,18 @@ class AMyProjectProjectile : public AActor
 
 	int headshotdamage;
 
+	AMyProjectCharacter* source;
+
 
 public:
 	AMyProjectProjectile();
 
-	class AMyProjectCharacter* player;
 
 	UPROPERTY(EditAnywhere, Category = CollisionSwitch)
 		collisionSwitch state;
+
+	UFUNCTION()
+	void Initialize(AMyProjectCharacter* character);
 
 
 	/** called when projectile hits something */
