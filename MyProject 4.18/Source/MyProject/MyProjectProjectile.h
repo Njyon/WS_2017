@@ -44,6 +44,7 @@ class AMyProjectProjectile : public AActor
 
 	class ATP_ThirdPersonCharacter* damageNPC;
 
+
 public:
 	AMyProjectProjectile();
 
@@ -56,6 +57,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void InitializeNPC(ATP_ThirdPersonCharacter* damageNPC);
+
 
 	/** called when projectile hits something */
 	UFUNCTION()

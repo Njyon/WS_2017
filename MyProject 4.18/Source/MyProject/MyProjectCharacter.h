@@ -282,6 +282,8 @@ public:								////// PUBLIC //////
 		void FullStamina();
 	UFUNCTION(BlueprintImplementableEvent)
 		void PlayDeathAnim();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnCanNotShootBpEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
@@ -306,7 +308,7 @@ private:								////// PRIVATE //////
 
 											// UPROPERTY //
 	///DataType
-	int wallCollisionCounter = 0;							// Counts the Collision overlaps (Prevents bug)
+	int wallCollisionCounter = 0;	// Counts the Collision overlaps (Prevents bug)
 	float soundTimeDilation;
 	float helperWallJumpNegativeFloat = 0;
 	bool isLMBPressed;

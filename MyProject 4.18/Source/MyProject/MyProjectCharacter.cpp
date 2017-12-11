@@ -400,6 +400,11 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 				Reload();
 			}
 		}
+
+		else if (this->isBulletFired == true)
+		{
+			OnCanNotShootBpEvent();
+		}
 		else
 		{
 			///InCrease Shoot speed when Slomo is Active
@@ -537,15 +542,15 @@ void AMyProjectCharacter::LMBReleased()
 
 void AMyProjectCharacter::RMBPressed()
 {
-	if (movementComponent->IsFalling() == true || this->sliding == true) // Check if you can Set Slomo to Active
-	{
+	//if (movementComponent->IsFalling() == true || this->sliding == true) // Check if you can Set Slomo to Active
+	//{
 		if (this->ressource > 0)
 		{
 			isSlomoActive = true;
 			UGameplayStatics::SetGlobalTimeDilation(world, slomoTimeDilation); // Set Time to Slomo Time Dilation
 			SlowmoAudioComponent->Play();
 		}
-	}
+	/*}*/
 }
 
 void AMyProjectCharacter::RMBReleased()
