@@ -350,7 +350,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	///Sounds Slowmo
-	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
+	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
 	SlideAudioComponent->SetFloatParameter(FName("sfx_SlidingSlowmo"), soundTimeDilation);				//SlideSound		
 	WallrunAudioComponent->SetFloatParameter(FName("sfx_WallrunSlowmo"), soundTimeDilation);				//WallrunSound		
@@ -380,7 +380,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("2"));
 		WallrunAudioComponent->Stop();
-		
+
 	}
 	///Shoot
 	if (isLMBPressed == true)
@@ -405,37 +405,35 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		{
 			OnCanNotShootBpEvent();
 		}
+		///InCrease Shoot speed when Slomo is Active
+		if (isSlomoActive == true)
+		{
+			if (world->GetTimerManager().IsTimerActive(timeHandle) == true && isShootingInNormalSpeed == true)
+			{
+				isShootingInNormalSpeed = false;
+				world->GetTimerManager().PauseTimer(timeHandle);
+				world->GetTimerManager().ClearTimer(timeHandle); // Cleartimer if u switch into Slomo mode
+			}
+			else if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
+			{
+				world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::BulletCooldown, fireRateSlomo, false); // Shoot Cooldown
+			}
+		}
+		///Shoot Speed = Normal
 		else
 		{
-			///InCrease Shoot speed when Slomo is Active
-			if (isSlomoActive == true)
+			if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
 			{
-				if (world->GetTimerManager().IsTimerActive(timeHandle) == true && isShootingInNormalSpeed == true)
-				{
-					isShootingInNormalSpeed = false;
-					world->GetTimerManager().PauseTimer(timeHandle);
-					world->GetTimerManager().ClearTimer(timeHandle); // Cleartimer if u switch into Slomo mode
-				}
-				else if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
-				{
-					world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::BulletCooldown, fireRateSlomo, false); // Shoot Cooldown
-				}
-			}
-			///Shoot Speed = Normal
-			else
-			{
-				if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
-				{
-					world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::BulletCooldown, firerateNoSlomo, false); // Shoot Cooldown
+				world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::BulletCooldown, firerateNoSlomo, false); // Shoot Cooldown
 
-					if (isShootingInNormalSpeed == false)
-					{
-						isShootingInNormalSpeed = true;
-					}
+				if (isShootingInNormalSpeed == false)
+				{
+					isShootingInNormalSpeed = true;
 				}
 			}
 		}
 	}
+
 
 	///Slomo
 	if (isSlomoActive == true)

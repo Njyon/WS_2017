@@ -36,19 +36,11 @@ AMyProjectProjectile::AMyProjectProjectile()
 
 void AMyProjectProjectile::Initialize(AMyProjectCharacter* character)
 {
-	UE_LOG(LogTemp, Warning, TEXT("was �bergeben wird : %s"), *character->GetName());
 	this->source = character;
-	UE_LOG(LogTemp, Warning, TEXT("was wir haben ist : %s"), *source->GetName());
 }
 void AMyProjectProjectile::InitializeNPC(ATP_ThirdPersonCharacter* damageNPC)
 {
 	this->damageNPC = damageNPC;
-}
-
-void AMyProjectProjectile::InitializeNPC(ATP_ThirdPersonCharacter* npccharacter)
-{
-	UE_LOG(LogTemp, Warning, TEXT("ini"));
-	npcsource = npccharacter;
 }
 
 void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
