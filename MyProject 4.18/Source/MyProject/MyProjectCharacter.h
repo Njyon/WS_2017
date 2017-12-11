@@ -73,6 +73,7 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, Category = Spawn)
 	FVector spawnPoint;
 	FRotator spawnRotation;
+	FVector playerpos;
 
 										// UPROPERTY //
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
@@ -157,6 +158,8 @@ public:								////// PUBLIC //////
 		float healthPerDelay = 15.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float lastTimeHitDelay = 1.0f;												// Healthrecharge
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
+		float hitAngle;
 
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -230,7 +233,7 @@ public:								////// PUBLIC //////
 		class UAudioComponent* JumpAudioComponent;
 
 										// UFUNCTION //
-	void Damage(int damage);
+	void Damage(int damage, FVector damageCauser);
 	void SetRespawn(FVector spawnVector, FRotator spawnRotator);
 	void Healthrecharge();
 	void RessoourceRefill(float amount);
@@ -279,6 +282,8 @@ public:								////// PUBLIC //////
 		void FullStamina();
 	UFUNCTION(BlueprintImplementableEvent)
 		void PlayDeathAnim();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnCanNotShootBpEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
@@ -303,7 +308,7 @@ private:								////// PRIVATE //////
 
 											// UPROPERTY //
 	///DataType
-	int wallCollisionCounter = 0;							// Counts the Collision overlaps (Prevents bug)
+	int wallCollisionCounter = 0;	// Counts the Collision overlaps (Prevents bug)
 	float soundTimeDilation;
 	float helperWallJumpNegativeFloat = 0;
 	bool isLMBPressed;

@@ -43,6 +43,8 @@ class AMyProjectProjectile : public AActor
 
 	AMyProjectCharacter* source;
 
+	ATP_ThirdPersonCharacter* npcsource;
+
 
 public:
 	AMyProjectProjectile();
@@ -52,7 +54,10 @@ public:
 		collisionSwitch state;
 
 	UFUNCTION()
-	void Initialize(AMyProjectCharacter* character);
+		void Initialize(AMyProjectCharacter* character);
+
+	UFUNCTION(BlueprintCallable)
+		void InitializeNPC(ATP_ThirdPersonCharacter* npccharacter);
 
 
 	/** called when projectile hits something */

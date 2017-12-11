@@ -38,6 +38,12 @@ void AMyProjectProjectile::Initialize(AMyProjectCharacter* character)
 	source = character;
 }
 
+void AMyProjectProjectile::InitializeNPC(ATP_ThirdPersonCharacter* npccharacter)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ini"));
+	npcsource = npccharacter;
+}
+
 void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(OtherActor);
@@ -101,8 +107,8 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("hit"));
-			hittedplayer->Damage(projectileDamage);
+			UE_LOG(LogTemp, Warning, TEXT("hit"));
+			hittedplayer->Damage(projectileDamage, npcsource->GetActorTransform().GetLocation());
 
 			//ProjectileMovement->bShouldBounce = false;
 			Destroy();
