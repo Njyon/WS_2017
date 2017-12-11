@@ -815,7 +815,7 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 				//////////	  Functions     //////////
 				//////////////////////////////////////
 
-void AMyProjectCharacter::Damage(int damage)
+void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 {
 	if (godMode == false)
 	{
@@ -823,6 +823,15 @@ void AMyProjectCharacter::Damage(int damage)
 		this->OnDamageBPEvent();
 		isHit = true;
 		world->GetTimerManager().SetTimer(delay, this, &AMyProjectCharacter::GotHit, this->lastTimeHitDelay, false);
+		playerpos = this->GetActorForwardVector();
+		playerpos.Normalize();
+		damageCauser = damageCauser - this->GetActorForwardVector();
+		damageCauser.Normalize();
+		playerpos = playerpos * FVector(1, 1, 0);
+		damageCauser = damageCauser * FVector(1, 1, 0);
+		hitAngle = FMath::Acos(FVector::DotProduct(damageCauser, playerpos));
+		hitAngle = FMath::RadiansToDegrees(hitAngle);
+		UE_LOG(LogTemp, Warning, TEXT("Hit Angle: %f %"), this->hitAngle);
 
 		if (Health <= 0.0f)
 		{

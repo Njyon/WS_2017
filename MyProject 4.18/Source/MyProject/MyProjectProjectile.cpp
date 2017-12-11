@@ -1,6 +1,7 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "MyProjectProjectile.h"
+#include "MyProject/MyProjectCharacter.h"
 #include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
@@ -35,7 +36,13 @@ AMyProjectProjectile::AMyProjectProjectile()
 
 void AMyProjectProjectile::Initialize(AMyProjectCharacter* character)
 {
-	source = character;
+	UE_LOG(LogTemp, Warning, TEXT("was übergeben wird : %s"), *character->GetName());
+	this->source = character;
+	UE_LOG(LogTemp, Warning, TEXT("was wir haben ist : %s"), *source->GetName());
+}
+void AMyProjectProjectile::InitializeNPC(ATP_ThirdPersonCharacter* damageNPC)
+{
+	this->damageNPC = damageNPC;
 }
 
 void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -56,10 +63,12 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 				//UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
 				if (Hit.GetComponent()->ComponentHasTag("Head"))
 				{
-					//UE_LOG(LogTemp, Warning, TEXT("hit head"));
+					UE_LOG(LogTemp, Warning, TEXT("hit head"));
 					headshotdamage = projectileDamage * headshotMultiplier;
 					source->RessoourceRefill(ressourceRefill);
 					hittedNPC->Damage(headshotdamage);
+					//source = GetWorld()->GetFirstPlayerController();
+				
 				}
 
 				else if (Hit.GetComponent()->ComponentHasTag("Body")/* || Hit.GetComponent()->ComponentHasTag("LLeg") || Hit.GetComponent()->ComponentHasTag("RLeg")*/)
@@ -102,7 +111,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("hit"));
-			hittedplayer->Damage(projectileDamage);
+			hittedplayer->Damage(projectileDamage, damageNPC->GetActorTransform().GetLocation());
 
 			//ProjectileMovement->bShouldBounce = false;
 			Destroy();
