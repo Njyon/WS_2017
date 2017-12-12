@@ -349,6 +349,32 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false)
+	{
+		if (!ismovingTimer)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("notmoving"));
+			ismovingTimer = true;
+			onNotMoving = true;
+			world->GetTimerManager().SetTimer(noMoving, this, &AMyProjectCharacter::NotMoving, notMoving, false);
+		}
+	}
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == false || sliding == true || isOnWall == true || isOnLadder == true)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("moving"));
+		onNotMoving = false;
+		ismovingTimer = false;
+		islosingHealth = false;
+	}
+	if (islosingHealth == true && sliding == false && isOnWall == false && isOnLadder == false)
+	{
+		if (world->GetTimerManager().IsTimerActive(losingHealth) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
+		{
+			world->GetTimerManager().SetTimer(losingHealth, this, &AMyProjectCharacter::LosingHealth, losingHealthTimer, false);
+		}
+	}
+	
+
 	///Sounds Slowmo
 	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
@@ -441,13 +467,13 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		this->ressource -= world->GetDeltaSeconds() * this->ressourceDrainAmount;
 		OnResourceChange();
 
-		if (movementComponent->IsFalling() == false && this->sliding == false)  // check if Character is in "Action"
-		{
-			isSlomoActive = false;
-			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
-			SlowmoAudioComponent->Stop();
-		}
-		else if (this->ressource < 0)
+		//if (movementComponent->IsFalling() == false && this->sliding == false)  // check if Character is in "Action"
+		//{
+		//	isSlomoActive = false;
+		//	UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
+		//	SlowmoAudioComponent->Stop();
+		//}
+		/*else*/ if (this->ressource < 0)
 		{
 			isSlomoActive = false;
 			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
@@ -466,6 +492,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		this->ressource -= world->GetDeltaSeconds() * this->sprintDrainAmount;
 		OnResourceChange();
+		onNotMoving = false;
 	}
 
 	//Ressource
@@ -490,7 +517,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	//UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
 	if (Health <= MaxHealth)
 	{
-		if (!isHit)
+		if (!isHit && !onNotMoving)
 		{
 			if (world->GetTimerManager().IsTimerActive(healthrecharge) == false)
 			{
@@ -851,6 +878,21 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 void AMyProjectCharacter::GotHit()
 {
 	isHit = false;
+}
+
+void AMyProjectCharacter::NotMoving()
+{
+	//ismovingTimer = false;
+	islosingHealth = true;
+	UE_LOG(LogTemp, Warning, TEXT("1"));
+	Health = Health - 10;
+	this->OnDamageBPEvent();
+}
+void AMyProjectCharacter::LosingHealth()
+{
+	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
+	Health = Health - 10;
+	this->OnDamageBPEvent();
 }
 
 void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)

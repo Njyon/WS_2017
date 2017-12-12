@@ -132,6 +132,10 @@ public:								////// PUBLIC //////
 		int sprintSpeed = 1200;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		int walkSpeed = 600;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Crank)
+		int notMoving = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int losingHealthTimer = 1;
 
 
 	// is Slomo Active or Deactive
@@ -327,6 +331,9 @@ private:								////// PRIVATE //////
 	bool isShootingLeft = false;
 	bool dead = false;
 	bool isHit = false;
+	bool onNotMoving = false;
+	bool ismovingTimer = false;
+	bool islosingHealth = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for Wallrun
@@ -340,6 +347,8 @@ private:								////// PRIVATE //////
 	FTimerHandle delay;
 	FTimerHandle healthrecharge;
 	FTimerHandle respawn;
+	FTimerHandle noMoving;
+	FTimerHandle losingHealth;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
 	///Class
@@ -358,6 +367,8 @@ private:								////// PRIVATE //////
 	void WallrunEnd();
 	void Respawn();
 	void GotHit();
+	void NotMoving();
+	void LosingHealth();
 	
 
 	///////////////////
