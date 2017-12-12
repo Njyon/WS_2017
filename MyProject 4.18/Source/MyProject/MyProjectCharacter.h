@@ -111,6 +111,8 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float jumpHeightOnWall = 600;												// Set Jump Height on Wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float jumpHeightOnWallUp = 1200;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float climbEndBoost = -500;													// Set Climb End Boost
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float maxRessource = 100;													// Set Max Ressources
@@ -334,9 +336,10 @@ private:								////// PRIVATE //////
 	bool onNotMoving = false;
 	bool ismovingTimer = false;
 	bool islosingHealth = false;
+	bool WalllrunUp = false;
 	
 	///Struct
-	FVector wallRunDirection;								// Helper for Wallrun
+	FVector wallRunDirection;								// Helper for allrun
 	FVector playerDirection;								// Helper for Wallrun
 	FVector playerRightVector;								// Helper for Wallrun
 	FRotator currentCamRotation;
@@ -365,6 +368,7 @@ private:								////// PRIVATE //////
 	void GravitationOff();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
+	void WallrunEndUp();
 	void Respawn();
 	void GotHit();
 	void NotMoving();
