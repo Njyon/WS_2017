@@ -349,7 +349,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false)
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
 	{
 		if (!ismovingTimer)
 		{
@@ -366,7 +366,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		ismovingTimer = false;
 		islosingHealth = false;
 	}
-	if (islosingHealth == true && sliding == false && isOnWall == false && isOnLadder == false)
+	if (islosingHealth == true && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
 	{
 		if (world->GetTimerManager().IsTimerActive(losingHealth) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
 		{
