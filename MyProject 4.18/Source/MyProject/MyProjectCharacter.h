@@ -86,6 +86,8 @@ public:								////// PUBLIC //////
 		bool godMode = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Sprint)
 		bool canSprint = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Slide)
+		bool sliding = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		int magazineSize = 12;
@@ -321,7 +323,6 @@ private:								////// PRIVATE //////
 	bool isWallLeft = false;					// is on wall Left?
 	bool wallrunDoOnce = true;
 	bool ishiftButtonPressed = false;
-	bool sliding = false;
 	bool isFalling = false;
 	bool climbingSoundDoOnce = false;
 	bool isShootingLeft = false;
