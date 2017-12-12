@@ -833,7 +833,8 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 		0.0f						// Max Range
 	);
 
-	this->WallrunEnd();
+	
+	//this->WallrunEnd();
 
 }
 
@@ -1272,6 +1273,45 @@ void AMyProjectCharacter::WallrunRetriggerableDelay()
 // Resets Values to Normal
 void AMyProjectCharacter::WallrunEnd()
 {
+
+	if (this->isWallRight == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
+		FVector sideVector = this->GetActorRightVector() * this->helperWallJumpNegativeFloat;
+		FVector launchVector = sideVector + forwardVector;
+
+		this->LaunchCharacter(FVector(							// Jump when wall is on you right side
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeightOnWall),
+			false,
+			true
+		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
+	}
+	else if (this->isWallLeft == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
+		FVector sideVector = this->GetActorRightVector() * this->wallJumpForce;
+		FVector launchVector = sideVector + forwardVector;
+
+		this->LaunchCharacter(FVector(						// Jump when wall is on your Left side
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeightOnWall),
+			false,
+			true
+		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
+	}
 	this->movementComponent->GravityScale = this->gravitation;
 	this->movementComponent->AirControl = this->airControll;
 	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 0.0f));
@@ -1279,6 +1319,7 @@ void AMyProjectCharacter::WallrunEnd()
 	this->isWallRight = false;
 	this->isWallLeft = false;
 	this->wallrunDoOnce = true;
+
 }
 
 						//////////////////////////////////////
