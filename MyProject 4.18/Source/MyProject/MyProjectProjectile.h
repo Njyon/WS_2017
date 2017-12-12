@@ -27,7 +27,7 @@ class AMyProjectProjectile : public AActor
 		class UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-		int projectileDamage = 50;
+		int projectileDamage = 25;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		int headshotMultiplier = 2;

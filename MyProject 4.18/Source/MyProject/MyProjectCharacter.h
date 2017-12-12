@@ -111,6 +111,8 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float jumpHeightOnWall = 600;												// Set Jump Height on Wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float jumpHeightOnWallUp = 1200;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float climbEndBoost = -500;													// Set Climb End Boost
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float maxRessource = 100;													// Set Max Ressources
@@ -132,6 +134,10 @@ public:								////// PUBLIC //////
 		int sprintSpeed = 1200;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		int walkSpeed = 600;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Crank)
+		int notMoving = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int losingHealthTimer = 1;
 
 
 	// is Slomo Active or Deactive
@@ -327,9 +333,13 @@ private:								////// PRIVATE //////
 	bool isShootingLeft = false;
 	bool dead = false;
 	bool isHit = false;
+	bool onNotMoving = false;
+	bool ismovingTimer = false;
+	bool islosingHealth = false;
+	bool WalllrunUp = false;
 	
 	///Struct
-	FVector wallRunDirection;								// Helper for Wallrun
+	FVector wallRunDirection;								// Helper for allrun
 	FVector playerDirection;								// Helper for Wallrun
 	FVector playerRightVector;								// Helper for Wallrun
 	FRotator currentCamRotation;
@@ -340,6 +350,8 @@ private:								////// PRIVATE //////
 	FTimerHandle delay;
 	FTimerHandle healthrecharge;
 	FTimerHandle respawn;
+	FTimerHandle noMoving;
+	FTimerHandle losingHealth;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
 	///Class
@@ -356,8 +368,11 @@ private:								////// PRIVATE //////
 	void GravitationOff();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
+	void WallrunEndUp();
 	void Respawn();
 	void GotHit();
+	void NotMoving();
+	void LosingHealth();
 	
 
 	///////////////////
