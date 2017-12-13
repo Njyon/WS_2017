@@ -73,6 +73,7 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, Category = Spawn)
 	FVector spawnPoint;
 	FRotator spawnRotation;
+	FVector playerpos;
 
 										// UPROPERTY //
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
@@ -83,6 +84,10 @@ public:								////// PUBLIC //////
 		bool isOnLadder = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool godMode = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Sprint)
+		bool canSprint = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Slide)
+		bool sliding = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		int magazineSize = 12;
@@ -108,6 +113,8 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float jumpHeightOnWall = 600;												// Set Jump Height on Wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
+		float jumpHeightOnWallUp = 1200;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float climbEndBoost = -500;													// Set Climb End Boost
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
 		float maxRessource = 100;													// Set Max Ressources
@@ -129,6 +136,10 @@ public:								////// PUBLIC //////
 		int sprintSpeed = 1200;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		int walkSpeed = 600;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Crank)
+		int notMoving = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int losingHealthTimer = 1;
 
 
 	// is Slomo Active or Deactive
@@ -157,6 +168,8 @@ public:								////// PUBLIC //////
 		float healthPerDelay = 15.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float lastTimeHitDelay = 1.0f;												// Healthrecharge
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
+		float hitAngle;
 
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -230,7 +243,7 @@ public:								////// PUBLIC //////
 		class UAudioComponent* JumpAudioComponent;
 
 										// UFUNCTION //
-	void Damage(int damage);
+	void Damage(int damage, FVector damageCauser);
 	void SetRespawn(FVector spawnVector, FRotator spawnRotator);
 	void Healthrecharge();
 	void RessoourceRefill(float amount);
@@ -261,6 +274,10 @@ public:								////// PUBLIC //////
 
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
+	UFUNCTION(BlueprintCallable)
+		void SlideCam();
+	UFUNCTION(BlueprintCallable)
+		void RevertedSlideCam();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnDamageBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
@@ -269,16 +286,18 @@ public:								////// PUBLIC //////
 		void OnAmmoChange();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnResourceChange();
-	UFUNCTION(BlueprintCallable)
-		void SlideCam();
-	UFUNCTION(BlueprintCallable)
-		void RevertedSlideCam();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnReloadBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void FullStamina();
 	UFUNCTION(BlueprintImplementableEvent)
 		void PlayDeathAnim();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnCanNotShootBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnIsDeadBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnRespawnBpEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
@@ -303,7 +322,7 @@ private:								////// PRIVATE //////
 
 											// UPROPERTY //
 	///DataType
-	int wallCollisionCounter = 0;							// Counts the Collision overlaps (Prevents bug)
+	int wallCollisionCounter = 0;	// Counts the Collision overlaps (Prevents bug)
 	float soundTimeDilation;
 	float helperWallJumpNegativeFloat = 0;
 	bool isLMBPressed;
@@ -314,16 +333,18 @@ private:								////// PRIVATE //////
 	bool isWallLeft = false;					// is on wall Left?
 	bool wallrunDoOnce = true;
 	bool ishiftButtonPressed = false;
-	bool sliding = false;
 	bool isFalling = false;
 	bool climbingSoundDoOnce = false;
 	bool isShootingLeft = false;
-	bool canSprint = false;
 	bool dead = false;
 	bool isHit = false;
+	bool onNotMoving = false;
+	bool ismovingTimer = false;
+	bool islosingHealth = false;
+	bool WalllrunUp = false;
 	
 	///Struct
-	FVector wallRunDirection;								// Helper for Wallrun
+	FVector wallRunDirection;								// Helper for allrun
 	FVector playerDirection;								// Helper for Wallrun
 	FVector playerRightVector;								// Helper for Wallrun
 	FRotator currentCamRotation;
@@ -334,6 +355,8 @@ private:								////// PRIVATE //////
 	FTimerHandle delay;
 	FTimerHandle healthrecharge;
 	FTimerHandle respawn;
+	FTimerHandle noMoving;
+	FTimerHandle losingHealth;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
 	///Class
@@ -350,8 +373,11 @@ private:								////// PRIVATE //////
 	void GravitationOff();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
+	void WallrunEndUp();
 	void Respawn();
 	void GotHit();
+	void NotMoving();
+	void LosingHealth();
 	
 
 	///////////////////

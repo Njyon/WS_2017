@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "MyProjectCharacter.h"
 #include "MyProjectProjectile.generated.h"
 
 UENUM()
@@ -28,7 +27,7 @@ class AMyProjectProjectile : public AActor
 		class UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-		int projectileDamage = 50;
+		int projectileDamage = 25;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		int headshotMultiplier = 2;
@@ -37,11 +36,13 @@ class AMyProjectProjectile : public AActor
 		float forceImpulse = 100.0f;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-		float ressourceRefill = 20.0f;
+		float ressourceRefill = 100.0f;
 
 	int headshotdamage;
 
-	AMyProjectCharacter* source;
+	class AMyProjectCharacter* source;
+
+	class ATP_ThirdPersonCharacter* damageNPC;
 
 
 public:
@@ -52,7 +53,10 @@ public:
 		collisionSwitch state;
 
 	UFUNCTION()
-	void Initialize(AMyProjectCharacter* character);
+		void Initialize(AMyProjectCharacter* character);
+
+	UFUNCTION(BlueprintCallable)
+		void InitializeNPC(ATP_ThirdPersonCharacter* damageNPC);
 
 
 	/** called when projectile hits something */

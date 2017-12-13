@@ -349,8 +349,34 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
+	{
+		if (!ismovingTimer)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("notmoving"));
+			ismovingTimer = true;
+			onNotMoving = true;
+			world->GetTimerManager().SetTimer(noMoving, this, &AMyProjectCharacter::NotMoving, notMoving, false);
+		}
+	}
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == false || sliding == true || isOnWall == true || isOnLadder == true)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("moving"));
+		onNotMoving = false;
+		ismovingTimer = false;
+		islosingHealth = false;
+	}
+	if (islosingHealth == true && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
+	{
+		if (world->GetTimerManager().IsTimerActive(losingHealth) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
+		{
+			world->GetTimerManager().SetTimer(losingHealth, this, &AMyProjectCharacter::LosingHealth, losingHealthTimer, false);
+		}
+	}
+	
+
 	///Sounds Slowmo
-	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);		
+	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);
 	ShootAudioComponent->SetFloatParameter(FName("sfx_WeaponFireSlowmo"), soundTimeDilation);				//ShootSound		
 	SlideAudioComponent->SetFloatParameter(FName("sfx_SlidingSlowmo"), soundTimeDilation);				//SlideSound		
 	WallrunAudioComponent->SetFloatParameter(FName("sfx_WallrunSlowmo"), soundTimeDilation);				//WallrunSound		
@@ -380,7 +406,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("2"));
 		WallrunAudioComponent->Stop();
-		
+
 	}
 	///Shoot
 	if (isLMBPressed == true)
@@ -400,37 +426,40 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 				Reload();
 			}
 		}
+
+		else if (this->isBulletFired == true)
+		{
+			OnCanNotShootBpEvent();
+		}
+		///InCrease Shoot speed when Slomo is Active
+		if (isSlomoActive == true)
+		{
+			if (world->GetTimerManager().IsTimerActive(timeHandle) == true && isShootingInNormalSpeed == true)
+			{
+				isShootingInNormalSpeed = false;
+				world->GetTimerManager().PauseTimer(timeHandle);
+				world->GetTimerManager().ClearTimer(timeHandle); // Cleartimer if u switch into Slomo mode
+			}
+			else if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
+			{
+				world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::BulletCooldown, fireRateSlomo, false); // Shoot Cooldown
+			}
+		}
+		///Shoot Speed = Normal
 		else
 		{
-			///InCrease Shoot speed when Slomo is Active
-			if (isSlomoActive == true)
+			if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
 			{
-				if (world->GetTimerManager().IsTimerActive(timeHandle) == true && isShootingInNormalSpeed == true)
-				{
-					isShootingInNormalSpeed = false;
-					world->GetTimerManager().PauseTimer(timeHandle);
-					world->GetTimerManager().ClearTimer(timeHandle); // Cleartimer if u switch into Slomo mode
-				}
-				else if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
-				{
-					world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::BulletCooldown, fireRateSlomo, false); // Shoot Cooldown
-				}
-			}
-			///Shoot Speed = Normal
-			else
-			{
-				if (world->GetTimerManager().IsTimerActive(timeHandle) == false) // Trigger Only Once and than wait for Cooldown (Cooldwon is Rewriteble)
-				{
-					world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::BulletCooldown, firerateNoSlomo, false); // Shoot Cooldown
+				world->GetTimerManager().SetTimer(timeHandle, this, &AMyProjectCharacter::BulletCooldown, firerateNoSlomo, false); // Shoot Cooldown
 
-					if (isShootingInNormalSpeed == false)
-					{
-						isShootingInNormalSpeed = true;
-					}
+				if (isShootingInNormalSpeed == false)
+				{
+					isShootingInNormalSpeed = true;
 				}
 			}
 		}
 	}
+
 
 	///Slomo
 	if (isSlomoActive == true)
@@ -438,13 +467,13 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		this->ressource -= world->GetDeltaSeconds() * this->ressourceDrainAmount;
 		OnResourceChange();
 
-		if (movementComponent->IsFalling() == false && this->sliding == false)  // check if Character is in "Action"
-		{
-			isSlomoActive = false;
-			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
-			SlowmoAudioComponent->Stop();
-		}
-		else if (this->ressource < 0)
+		//if (movementComponent->IsFalling() == false && this->sliding == false)  // check if Character is in "Action"
+		//{
+		//	isSlomoActive = false;
+		//	UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
+		//	SlowmoAudioComponent->Stop();
+		//}
+		/*else*/ if (this->ressource < 0)
 		{
 			isSlomoActive = false;
 			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
@@ -463,6 +492,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		this->ressource -= world->GetDeltaSeconds() * this->sprintDrainAmount;
 		OnResourceChange();
+		onNotMoving = false;
 	}
 
 	//Ressource
@@ -487,7 +517,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	//UE_LOG(LogTemp, Warning, TEXT("Ammo  : %i %"), this->currentAmmo);
 	if (Health <= MaxHealth)
 	{
-		if (!isHit)
+		if (!isHit && !onNotMoving)
 		{
 			if (world->GetTimerManager().IsTimerActive(healthrecharge) == false)
 			{
@@ -537,15 +567,15 @@ void AMyProjectCharacter::LMBReleased()
 
 void AMyProjectCharacter::RMBPressed()
 {
-	if (movementComponent->IsFalling() == true || this->sliding == true) // Check if you can Set Slomo to Active
-	{
+	//if (movementComponent->IsFalling() == true || this->sliding == true) // Check if you can Set Slomo to Active
+	//{
 		if (this->ressource > 0)
 		{
 			isSlomoActive = true;
 			UGameplayStatics::SetGlobalTimeDilation(world, slomoTimeDilation); // Set Time to Slomo Time Dilation
 			SlowmoAudioComponent->Play();
 		}
-	}
+	/*}*/
 }
 
 void AMyProjectCharacter::RMBReleased()
@@ -729,7 +759,7 @@ void AMyProjectCharacter::Jump()
 			}
 		}
 	}
-	else if (this->isWallRight == true)
+	else if (this->isWallRight == true && this->WalllrunUp == true)
 	{
 		this->movementComponent->GravityScale = gravitation;	// Set Gravity
 
@@ -748,7 +778,7 @@ void AMyProjectCharacter::Jump()
 		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
 		JumpAudioComponent->Play();
 	}
-	else if (this->isWallLeft == true)
+	else if (this->isWallLeft == true && this->WalllrunUp == true)
 	{
 		this->movementComponent->GravityScale = gravitation;	// Set Gravity
 
@@ -769,6 +799,7 @@ void AMyProjectCharacter::Jump()
 	}
 	else if (this->isOnLadder == true)
 	{
+		
 		this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
 		this->isOnLadder = false;
 		FVector launchVector = this->GetActorForwardVector() * this->climbEndBoost;
@@ -803,7 +834,8 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 		0.0f						// Max Range
 	);
 
-	this->WallrunEnd();
+	
+	//this->WallrunEnd();
 
 }
 
@@ -815,7 +847,7 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 				//////////	  Functions     //////////
 				//////////////////////////////////////
 
-void AMyProjectCharacter::Damage(int damage)
+void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 {
 	if (godMode == false)
 	{
@@ -823,13 +855,26 @@ void AMyProjectCharacter::Damage(int damage)
 		this->OnDamageBPEvent();
 		isHit = true;
 		world->GetTimerManager().SetTimer(delay, this, &AMyProjectCharacter::GotHit, this->lastTimeHitDelay, false);
+		playerpos = this->GetActorForwardVector();
+		playerpos.Normalize();
+		damageCauser = damageCauser - this->GetActorForwardVector();
+		damageCauser.Normalize();
+		playerpos = playerpos * FVector(1, 1, 0);
+		damageCauser = damageCauser * FVector(1, 1, 0);
+		hitAngle = FMath::Acos(FVector::DotProduct(damageCauser, playerpos));
+		hitAngle = FMath::RadiansToDegrees(hitAngle);
+		UE_LOG(LogTemp, Warning, TEXT("Hit Angle: %f %"), this->hitAngle);
 
 		if (Health <= 0.0f)
 		{
 			if (dead == false)
 			{
+				OnIsDeadBpEvent();
+				LMBReleased();
 				dead = true;
 				this->PlayDeathAnim();
+				//this->playerController->UnPossess();
+				this->AActor::DisableInput(GetWorld()->GetFirstPlayerController());
 				world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 			}
 		}
@@ -839,6 +884,21 @@ void AMyProjectCharacter::Damage(int damage)
 void AMyProjectCharacter::GotHit()
 {
 	isHit = false;
+}
+
+void AMyProjectCharacter::NotMoving()
+{
+	//ismovingTimer = false;
+	islosingHealth = true;
+	UE_LOG(LogTemp, Warning, TEXT("1"));
+	Health = Health - 10;
+	this->OnDamageBPEvent();
+}
+void AMyProjectCharacter::LosingHealth()
+{
+	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
+	Health = Health - 10;
+	this->OnDamageBPEvent();
 }
 
 void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
@@ -854,6 +914,9 @@ void AMyProjectCharacter::Respawn()
 	this->OnDamageBPEvent();
 	TeleportTo(spawnPoint, spawnRotation, false, true);
 	dead = false;
+	//this->playerController->Possess(this);
+	this->AActor::EnableInput(GetWorld()->GetFirstPlayerController());
+	OnRespawnBpEvent();
 }
 
 void AMyProjectCharacter::Healthrecharge()
@@ -906,7 +969,7 @@ void AMyProjectCharacter::EndSlide()
 	sliding = false;
 	ishiftButtonPressed = false;
 	this->movementComponent->MaxAcceleration = 3000;
-	this->movementComponent->MaxWalkSpeed = 600;
+	this->movementComponent->MaxWalkSpeed = walkSpeed;
 	this->movementComponent->GroundFriction = 8;
 	this->movementComponent->BrakingDecelerationWalking = 2048;
 	this->movementComponent->BrakingFrictionFactor = 2;
@@ -1123,6 +1186,19 @@ void AMyProjectCharacter::WallrunLaunch()
 
 				GravitationOff();
 			}
+			else if (hitResult.GetActor()->ActorHasTag("RunWallUp"))
+			{
+				WalllrunUp = true;
+				FVector playerPosition = this->GetTransform().GetLocation();
+				this->playerDirection = this->playerDirection * 1000;
+
+				FVector launchCharacterVector = this->wallRunDirection - playerPosition;
+				launchCharacterVector = launchCharacterVector + this->playerDirection;
+
+				this->LaunchCharacter(launchCharacterVector, true, true);			// Launches Character in the Desiert Direction
+
+				GravitationOff();
+			}
 			else												// wallrun if u dont look at wall && the wall is on your Right side
 			{
 				this->playerDirection = this->playerDirection * 1000;
@@ -1149,6 +1225,19 @@ void AMyProjectCharacter::WallrunLaunch()
 		{
 			if (hitResult.GetActor()->ActorHasTag("RunWall"))	// Wallrun if you look at wall && the wall is on your Left side
 			{
+				FVector playerPosition = this->GetTransform().GetLocation();
+				this->playerDirection = this->playerDirection * 1000;
+
+				FVector launchCharacterVector = this->wallRunDirection - playerPosition;
+				launchCharacterVector = launchCharacterVector + this->playerDirection;
+
+				this->LaunchCharacter(launchCharacterVector, true, true);			// Launches Character in the Desiert Direction
+
+				GravitationOff();
+			}
+			else if (hitResult.GetActor()->ActorHasTag("RunWallUp"))
+			{
+				WalllrunUp = true;
 				FVector playerPosition = this->GetTransform().GetLocation();
 				this->playerDirection = this->playerDirection * 1000;
 
@@ -1218,6 +1307,46 @@ void AMyProjectCharacter::WallrunRetriggerableDelay()
 // Resets Values to Normal
 void AMyProjectCharacter::WallrunEnd()
 {
+	WalllrunUp = false;
+
+	if (this->isWallRight == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
+		FVector sideVector = this->GetActorRightVector() * this->helperWallJumpNegativeFloat;
+		FVector launchVector = sideVector + forwardVector;
+
+		this->LaunchCharacter(FVector(							// Jump when wall is on you right side
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeightOnWall),
+			false,
+			true
+		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
+	}
+	else if (this->isWallLeft == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
+		FVector sideVector = this->GetActorRightVector() * this->wallJumpForce;
+		FVector launchVector = sideVector + forwardVector;
+
+		this->LaunchCharacter(FVector(						// Jump when wall is on your Left side
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeightOnWall),
+			false,
+			true
+		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
+	}
 	this->movementComponent->GravityScale = this->gravitation;
 	this->movementComponent->AirControl = this->airControll;
 	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 0.0f));
@@ -1225,6 +1354,58 @@ void AMyProjectCharacter::WallrunEnd()
 	this->isWallRight = false;
 	this->isWallLeft = false;
 	this->wallrunDoOnce = true;
+
+}
+void AMyProjectCharacter::WallrunEndUp()
+{
+	WalllrunUp = false;
+
+	if (this->isWallRight == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
+		FVector sideVector = this->GetActorRightVector() * this->helperWallJumpNegativeFloat;
+		FVector launchVector = sideVector + forwardVector;
+
+		this->LaunchCharacter(FVector(							// Jump when wall is on you right side
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeightOnWallUp),
+			false,
+			true
+		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
+	}
+	else if (this->isWallLeft == true)
+	{
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
+		FVector sideVector = this->GetActorRightVector() * this->wallJumpForce;
+		FVector launchVector = sideVector + forwardVector;
+
+		this->LaunchCharacter(FVector(						// Jump when wall is on your Left side
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeightOnWallUp),
+			false,
+			true
+		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
+		JumpAudioComponent->Play();
+	}
+	this->movementComponent->GravityScale = this->gravitation;
+	this->movementComponent->AirControl = this->airControll;
+	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 0.0f));
+	this->isOnWall = false;
+	this->isWallRight = false;
+	this->isWallLeft = false;
+	this->wallrunDoOnce = true;
+
 }
 
 						//////////////////////////////////////
@@ -1234,7 +1415,7 @@ void AMyProjectCharacter::WallrunEnd()
 /// Main Start Walldetection
 void AMyProjectCharacter::OnWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)		// Check if the Wall has the right TAG and if the player is in the air
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false || otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)		// Check if the Wall has the right TAG and if the player is in the air
 	{
 		this->isOnWall = true;																					// Set the Wallrun State
 		this->wallCollisionCounter = 0;																			// Set the Wallruncounter back to 0 (Colliding bug prevention) 
@@ -1262,12 +1443,26 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 			}
 		}
 	}
+	else if (otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	{
+		this->wallrunTimeline->Stop();																			// Stops Timeline
+
+		if (this->wallCollisionCounter >= 1)
+		{
+			this->wallCollisionCounter--;																		// Decrements Counter when its higher than 0
+
+			if (this->wallCollisionCounter == 0)
+			{
+				this->WallrunEndUp();																				// Call End Wallrun
+			}
+		}
+	}
 }
 
 /// Right Walldetector Begin
 void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false || otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;					// set the bool false so it only can on of them be true (safty first)
 		this->isWallRight = true;	
@@ -1282,7 +1477,7 @@ void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp
 /// Right Walldetector End
 void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false || otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;					
 		this->isWallRight = false;
@@ -1299,7 +1494,7 @@ void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitCom
 void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
 
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false || otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallRight = false;						// set the bool false so it only can on of them be true (safty first)
 		this->isWallLeft = true;		
@@ -1314,7 +1509,7 @@ void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp,
 /// Left Walldetector End
 void AMyProjectCharacter::EndLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false || otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;
 		this->isWallRight = false;
@@ -1362,7 +1557,7 @@ void AMyProjectCharacter::WallrunFloatReturn(float value)											// This Upda
 			
 			if (hitResult.IsValidBlockingHit() == true)
 			{
-				if (hitResult.GetActor()->ActorHasTag("RunWall"))
+				if (hitResult.GetActor()->ActorHasTag("RunWall") || hitResult.GetActor()->ActorHasTag("RunWallUp"))
 				{
 					FVector rayHitLocation = hitResult.Location;
 					FVector wallForwardVector = hitResult.GetActor()->GetTransform().GetRotation().GetForwardVector() * 10;
@@ -1412,7 +1607,7 @@ void AMyProjectCharacter::WallrunFloatReturn(float value)											// This Upda
 
 			if (hitResult.IsValidBlockingHit() == true)
 			{
-				if (hitResult.GetActor()->ActorHasTag("RunWall"))
+				if (hitResult.GetActor()->ActorHasTag("RunWall") || hitResult.GetActor()->ActorHasTag("RunWallUp"))
 				{
 					FVector rayHitLocation = hitResult.Location;
 					FVector wallForwardVector = hitResult.GetActor()->GetTransform().GetRotation().GetForwardVector() * 10;
