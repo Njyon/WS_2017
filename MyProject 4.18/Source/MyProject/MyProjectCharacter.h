@@ -298,6 +298,10 @@ public:								////// PUBLIC //////
 		void OnIsDeadBpEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnRespawnBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnBulletSpawnBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnWalkingBpEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
