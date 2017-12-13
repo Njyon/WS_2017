@@ -870,9 +870,11 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 			if (dead == false)
 			{
 				OnIsDeadBpEvent();
+				LMBReleased();
 				dead = true;
 				this->PlayDeathAnim();
-				this->playerController->UnPossess();
+				//this->playerController->UnPossess();
+				this->AActor::DisableInput(GetWorld()->GetFirstPlayerController());
 				world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 			}
 		}
@@ -912,7 +914,8 @@ void AMyProjectCharacter::Respawn()
 	this->OnDamageBPEvent();
 	TeleportTo(spawnPoint, spawnRotation, false, true);
 	dead = false;
-	this->playerController->Possess(this);
+	//this->playerController->Possess(this);
+	this->AActor::EnableInput(GetWorld()->GetFirstPlayerController());
 	OnRespawnBpEvent();
 }
 
@@ -966,7 +969,7 @@ void AMyProjectCharacter::EndSlide()
 	sliding = false;
 	ishiftButtonPressed = false;
 	this->movementComponent->MaxAcceleration = 3000;
-	this->movementComponent->MaxWalkSpeed = 600;
+	this->movementComponent->MaxWalkSpeed = walkSpeed;
 	this->movementComponent->GroundFriction = 8;
 	this->movementComponent->BrakingDecelerationWalking = 2048;
 	this->movementComponent->BrakingFrictionFactor = 2;
