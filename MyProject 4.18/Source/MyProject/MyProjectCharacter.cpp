@@ -759,7 +759,7 @@ void AMyProjectCharacter::Jump()
 			}
 		}
 	}
-	else if (this->isWallRight == true && this->WalllrunUp == true)
+	else if (this->isWallRight == true || this->WalllrunUp == true)
 	{
 		this->movementComponent->GravityScale = gravitation;	// Set Gravity
 
@@ -778,7 +778,7 @@ void AMyProjectCharacter::Jump()
 		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
 		JumpAudioComponent->Play();
 	}
-	else if (this->isWallLeft == true && this->WalllrunUp == true)
+	else if (this->isWallLeft == true || this->WalllrunUp == true)
 	{
 		this->movementComponent->GravityScale = gravitation;	// Set Gravity
 
