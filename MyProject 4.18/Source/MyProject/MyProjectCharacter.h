@@ -302,6 +302,8 @@ public:								////// PUBLIC //////
 		void OnBulletSpawnBpEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnWalkingBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnCrankDamageBpEvent();
 
 	/// Timeline Floats
 	UFUNCTION()

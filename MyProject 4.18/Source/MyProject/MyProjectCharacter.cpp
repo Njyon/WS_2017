@@ -902,12 +902,12 @@ void AMyProjectCharacter::LosingHealth()
 {
 	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
 	Health = Health - 10;
-	this->OnDamageBPEvent();
+	this->OnCrankDamageBpEvent();
 	if (Health <= 0.0f)
 	{
 		if (dead == false)
 		{
-			OnIsDeadBpEvent();
+			OnCrankDamageBpEvent();
 			LMBReleased();
 			dead = true;
 			//this->playerController->UnPossess();
