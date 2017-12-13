@@ -365,6 +365,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		onNotMoving = false;
 		ismovingTimer = false;
 		islosingHealth = false;
+		world->GetTimerManager().PauseTimer(losingHealth);
+		world->GetTimerManager().ClearTimer(losingHealth);
+		world->GetTimerManager().PauseTimer(noMoving);
+		world->GetTimerManager().ClearTimer(noMoving);
 	}
 	if (islosingHealth == true && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
 	{
