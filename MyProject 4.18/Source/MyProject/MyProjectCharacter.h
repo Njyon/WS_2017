@@ -74,7 +74,7 @@ public:								////// PUBLIC //////
 	FVector spawnPoint;
 	FRotator spawnRotation;
 	FVector playerpos;
-
+	
 										// UPROPERTY //
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isSpacebarPressed = false;
