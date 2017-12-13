@@ -604,6 +604,7 @@ void AMyProjectCharacter::MoveForward(float value)
 	{
 		if (WalkAudioComponent->IsPlaying() == false)
 		{
+			OnWalkingBpEvent();
 			FVector rayStart = this->GetActorLocation();
 			FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
 
@@ -663,6 +664,7 @@ void AMyProjectCharacter::MoveRight(float value)
 	{
 		if (WalkAudioComponent->IsPlaying() == false)
 		{
+			OnWalkingBpEvent();
 			FVector rayStart = this->GetActorLocation();
 			FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
 
@@ -872,9 +874,11 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 				OnIsDeadBpEvent();
 				LMBReleased();
 				dead = true;
-				this->PlayDeathAnim();
 				//this->playerController->UnPossess();
-				this->AActor::DisableInput(GetWorld()->GetFirstPlayerController());
+				this->AActor::DisableInput(Cast<APlayerController>(this));
+				this->playerController->SetIgnoreLookInput(true);
+				this->playerController->SetIgnoreMoveInput(true);
+				this->PlayDeathAnim();
 				world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 			}
 		}
@@ -899,6 +903,21 @@ void AMyProjectCharacter::LosingHealth()
 	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
 	Health = Health - 10;
 	this->OnDamageBPEvent();
+	if (Health <= 0.0f)
+	{
+		if (dead == false)
+		{
+			OnIsDeadBpEvent();
+			LMBReleased();
+			dead = true;
+			//this->playerController->UnPossess();
+			this->AActor::DisableInput(Cast<APlayerController>(this));
+			this->playerController->SetIgnoreLookInput(true);
+			this->playerController->SetIgnoreMoveInput(true);
+			this->PlayDeathAnim();
+			world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+		}
+	}
 }
 
 void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
@@ -915,7 +934,9 @@ void AMyProjectCharacter::Respawn()
 	TeleportTo(spawnPoint, spawnRotation, false, true);
 	dead = false;
 	//this->playerController->Possess(this);
-	this->AActor::EnableInput(GetWorld()->GetFirstPlayerController());
+	this->AActor::EnableInput(Cast<APlayerController>(this));
+	this->playerController->SetIgnoreLookInput(false);
+	this->playerController->SetIgnoreMoveInput(false);
 	OnRespawnBpEvent();
 }
 
@@ -1057,6 +1078,7 @@ void AMyProjectCharacter::SpawnBullet()
 			spawnInfo);																	// Set Spawn Info
 			
 		projectile->Initialize(this);
+		OnBulletSpawnBpEvent();
 		}
 
 		else if (isShootingLeft)
@@ -1077,6 +1099,7 @@ void AMyProjectCharacter::SpawnBullet()
 				newRotation,																// SpawnRotation
 				spawnInfo);
 			projectile->Initialize(this);
+			OnBulletSpawnBpEvent();
 		}
 
 
@@ -1102,6 +1125,7 @@ void AMyProjectCharacter::SpawnBullet()
 			newRotation,																// SpawnRotation
 			spawnInfo);
 		projectile->Initialize(this);// Set Spawn Info
+		OnBulletSpawnBpEvent();
 		}
 
 		else if (isShootingLeft)
@@ -1122,6 +1146,7 @@ void AMyProjectCharacter::SpawnBullet()
 				newRotation,																// SpawnRotation
 				spawnInfo);	
 			projectile->Initialize(this);// Set Spawn Info
+			OnBulletSpawnBpEvent();
 		}
 
 
