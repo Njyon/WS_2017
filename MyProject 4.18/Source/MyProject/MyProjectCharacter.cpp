@@ -869,8 +869,10 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 		{
 			if (dead == false)
 			{
+				OnIsDeadBpEvent();
 				dead = true;
 				this->PlayDeathAnim();
+				this->playerController->UnPossess();
 				world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 			}
 		}
@@ -910,6 +912,8 @@ void AMyProjectCharacter::Respawn()
 	this->OnDamageBPEvent();
 	TeleportTo(spawnPoint, spawnRotation, false, true);
 	dead = false;
+	this->playerController->Possess(this);
+	OnRespawnBpEvent();
 }
 
 void AMyProjectCharacter::Healthrecharge()

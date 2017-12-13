@@ -274,6 +274,10 @@ public:								////// PUBLIC //////
 
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
+	UFUNCTION(BlueprintCallable)
+		void SlideCam();
+	UFUNCTION(BlueprintCallable)
+		void RevertedSlideCam();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnDamageBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
@@ -282,10 +286,6 @@ public:								////// PUBLIC //////
 		void OnAmmoChange();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnResourceChange();
-	UFUNCTION(BlueprintCallable)
-		void SlideCam();
-	UFUNCTION(BlueprintCallable)
-		void RevertedSlideCam();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnReloadBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
@@ -294,6 +294,10 @@ public:								////// PUBLIC //////
 		void PlayDeathAnim();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnCanNotShootBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnIsDeadBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnRespawnBpEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
