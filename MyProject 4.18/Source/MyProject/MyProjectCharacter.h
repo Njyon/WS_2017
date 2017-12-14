@@ -105,9 +105,9 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float airControll = 0.2f;													// Set AirControll
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float wallJumpForce = 375;													// Set the force to Jump from the wall
+		float wallJumpForce = 1000;													// Set the force to Jump from the wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float wallJumpForceForward = 10;											// Set the force to Jump from the wall in View direction
+		float wallJumpForceForward = 400;											// Set the force to Jump from the wall in View direction
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float jumpHeight = 1000;													// Set Jump Height
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
@@ -135,7 +135,7 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		int sprintSpeed = 1200;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		int walkSpeed = 600;
+		int walkSpeed = 1100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Crank)
 		float notMoving = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
