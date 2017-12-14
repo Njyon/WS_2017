@@ -74,7 +74,7 @@ public:								////// PUBLIC //////
 	FVector spawnPoint;
 	FRotator spawnRotation;
 	FVector playerpos;
-
+	
 										// UPROPERTY //
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isSpacebarPressed = false;
@@ -137,9 +137,9 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		int walkSpeed = 600;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Crank)
-		int notMoving = 5;
+		float notMoving = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		int losingHealthTimer = 1;
+		float losingHealthTimer = 1;
 
 
 	// is Slomo Active or Deactive
@@ -302,6 +302,8 @@ public:								////// PUBLIC //////
 		void OnBulletSpawnBpEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnWalkingBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnCrankDamageBpEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
