@@ -768,43 +768,30 @@ void AMyProjectCharacter::Jump()
 			}
 		}
 	}
-	else if (this->isWallRight == true || this->WalllrunUp == true)
+	else if (this->isWallRight == true)
 	{
-		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+		if (this->WallrunUp == true)
+		{
+			WallrunEndUp();
+		}
+		else
+		{
+			WallrunEnd();
+		}
 
-		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
-		FVector sideVector = this->GetActorRightVector() * this->helperWallJumpNegativeFloat;
-		FVector launchVector = sideVector + forwardVector;
-
-		this->LaunchCharacter(FVector(							// Jump when wall is on you right side
-			launchVector.X,
-			launchVector.Y, 
-			this->jumpHeightOnWall),
-			false, 
-			true
-		);
-
-		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
-		JumpAudioComponent->Play();
 	}
-	else if (this->isWallLeft == true || this->WalllrunUp == true)
+	else if (this->isWallLeft == true)
 	{
-		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+		if (this->WallrunUp == true)
+		{
+			WallrunEndUp();
+		}
 
-		FVector forwardVector = this->GetActorForwardVector() * this->wallJumpForceForward;
-		FVector sideVector = this->GetActorRightVector() * this->wallJumpForce;
-		FVector launchVector = sideVector + forwardVector;
+		else
+		{
+			WallrunEnd();
+		}
 
-		this->LaunchCharacter(FVector(						// Jump when wall is on your Left side
-			launchVector.X,
-			launchVector.Y,
-			this->jumpHeightOnWall),
-			false,
-			true
-		);
-
-		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 2);
-		JumpAudioComponent->Play();
 	}
 	else if (this->isOnLadder == true)
 	{
@@ -1220,7 +1207,7 @@ void AMyProjectCharacter::WallrunLaunch()
 			}
 			else if (hitResult.GetActor()->ActorHasTag("RunWallUp"))
 			{
-				WalllrunUp = true;
+				WallrunUp = true;
 				FVector playerPosition = this->GetTransform().GetLocation();
 				this->playerDirection = this->playerDirection * 1000;
 
@@ -1267,9 +1254,9 @@ void AMyProjectCharacter::WallrunLaunch()
 
 				GravitationOff();
 			}
-			else if (hitResult.GetActor()->ActorHasTag("RunWallUp"))
+			else if (hitResult.GetActor()->ActorHasTag("RunWallUp"))												 
 			{
-				WalllrunUp = true;
+				WallrunUp = true;
 				FVector playerPosition = this->GetTransform().GetLocation();
 				this->playerDirection = this->playerDirection * 1000;
 
@@ -1339,7 +1326,7 @@ void AMyProjectCharacter::WallrunRetriggerableDelay()
 // Resets Values to Normal
 void AMyProjectCharacter::WallrunEnd()
 {
-	WalllrunUp = false;
+	WallrunUp = false;
 
 	if (this->isWallRight == true)
 	{
@@ -1390,7 +1377,7 @@ void AMyProjectCharacter::WallrunEnd()
 }
 void AMyProjectCharacter::WallrunEndUp()
 {
-	WalllrunUp = false;
+	WallrunUp = false;
 
 	if (this->isWallRight == true)
 	{
