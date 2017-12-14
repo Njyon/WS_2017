@@ -347,7 +347,7 @@ private:								////// PRIVATE //////
 	bool onNotMoving = false;
 	bool ismovingTimer = false;
 	bool islosingHealth = false;
-	bool WalllrunUp = false;
+	bool WallrunUp = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for allrun
