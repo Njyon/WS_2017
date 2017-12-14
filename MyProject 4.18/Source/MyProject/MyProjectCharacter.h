@@ -171,6 +171,9 @@ public:								////// PUBLIC //////
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
 		float hitAngle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HeadTilt)
+		FRotator normalCamRotation;
+
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		FVector GunOffset;
@@ -355,7 +358,6 @@ private:								////// PRIVATE //////
 	FVector playerRightVector;								// Helper for Wallrun
 	FRotator currentCamRotation;
 	FRotator tiltedCamRotation;
-	FRotator normalCamRotation;
 	FTimerHandle timeHandle;								// needed for set Timer
 	FTimerHandle wallrunHandle;								// Timehandle (Delay for the Wallrun)
 	FTimerHandle delay;
