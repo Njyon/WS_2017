@@ -23,7 +23,11 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 AMyProjectCharacter::AMyProjectCharacter()
 {
-
+	static ConstructorHelpers::FObjectFinder<UBlueprint> projectile(TEXT("Class'/Game/Blueprints/Player/Behaviour/PlayerProjectile'"));
+	if (projectile.Object != nullptr)
+	{
+		playerProjectile = (UClass*)projectile.Object->GeneratedClass;
+	}
 			//////////////////////////////////////
 			//////////		Sounds		//////////
 			//////////////////////////////////////
@@ -608,7 +612,6 @@ void AMyProjectCharacter::MoveForward(float value)
 	{
 		if (WalkAudioComponent->IsPlaying() == false)
 		{
-			OnWalkingBpEvent();
 			FVector rayStart = this->GetActorLocation();
 			FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
 
@@ -647,7 +650,7 @@ void AMyProjectCharacter::MoveForward(float value)
 						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
 					}
 				}
-
+				OnWalkingBpEvent();
 				WalkAudioComponent->Play();
 			}
 
