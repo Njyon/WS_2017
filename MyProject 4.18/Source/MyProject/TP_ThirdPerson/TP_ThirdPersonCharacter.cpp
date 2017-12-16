@@ -186,7 +186,7 @@ void ATP_ThirdPersonCharacter::Damage(int damage)
 		UE_LOG(LogTemp, Warning, TEXT("dead"));
 		AController* controller = this->GetController();
 		//controller->PawnPendingDestroy(this);
-		SetActorEnableCollision(false);
+		//SetActorEnableCollision(false);
 		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		OnNPCDeathBPEvent();
 	}
