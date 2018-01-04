@@ -30,9 +30,9 @@ class AMyProjectCharacter : public ACharacter
 	class UCameraComponent* FirstPersonCameraComponent;
 
 	/** Gun mesh: 1st person view (seen only by self) */
-	UPROPERTY(EditAnywhere, Category = Mesh)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* FP_Gun;
-	UPROPERTY(EditAnywhere, Category = Mesh)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* FP_Gun_1;
 
 	/** Location on gun mesh where projectiles should spawn. */
