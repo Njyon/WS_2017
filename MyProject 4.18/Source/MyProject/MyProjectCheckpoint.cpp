@@ -13,7 +13,7 @@ AMyProjectCheckpoint::AMyProjectCheckpoint()
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCheckpoint::OnOverlap);
 	
-	
+	spawn = CreateDefaultSubobject<USceneComponent>(TEXT("Spawn"));
 
 	// Set as root component
 	RootComponent = CollisionComp;
@@ -24,8 +24,10 @@ void AMyProjectCheckpoint::BeginPlay()
 {
 	Super::BeginPlay();
 
-	vector = GetActorLocation();
-	rotator = GetActorRotation();
+	vector = spawn->GetComponentTransform().GetLocation();
+	rotator = spawn->GetComponentTransform().GetRotation().Rotator();
+	/*vector = GetActorLocation();
+	rotator = GetActorRotation();*/
 }
 
   void AMyProjectCheckpoint::OnOverlap(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResult)

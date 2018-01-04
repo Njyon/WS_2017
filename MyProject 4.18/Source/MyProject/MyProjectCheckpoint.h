@@ -7,14 +7,17 @@
 #include "MyProjectCharacter.h"
 #include "MyProjectCheckpoint.generated.h"
 
+
 UCLASS(config = Game)
 class MYPROJECT_API AMyProjectCheckpoint : public AActor
 {
 	GENERATED_BODY()
 	
 	
-	UPROPERTY(VisibleDefaultsOnly, Category = Checkpoint)
-	class UBoxComponent* CollisionComp;
+	UPROPERTY(VisibleAnywhere, Category = Checkpoint)
+		class UBoxComponent* CollisionComp;
+	UPROPERTY(VisibleAnywhere, Category = Checkpoint)
+		class USceneComponent* spawn;
 
 public:	
 	// Sets default values for this actor's properties
@@ -32,6 +35,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
 	UFUNCTION()
 		void OnOverlap(
 			class UPrimitiveComponent* hitComp,
