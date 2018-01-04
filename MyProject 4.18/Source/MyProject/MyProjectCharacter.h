@@ -30,9 +30,9 @@ class AMyProjectCharacter : public ACharacter
 	class UCameraComponent* FirstPersonCameraComponent;
 
 	/** Gun mesh: 1st person view (seen only by self) */
-	UPROPERTY(EditAnywhere, Category = Mesh)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* FP_Gun;
-	UPROPERTY(EditAnywhere, Category = Mesh)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* FP_Gun_1;
 
 	/** Location on gun mesh where projectiles should spawn. */
@@ -90,11 +90,14 @@ public:								////// PUBLIC //////
 		bool sliding = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 		bool isShootingLeft = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
+		bool isReloading = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		int magazineSize = 12;
 	UPROPERTY(BlueprintReadOnly, Category = Gun)
 		int currentAmmo;
+
 	//FireRate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		float fireRateSlomo = 0.05f;												//Set Fire Rate in Slomo
@@ -291,8 +294,6 @@ public:								////// PUBLIC //////
 		void OnAmmoChange();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnResourceChange();
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnReloadBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void FullStamina();
 	UFUNCTION(BlueprintImplementableEvent)
