@@ -23,11 +23,12 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 AMyProjectCharacter::AMyProjectCharacter()
 {
-	static ConstructorHelpers::FObjectFinder<UBlueprint> projectile(TEXT("Class'/Game/Blueprints/Player/Behaviour/PlayerProjectile'"));
-	if (projectile.Object != nullptr)
-	{
-		playerProjectile = (UClass*)projectile.Object->GeneratedClass;
-	}
+	//static ConstructorHelpers::FClassFinder<UClass> projectile(TEXT("Class'/Game/Blueprints/Player/Behaviour/PlayerProjectile'"));
+	//if (projectile.Class != NULL)
+	//{
+	//	//playerProjectile = (UClass*)projectile.Class;
+	//	playerProjectile = projectile.Class;
+	//}
 			//////////////////////////////////////
 			//////////		Sounds		//////////
 			//////////////////////////////////////
