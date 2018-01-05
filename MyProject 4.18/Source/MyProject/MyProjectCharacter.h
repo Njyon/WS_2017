@@ -381,6 +381,7 @@ private:								////// PRIVATE //////
 	void BulletCooldown();	// Sets the isBulletFired bool
 	void WallrunLaunch();
 	void GravitationOff();
+	void GravitationOn();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
 	void WallrunEndUp();
