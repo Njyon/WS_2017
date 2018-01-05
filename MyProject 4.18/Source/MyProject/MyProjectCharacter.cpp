@@ -365,7 +365,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	}
 	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == false || sliding == true || isOnWall == true || isOnLadder == true)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("moving"));
+		//UE_LOG(LogTemp, Warning, TEXT("moving"));
 		onNotMoving = false;
 		ismovingTimer = false;
 		islosingHealth = false;
@@ -1458,7 +1458,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 
 			if (this->wallCollisionCounter == 0)
 			{
-				this->WallrunEnd();																				// Call End Wallrun
+				//this->WallrunEnd();																				// Call End Wallrun
 			}
 		}
 	}
@@ -1472,7 +1472,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 
 			if (this->wallCollisionCounter == 0)
 			{
-				this->WallrunEndUp();																				// Call End Wallrun
+				//this->WallrunEndUp();																				// Call End Wallrun
 			}
 		}
 	}

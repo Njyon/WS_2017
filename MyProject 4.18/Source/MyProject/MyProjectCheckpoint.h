@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MyProjectCharacter.h"
+#include "Spawn.h"
 #include "MyProjectCheckpoint.generated.h"
 
 
@@ -22,6 +23,15 @@ class MYPROJECT_API AMyProjectCheckpoint : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AMyProjectCheckpoint();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
+		TArray<ASpawn*> spawns;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
+		int amountOfEnemys;
+
+	
+
+
 
 	FVector vector;
 	FRotator rotator;
@@ -46,6 +56,8 @@ private:
 			const FHitResult & sweepResult
 		);
 
+	UPROPERTY()
+		uint8 lenght;
 	
 	
 };
