@@ -1290,6 +1290,17 @@ void AMyProjectCharacter::WallrunLaunch()
 	}
 }
 
+void AMyProjectCharacter::GravitationOn()
+{
+	this->movementComponent->GravityScale = this->gravitation;
+	this->movementComponent->AirControl = this->airControll;
+	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 0.0f));
+	this->isOnWall = false;
+	this->isWallRight = false;
+	this->isWallLeft = false;
+	this->wallrunDoOnce = true;
+}
+
 //// Called after LaunchCharacter
 void AMyProjectCharacter::GravitationOff()
 {
@@ -1459,6 +1470,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 
 			if (this->wallCollisionCounter == 0)
 			{
+				this->GravitationOn();
 				//this->WallrunEnd();																				// Call End Wallrun
 			}
 		}
@@ -1473,6 +1485,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 
 			if (this->wallCollisionCounter == 0)
 			{
+				this->GravitationOn();
 				//this->WallrunEndUp();																				// Call End Wallrun
 			}
 		}
