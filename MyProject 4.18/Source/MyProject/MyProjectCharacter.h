@@ -283,6 +283,8 @@ public:								////// PUBLIC //////
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
 	UFUNCTION(BlueprintCallable)
+		void Respawn();
+	UFUNCTION(BlueprintCallable)
 		void SlideCam();
 	UFUNCTION(BlueprintCallable)
 		void RevertedSlideCam();
@@ -385,7 +387,6 @@ private:								////// PRIVATE //////
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
 	void WallrunEndUp();
-	void Respawn();
 	void GotHit();
 	void NotMoving();
 	void LosingHealth();
