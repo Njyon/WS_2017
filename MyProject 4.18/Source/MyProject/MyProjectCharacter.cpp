@@ -2,6 +2,7 @@
 
 ///Unreal Stuff
 #include "MyProjectCharacter.h"
+#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 //#include "Camera/CameraComponent.h"
 //#include "Components/CapsuleComponent.h"
 //#include "Components/InputComponent.h"
@@ -23,10 +24,18 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 AMyProjectCharacter::AMyProjectCharacter()
 {
-	static ConstructorHelpers::FObjectFinder<UBlueprint> projectile(TEXT("Class'/Game/Blueprints/Player/Behaviour/PlayerProjectile'"));
-	if (projectile.Object != nullptr)
+	//static ConstructorHelpers::FClassFinder<UClass> projectile(TEXT("Class'/Game/Blueprints/Player/Behaviour/PlayerProjectile'"));
+	//if (projectile.Class != NULL)
+	//{
+	//	//playerProjectile = (UClass*)projectile.Class;
+	//	playerProjectile = projectile.Class;
+	//}
+
+	static ConstructorHelpers::FClassFinder<AMyProjectProjectile> projectile(TEXT("'/Game/Blueprints/Player/Behaviour/PlayerProjectile'"));
+	if (projectile.Class != NULL)
 	{
-		playerProjectile = (UClass*)projectile.Object->GeneratedClass;
+		//playerProjectile = (UClass*)projectile.Class;
+		playerProjectile = projectile.Class;
 	}
 			//////////////////////////////////////
 			//////////		Sounds		//////////
@@ -102,8 +111,8 @@ AMyProjectCharacter::AMyProjectCharacter()
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	Mesh1P->RelativeRotation = FRotator(1.9f, -19.19f, 5.2f);
-	Mesh1P->RelativeLocation = FVector(-0.5f, -4.4f, -155.7f);
+	Mesh1P->RelativeRotation = FRotator(-12.0, 2.0f, -90.0f);
+	Mesh1P->RelativeLocation = FVector(42.0f, -5.0f, -163.0f);
 
 	// Create a gun mesh component
 	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
@@ -258,6 +267,8 @@ void AMyProjectCharacter::BeginPlay()
 	this->helperWallJumpNegativeFloat = this->wallJumpForce * 2;
 	this->helperWallJumpNegativeFloat = this->wallJumpForce - this->helperWallJumpNegativeFloat;
 
+	this->movementComponent->MaxWalkSpeed = this->walkSpeed;
+
 	this->ressource = this->maxRessource;
 	this->currentAmmo = this->magazineSize;
 }
@@ -365,7 +376,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	}
 	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == false || sliding == true || isOnWall == true || isOnLadder == true)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("moving"));
+		//UE_LOG(LogTemp, Warning, TEXT("moving"));
 		onNotMoving = false;
 		ismovingTimer = false;
 		islosingHealth = false;
@@ -712,7 +723,7 @@ void AMyProjectCharacter::Reload()
 {
 	if (this->currentAmmo < this->magazineSize)
 	{
-		OnReloadBPEvent();
+		isReloading = true;
 		this->currentAmmo = this->magazineSize;
 		OnAmmoChange();
 	}
@@ -889,28 +900,29 @@ void AMyProjectCharacter::NotMoving()
 	//ismovingTimer = false;
 	islosingHealth = true;
 	UE_LOG(LogTemp, Warning, TEXT("1"));
-	Health = Health - 10;
-	this->OnDamageBPEvent();
+	Health = Health - crankDamage;
+	this->OnCrankDamageBpEvent();
 }
 void AMyProjectCharacter::LosingHealth()
 {
 	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
-	Health = Health - 10;
+	Health = Health - crankDamage;
 	this->OnCrankDamageBpEvent();
-	if (Health <= 0.0f)
+	if (Health <= crankHealthThreshhold && isHit == false)
 	{
-		if (dead == false)
-		{
-			OnCrankDamageBpEvent();
-			LMBReleased();
-			dead = true;
-			//this->playerController->UnPossess();
-			this->AActor::DisableInput(Cast<APlayerController>(this));
-			this->playerController->SetIgnoreLookInput(true);
-			this->playerController->SetIgnoreMoveInput(true);
-			this->PlayDeathAnim();
-			world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
-		}
+		Health = crankHealthThreshhold;
+		//if (dead == false)
+		//{
+		//	OnCrankDamageBpEvent();
+		//	LMBReleased();
+		//	dead = true;
+		//	//this->playerController->UnPossess();
+		//	this->AActor::DisableInput(Cast<APlayerController>(this));
+		//	this->playerController->SetIgnoreLookInput(true);
+		//	this->playerController->SetIgnoreMoveInput(true);
+		//	this->PlayDeathAnim();
+		//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+		//}
 	}
 }
 
@@ -932,6 +944,11 @@ void AMyProjectCharacter::Respawn()
 	this->playerController->SetIgnoreLookInput(false);
 	this->playerController->SetIgnoreMoveInput(false);
 	OnRespawnBpEvent();
+
+	for (TActorIterator<ATP_ThirdPersonCharacter> it(GetWorld()); it; ++it)
+	{
+		it->EnemyRespawn();
+	}
 }
 
 void AMyProjectCharacter::Healthrecharge()
@@ -1289,6 +1306,17 @@ void AMyProjectCharacter::WallrunLaunch()
 	}
 }
 
+void AMyProjectCharacter::GravitationOn()
+{
+	this->movementComponent->GravityScale = this->gravitation;
+	this->movementComponent->AirControl = this->airControll;
+	this->movementComponent->SetPlaneConstraintNormal(FVector(0.0f, 0.0f, 0.0f));
+	this->isOnWall = false;
+	this->isWallRight = false;
+	this->isWallLeft = false;
+	this->wallrunDoOnce = true;
+}
+
 //// Called after LaunchCharacter
 void AMyProjectCharacter::GravitationOff()
 {
@@ -1340,7 +1368,7 @@ void AMyProjectCharacter::WallrunEnd()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWall),
-			false,
+			true,
 			true
 		);
 
@@ -1359,7 +1387,7 @@ void AMyProjectCharacter::WallrunEnd()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWall),
-			false,
+			true,
 			true
 		);
 
@@ -1391,7 +1419,7 @@ void AMyProjectCharacter::WallrunEndUp()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWallUp),
-			false,
+			true,
 			true
 		);
 
@@ -1410,7 +1438,7 @@ void AMyProjectCharacter::WallrunEndUp()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWallUp),
-			false,
+			true,
 			true
 		);
 
@@ -1458,7 +1486,8 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 
 			if (this->wallCollisionCounter == 0)
 			{
-				this->WallrunEnd();																				// Call End Wallrun
+				this->GravitationOn();
+				//this->WallrunEnd();																				// Call End Wallrun
 			}
 		}
 	}
@@ -1472,7 +1501,8 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 
 			if (this->wallCollisionCounter == 0)
 			{
-				this->WallrunEndUp();																				// Call End Wallrun
+				this->GravitationOn();
+				//this->WallrunEndUp();																				// Call End Wallrun
 			}
 		}
 	}
@@ -1658,13 +1688,21 @@ void AMyProjectCharacter::TiltCamRightFloatReturn(float value)
 {
 	if (this->isWallRight == true)
 	{
-		FRotator lerpCamTilt = FMath::Lerp(this->currentCamRotation, this->tiltedCamRotation, value);
+		FRotator lerpCamTilt = FMath::Lerp(
+			FRotator(this->currentCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
+			FRotator(this->tiltedCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->tiltedCamRotation.Roll),
+			value
+		);
 
 		this->playerController->SetControlRotation(lerpCamTilt);
 	}
 	else
 	{
-		FRotator lerpCamTilt = FMath::Lerp(this->normalCamRotation, this->currentCamRotation, value);
+		FRotator lerpCamTilt = FMath::Lerp(
+			FRotator(this->normalCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->normalCamRotation.Roll),
+			FRotator(this->currentCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
+			value
+		);
 
 		this->playerController->SetControlRotation(lerpCamTilt);
 	}
@@ -1674,14 +1712,20 @@ void AMyProjectCharacter::TiltCamLeftFloatReturn(float value)
 {
 	if (this->isWallLeft == true)
 	{
-		FRotator lerpCamTilt = FMath::Lerp(this->currentCamRotation, this->tiltedCamRotation, value);
-
+		FRotator lerpCamTilt = FMath::Lerp(
+			FRotator(this->currentCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
+			FRotator(this->tiltedCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->tiltedCamRotation.Roll),
+			value
+		);
 		this->playerController->SetControlRotation(lerpCamTilt);
 	}
 	else
 	{
-		FRotator lerpCamTilt = FMath::Lerp(this->normalCamRotation, this->currentCamRotation, value);
-
+		FRotator lerpCamTilt = FMath::Lerp(
+			FRotator(this->normalCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->normalCamRotation.Roll),
+			FRotator(this->currentCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
+			value
+		);
 		this->playerController->SetControlRotation(lerpCamTilt);
 	}
 }

@@ -30,9 +30,9 @@ class AMyProjectCharacter : public ACharacter
 	class UCameraComponent* FirstPersonCameraComponent;
 
 	/** Gun mesh: 1st person view (seen only by self) */
-	UPROPERTY(EditAnywhere, Category = Mesh)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* FP_Gun;
-	UPROPERTY(EditAnywhere, Category = Mesh)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* FP_Gun_1;
 
 	/** Location on gun mesh where projectiles should spawn. */
@@ -88,11 +88,16 @@ public:								////// PUBLIC //////
 		bool canSprint = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Slide)
 		bool sliding = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+		bool isShootingLeft = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
+		bool isReloading = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		int magazineSize = 12;
 	UPROPERTY(BlueprintReadOnly, Category = Gun)
 		int currentAmmo;
+
 	//FireRate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		float fireRateSlomo = 0.05f;												//Set Fire Rate in Slomo
@@ -168,6 +173,10 @@ public:								////// PUBLIC //////
 		float healthPerDelay = 15.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float lastTimeHitDelay = 1.0f;												// Healthrecharge
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float crankDamage = 10.0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float crankHealthThreshhold = 20.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
 		float hitAngle;
 
@@ -192,6 +201,8 @@ public:								////// PUBLIC //////
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AMyProjectProjectile> playerProjectile;
+	/*UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		class UMyProjectProjectile* playerProjectile;*/
 
 	//TimeLines
 	UPROPERTY(EditAnywhere, Category = Timeline)
@@ -278,6 +289,8 @@ public:								////// PUBLIC //////
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
 	UFUNCTION(BlueprintCallable)
+		void Respawn();
+	UFUNCTION(BlueprintCallable)
 		void SlideCam();
 	UFUNCTION(BlueprintCallable)
 		void RevertedSlideCam();
@@ -289,8 +302,6 @@ public:								////// PUBLIC //////
 		void OnAmmoChange();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnResourceChange();
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnReloadBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void FullStamina();
 	UFUNCTION(BlueprintImplementableEvent)
@@ -344,7 +355,6 @@ private:								////// PRIVATE //////
 	bool ishiftButtonPressed = false;
 	bool isFalling = false;
 	bool climbingSoundDoOnce = false;
-	bool isShootingLeft = false;
 	bool dead = false;
 	bool isHit = false;
 	bool onNotMoving = false;
@@ -379,10 +389,10 @@ private:								////// PRIVATE //////
 	void BulletCooldown();	// Sets the isBulletFired bool
 	void WallrunLaunch();
 	void GravitationOff();
+	void GravitationOn();
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
 	void WallrunEndUp();
-	void Respawn();
 	void GotHit();
 	void NotMoving();
 	void LosingHealth();

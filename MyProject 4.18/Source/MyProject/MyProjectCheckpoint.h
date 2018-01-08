@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MyProjectCharacter.h"
+#include "Spawn.h"
 #include "MyProjectCheckpoint.generated.h"
+
 
 UCLASS(config = Game)
 class MYPROJECT_API AMyProjectCheckpoint : public AActor
@@ -13,12 +15,23 @@ class MYPROJECT_API AMyProjectCheckpoint : public AActor
 	GENERATED_BODY()
 	
 	
-	UPROPERTY(VisibleDefaultsOnly, Category = Checkpoint)
-	class UBoxComponent* CollisionComp;
+	UPROPERTY(VisibleAnywhere, Category = Checkpoint)
+		class UBoxComponent* CollisionComp;
+	/*UPROPERTY(VisibleAnywhere, Category = Checkpoint)
+		class UStaticMeshComponent* spawn;*/
 
 public:	
 	// Sets default values for this actor's properties
 	AMyProjectCheckpoint();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
+		TArray<ASpawn*> spawns;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
+		int amountOfEnemys;
+
+	
+
+
 
 	FVector vector;
 	FRotator rotator;
@@ -32,6 +45,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
 	UFUNCTION()
 		void OnOverlap(
 			class UPrimitiveComponent* hitComp,
@@ -42,6 +56,8 @@ private:
 			const FHitResult & sweepResult
 		);
 
+	UPROPERTY()
+		uint8 lenght;
 	
 	
 };
