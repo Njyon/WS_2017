@@ -30,43 +30,43 @@ class ATP_ThirdPersonCharacter : public ACharacter
 	//	class UBoxComponent* legRight;					// Right Leg
 
 public:
-
-	//DataType
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = health)
-		float Health = 100.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = health)
-		float MaxHealth = 100.0f;
-
-	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		float GetCurrentHealth();
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnNPCDeathBPEvent();
-
 	ATP_ThirdPersonCharacter();
+	//DataType
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	float BaseTurnRate;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		float BaseTurnRate;
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	float BaseLookUpRate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		float BaseLookUpRate;
+	UPROPERTY()
+		FVector spawnpoint;
+	UPROPERTY()
+		FRotator spawnRotation;
 
+
+	//Funcs
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = health)
+		float Health = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = health)
+		float MaxHealth = 100.0f;
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		float GetCurrentHealth();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnNPCDeathBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void DamageEvent();
-
 	UFUNCTION(Blueprintcallable)
 		void Walking();
-
 	UFUNCTION(Blueprintcallable)
 		void StopWalking();
-
 	UFUNCTION(Blueprintcallable)
 		void Shooting();
+	UFUNCTION()
+		void EnemyRespawn();
 
 	void Damage(int damage);
+
 
 								//Sound
 	//Walk

@@ -71,7 +71,12 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//SetHealth
 	Health = MaxHealth;
+
+	//SetSpawnpoint
+	this->spawnpoint = GetActorLocation();
+	this->spawnRotation = GetActorRotation();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -190,6 +195,11 @@ void ATP_ThirdPersonCharacter::Damage(int damage)
 		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		OnNPCDeathBPEvent();
 	}
+}
+
+void ATP_ThirdPersonCharacter::EnemyRespawn()
+{
+	TeleportTo(spawnpoint, spawnRotation, false, true);
 }
 
 

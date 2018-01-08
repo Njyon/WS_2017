@@ -173,6 +173,10 @@ public:								////// PUBLIC //////
 		float healthPerDelay = 15.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float lastTimeHitDelay = 1.0f;												// Healthrecharge
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float crankDamage = 10.0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float crankHealthThreshhold = 20.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
 		float hitAngle;
 

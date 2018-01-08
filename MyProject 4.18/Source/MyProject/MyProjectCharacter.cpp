@@ -2,6 +2,7 @@
 
 ///Unreal Stuff
 #include "MyProjectCharacter.h"
+#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 //#include "Camera/CameraComponent.h"
 //#include "Components/CapsuleComponent.h"
 //#include "Components/InputComponent.h"
@@ -110,8 +111,8 @@ AMyProjectCharacter::AMyProjectCharacter()
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	Mesh1P->RelativeRotation = FRotator(1.9f, -19.19f, 5.2f);
-	Mesh1P->RelativeLocation = FVector(-0.5f, -4.4f, -155.7f);
+	Mesh1P->RelativeRotation = FRotator(-12.0, 2.0f, -90.0f);
+	Mesh1P->RelativeLocation = FVector(42.0f, -5.0f, -163.0f);
 
 	// Create a gun mesh component
 	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
@@ -265,6 +266,8 @@ void AMyProjectCharacter::BeginPlay()
 
 	this->helperWallJumpNegativeFloat = this->wallJumpForce * 2;
 	this->helperWallJumpNegativeFloat = this->wallJumpForce - this->helperWallJumpNegativeFloat;
+
+	this->movementComponent->MaxWalkSpeed = this->walkSpeed;
 
 	this->ressource = this->maxRessource;
 	this->currentAmmo = this->magazineSize;
@@ -897,28 +900,29 @@ void AMyProjectCharacter::NotMoving()
 	//ismovingTimer = false;
 	islosingHealth = true;
 	UE_LOG(LogTemp, Warning, TEXT("1"));
-	Health = Health - 10;
-	this->OnDamageBPEvent();
+	Health = Health - crankDamage;
+	this->OnCrankDamageBpEvent();
 }
 void AMyProjectCharacter::LosingHealth()
 {
 	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
-	Health = Health - 10;
+	Health = Health - crankDamage;
 	this->OnCrankDamageBpEvent();
-	if (Health <= 0.0f)
+	if (Health <= crankHealthThreshhold && isHit == false)
 	{
-		if (dead == false)
-		{
-			OnCrankDamageBpEvent();
-			LMBReleased();
-			dead = true;
-			//this->playerController->UnPossess();
-			this->AActor::DisableInput(Cast<APlayerController>(this));
-			this->playerController->SetIgnoreLookInput(true);
-			this->playerController->SetIgnoreMoveInput(true);
-			this->PlayDeathAnim();
-			world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
-		}
+		Health = crankHealthThreshhold;
+		//if (dead == false)
+		//{
+		//	OnCrankDamageBpEvent();
+		//	LMBReleased();
+		//	dead = true;
+		//	//this->playerController->UnPossess();
+		//	this->AActor::DisableInput(Cast<APlayerController>(this));
+		//	this->playerController->SetIgnoreLookInput(true);
+		//	this->playerController->SetIgnoreMoveInput(true);
+		//	this->PlayDeathAnim();
+		//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+		//}
 	}
 }
 
@@ -940,6 +944,11 @@ void AMyProjectCharacter::Respawn()
 	this->playerController->SetIgnoreLookInput(false);
 	this->playerController->SetIgnoreMoveInput(false);
 	OnRespawnBpEvent();
+
+	for (TActorIterator<ATP_ThirdPersonCharacter> it(GetWorld()); it; ++it)
+	{
+		it->EnemyRespawn();
+	}
 }
 
 void AMyProjectCharacter::Healthrecharge()
@@ -1359,7 +1368,7 @@ void AMyProjectCharacter::WallrunEnd()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWall),
-			false,
+			true,
 			true
 		);
 
@@ -1378,7 +1387,7 @@ void AMyProjectCharacter::WallrunEnd()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWall),
-			false,
+			true,
 			true
 		);
 
@@ -1410,7 +1419,7 @@ void AMyProjectCharacter::WallrunEndUp()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWallUp),
-			false,
+			true,
 			true
 		);
 
@@ -1429,7 +1438,7 @@ void AMyProjectCharacter::WallrunEndUp()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWallUp),
-			false,
+			true,
 			true
 		);
 
