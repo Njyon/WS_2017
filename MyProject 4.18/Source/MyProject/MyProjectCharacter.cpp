@@ -266,6 +266,8 @@ void AMyProjectCharacter::BeginPlay()
 	this->helperWallJumpNegativeFloat = this->wallJumpForce * 2;
 	this->helperWallJumpNegativeFloat = this->wallJumpForce - this->helperWallJumpNegativeFloat;
 
+	this->movementComponent->MaxWalkSpeed = this->walkSpeed;
+
 	this->ressource = this->maxRessource;
 	this->currentAmmo = this->magazineSize;
 }
@@ -1359,7 +1361,7 @@ void AMyProjectCharacter::WallrunEnd()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWall),
-			false,
+			true,
 			true
 		);
 
@@ -1378,7 +1380,7 @@ void AMyProjectCharacter::WallrunEnd()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWall),
-			false,
+			true,
 			true
 		);
 
@@ -1410,7 +1412,7 @@ void AMyProjectCharacter::WallrunEndUp()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWallUp),
-			false,
+			true,
 			true
 		);
 
@@ -1429,7 +1431,7 @@ void AMyProjectCharacter::WallrunEndUp()
 			launchVector.X,
 			launchVector.Y,
 			this->jumpHeightOnWallUp),
-			false,
+			true,
 			true
 		);
 
