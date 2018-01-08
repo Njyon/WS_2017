@@ -29,6 +29,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 	//	//playerProjectile = (UClass*)projectile.Class;
 	//	playerProjectile = projectile.Class;
 	//}
+
+	static ConstructorHelpers::FClassFinder<AMyProjectProjectile> projectile(TEXT("'/Game/Blueprints/Player/Behaviour/PlayerProjectile'"));
+	if (projectile.Class != NULL)
+	{
+		//playerProjectile = (UClass*)projectile.Class;
+		playerProjectile = projectile.Class;
+	}
 			//////////////////////////////////////
 			//////////		Sounds		//////////
 			//////////////////////////////////////

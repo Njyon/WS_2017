@@ -197,6 +197,8 @@ public:								////// PUBLIC //////
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AMyProjectProjectile> playerProjectile;
+	/*UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		class UMyProjectProjectile* playerProjectile;*/
 
 	//TimeLines
 	UPROPERTY(EditAnywhere, Category = Timeline)
