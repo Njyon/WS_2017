@@ -905,22 +905,23 @@ void AMyProjectCharacter::NotMoving()
 void AMyProjectCharacter::LosingHealth()
 {
 	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
-	Health = Health - 10;
+	Health = Health - crankDamage;
 	this->OnCrankDamageBpEvent();
-	if (Health <= 0.0f)
+	if (Health <= crankHealthThreshhold && isHit == false)
 	{
-		if (dead == false)
-		{
-			OnCrankDamageBpEvent();
-			LMBReleased();
-			dead = true;
-			//this->playerController->UnPossess();
-			this->AActor::DisableInput(Cast<APlayerController>(this));
-			this->playerController->SetIgnoreLookInput(true);
-			this->playerController->SetIgnoreMoveInput(true);
-			this->PlayDeathAnim();
-			world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
-		}
+		Health = crankHealthThreshhold;
+		//if (dead == false)
+		//{
+		//	OnCrankDamageBpEvent();
+		//	LMBReleased();
+		//	dead = true;
+		//	//this->playerController->UnPossess();
+		//	this->AActor::DisableInput(Cast<APlayerController>(this));
+		//	this->playerController->SetIgnoreLookInput(true);
+		//	this->playerController->SetIgnoreMoveInput(true);
+		//	this->PlayDeathAnim();
+		//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+		//}
 	}
 }
 
