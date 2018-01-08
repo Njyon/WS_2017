@@ -13,7 +13,15 @@ AMyProjectCheckpoint::AMyProjectCheckpoint()
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCheckpoint::OnOverlap);
 	
-	spawn = CreateDefaultSubobject<USceneComponent>(TEXT("Spawn"));
+	//spawn = CreateDefaultSubobject<USphereComponent>(TEXT("Spawn"));
+
+	spawn = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Spawn"));
+	spawn->SetOnlyOwnerSee(true);
+	spawn->SetupAttachment(CollisionComp);
+	spawn->bCastDynamicShadow = false;
+	spawn->CastShadow = false;
+	spawn->RelativeRotation = FRotator(1.9f, -19.19f, 5.2f);
+	spawn->RelativeLocation = FVector(-0.5f, -4.4f, -155.7f);
 
 	// Set as root component
 	RootComponent = CollisionComp;
@@ -38,10 +46,11 @@ void AMyProjectCheckpoint::BeginPlay()
   void AMyProjectCheckpoint::OnOverlap(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResult)
 {
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(otherActor);
-	if ((otherActor != NULL) && (otherActor != this) && (otherComp != NULL) && hittedplayer != NULL)
+	if ((otherActor != NULL) && (otherActor != this) && hittedplayer != NULL)
 	{
 		if (!hasUsed)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("success"));
 			this->hasUsed = true;
 			hittedplayer->SetRespawn(vector, rotator);
 
