@@ -899,8 +899,8 @@ void AMyProjectCharacter::NotMoving()
 	//ismovingTimer = false;
 	islosingHealth = true;
 	UE_LOG(LogTemp, Warning, TEXT("1"));
-	Health = Health - 10;
-	this->OnDamageBPEvent();
+	Health = Health - crankDamage;
+	this->OnCrankDamageBpEvent();
 }
 void AMyProjectCharacter::LosingHealth()
 {
