@@ -17,8 +17,8 @@ class MYPROJECT_API AMyProjectCheckpoint : public AActor
 	
 	UPROPERTY(VisibleAnywhere, Category = Checkpoint)
 		class UBoxComponent* CollisionComp;
-	UPROPERTY(VisibleAnywhere, Category = Checkpoint)
-		class USceneComponent* spawn;
+	/*UPROPERTY(VisibleAnywhere, Category = Checkpoint)
+		class UStaticMeshComponent* spawn;*/
 
 public:	
 	// Sets default values for this actor's properties
