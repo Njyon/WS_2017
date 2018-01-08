@@ -197,6 +197,8 @@ public:								////// PUBLIC //////
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AMyProjectProjectile> playerProjectile;
+	/*UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		class UMyProjectProjectile* playerProjectile;*/
 
 	//TimeLines
 	UPROPERTY(EditAnywhere, Category = Timeline)
@@ -282,6 +284,8 @@ public:								////// PUBLIC //////
 
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
+	UFUNCTION(BlueprintCallable)
+		void Respawn();
 	UFUNCTION(BlueprintCallable)
 		void SlideCam();
 	UFUNCTION(BlueprintCallable)
@@ -385,7 +389,6 @@ private:								////// PRIVATE //////
 	void WallrunRetriggerableDelay();
 	void WallrunEnd();
 	void WallrunEndUp();
-	void Respawn();
 	void GotHit();
 	void NotMoving();
 	void LosingHealth();
