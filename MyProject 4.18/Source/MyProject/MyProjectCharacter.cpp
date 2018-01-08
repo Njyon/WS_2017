@@ -2,6 +2,7 @@
 
 ///Unreal Stuff
 #include "MyProjectCharacter.h"
+#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 //#include "Camera/CameraComponent.h"
 //#include "Components/CapsuleComponent.h"
 //#include "Components/InputComponent.h"
@@ -943,6 +944,11 @@ void AMyProjectCharacter::Respawn()
 	this->playerController->SetIgnoreLookInput(false);
 	this->playerController->SetIgnoreMoveInput(false);
 	OnRespawnBpEvent();
+
+	for (TActorIterator<ATP_ThirdPersonCharacter> it(GetWorld()); it; ++it)
+	{
+		it->EnemyRespawn();
+	}
 }
 
 void AMyProjectCharacter::Healthrecharge()

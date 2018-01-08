@@ -38,8 +38,9 @@ void AMyProjectCheckpoint::BeginPlay()
   void AMyProjectCheckpoint::OnOverlap(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResult)
 {
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(otherActor);
-	if ((otherActor != NULL) && (otherActor != this) && (otherComp != NULL) && hittedplayer != NULL)
+	if ((otherActor != NULL) && (otherActor != this) && hittedplayer != NULL)
 	{
+		UE_LOG(LogTemp, Error, TEXT("DFG"));
 		if (!hasUsed)
 		{
 			this->hasUsed = true;
