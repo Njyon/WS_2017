@@ -364,6 +364,19 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (isOnLadder == true)
+	{
+		if (LadderDoOnce == true)
+		{
+			OnClimbBPEvent();
+		}
+	}
+	if (isOnLadder == false)
+	{
+		LadderDoOnce = false;
+		OnClimbEndBPEvent();
+	}
+
 	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
 	{
 		if (!ismovingTimer)
@@ -969,6 +982,7 @@ void AMyProjectCharacter::Slide()
 	ishiftButtonPressed = true;
 	if (acceleration != FVector(0,0,0))
 	{
+		OnSlideBpEvent();
 		sliding = true;
 		this->movementComponent->GroundFriction = 0.0f;
 		this->movementComponent->BrakingDecelerationWalking = 0.0f;
@@ -998,6 +1012,7 @@ void AMyProjectCharacter::Slide()
 
 void AMyProjectCharacter::EndSlide()
 {
+	OnSlideEndBpEvent();
 	sliding = false;
 	ishiftButtonPressed = false;
 	this->movementComponent->MaxAcceleration = 3000;
@@ -1208,6 +1223,7 @@ void AMyProjectCharacter::WallrunLaunch()
 
 	if (this->isWallRight == true)
 	{
+		OnWallRunBpEvent();
 		if (hitResult.IsValidBlockingHit() == true)
 		{
 			if (hitResult.GetActor()->ActorHasTag("RunWall"))	// Wallrun if you look at wall && the wall is on your Right side
@@ -1257,6 +1273,7 @@ void AMyProjectCharacter::WallrunLaunch()
 	}
 	else
 	{
+		OnWallRunBpEvent();
 		if (hitResult.IsValidBlockingHit() == true)
 		{
 			if (hitResult.GetActor()->ActorHasTag("RunWall"))	// Wallrun if you look at wall && the wall is on your Left side
@@ -1354,7 +1371,7 @@ void AMyProjectCharacter::WallrunRetriggerableDelay()
 // Resets Values to Normal
 void AMyProjectCharacter::WallrunEnd()
 {
-	WallrunUp = false;
+	OnWallRunEndBpEvent();
 
 	if (this->isWallRight == true)
 	{
@@ -1402,10 +1419,11 @@ void AMyProjectCharacter::WallrunEnd()
 	this->isWallLeft = false;
 	this->wallrunDoOnce = true;
 
+	WallrunUp = false;
 }
 void AMyProjectCharacter::WallrunEndUp()
 {
-	WallrunUp = false;
+	OnWallRunEndBpEvent();
 
 	if (this->isWallRight == true)
 	{
@@ -1453,6 +1471,7 @@ void AMyProjectCharacter::WallrunEndUp()
 	this->isWallLeft = false;
 	this->wallrunDoOnce = true;
 
+	WallrunUp = false;
 }
 
 						//////////////////////////////////////
@@ -1487,6 +1506,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 			if (this->wallCollisionCounter == 0)
 			{
 				this->GravitationOn();
+				OnWallRunEndBpEvent();
 				//this->WallrunEnd();																				// Call End Wallrun
 			}
 		}
@@ -1502,6 +1522,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 			if (this->wallCollisionCounter == 0)
 			{
 				this->GravitationOn();
+				OnWallRunEndBpEvent();
 				//this->WallrunEndUp();																				// Call End Wallrun
 			}
 		}
@@ -1511,10 +1532,23 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 /// Right Walldetector Begin
 void AMyProjectCharacter::OnRightWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false || otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallLeft = false;					// set the bool false so it only can on of them be true (safty first)
 		this->isWallRight = true;	
+
+		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
+		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, -20.0f);
+		this->normalCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 0.0f);
+
+		this->camTiltRightTimeline->Play();
+	}
+	else if (otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	{
+		this->isWallLeft = false;					// set the bool false so it only can on of them be true (safty first)
+		this->isWallRight = true;
+
+		this->WallrunUp = true;
 
 		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
 		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, -20.0f);
@@ -1531,6 +1565,8 @@ void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitCom
 		this->isWallLeft = false;					
 		this->isWallRight = false;
 
+		this->WallrunUp = false;
+
 		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
 		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, -20.0f);
 		this->normalCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 0.0f);
@@ -1543,10 +1579,23 @@ void AMyProjectCharacter::EndRightWallDetected(class UPrimitiveComponent* hitCom
 void AMyProjectCharacter::OnLeftWallDetected(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResul)
 {
 
-	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false || otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	if (otherActor->ActorHasTag("RunWall") && this->movementComponent->IsFalling() && this->isOnLadder == false)
 	{
 		this->isWallRight = false;						// set the bool false so it only can on of them be true (safty first)
 		this->isWallLeft = true;		
+
+		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
+		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 20.0f);
+		this->normalCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 0.0f);
+
+		this->camTiltLeftTimeline->Play();
+	}
+	else if (otherActor->ActorHasTag("RunWallUp") && this->movementComponent->IsFalling() && this->isOnLadder == false)
+	{
+		this->isWallRight = false;						// set the bool false so it only can on of them be true (safty first)
+		this->isWallLeft = true;
+
+		this->WallrunUp = true;
 
 		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
 		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 20.0f);
@@ -1562,6 +1611,7 @@ void AMyProjectCharacter::EndLeftWallDetected(class UPrimitiveComponent* hitComp
 	{
 		this->isWallLeft = false;
 		this->isWallRight = false;
+		this->WallrunUp = false;
 
 		this->currentCamRotation = this->FirstPersonCameraComponent->GetComponentRotation();
 		this->tiltedCamRotation = FRotator(currentCamRotation.Pitch, currentCamRotation.Yaw, 20.0f);

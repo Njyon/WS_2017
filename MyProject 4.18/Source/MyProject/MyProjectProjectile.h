@@ -48,6 +48,8 @@ class AMyProjectProjectile : public AActor
 public:
 	AMyProjectProjectile();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnHitBpEvent();
 
 	UPROPERTY(EditAnywhere, Category = CollisionSwitch)
 		collisionSwitch state;
