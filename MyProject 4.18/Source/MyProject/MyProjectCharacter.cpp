@@ -364,6 +364,19 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (isOnLadder == true)
+	{
+		if (LadderDoOnce == true)
+		{
+			OnClimbBPEvent();
+		}
+	}
+	if (isOnLadder == false)
+	{
+		LadderDoOnce = false;
+		OnClimbEndBPEvent();
+	}
+
 	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
 	{
 		if (!ismovingTimer)
@@ -969,6 +982,7 @@ void AMyProjectCharacter::Slide()
 	ishiftButtonPressed = true;
 	if (acceleration != FVector(0,0,0))
 	{
+		OnSlideBpEvent();
 		sliding = true;
 		this->movementComponent->GroundFriction = 0.0f;
 		this->movementComponent->BrakingDecelerationWalking = 0.0f;
@@ -998,6 +1012,7 @@ void AMyProjectCharacter::Slide()
 
 void AMyProjectCharacter::EndSlide()
 {
+	OnSlideEndBpEvent();
 	sliding = false;
 	ishiftButtonPressed = false;
 	this->movementComponent->MaxAcceleration = 3000;
@@ -1208,6 +1223,7 @@ void AMyProjectCharacter::WallrunLaunch()
 
 	if (this->isWallRight == true)
 	{
+		OnWallRunBpEvent();
 		if (hitResult.IsValidBlockingHit() == true)
 		{
 			if (hitResult.GetActor()->ActorHasTag("RunWall"))	// Wallrun if you look at wall && the wall is on your Right side
@@ -1257,6 +1273,7 @@ void AMyProjectCharacter::WallrunLaunch()
 	}
 	else
 	{
+		OnWallRunBpEvent();
 		if (hitResult.IsValidBlockingHit() == true)
 		{
 			if (hitResult.GetActor()->ActorHasTag("RunWall"))	// Wallrun if you look at wall && the wall is on your Left side
@@ -1354,6 +1371,8 @@ void AMyProjectCharacter::WallrunRetriggerableDelay()
 // Resets Values to Normal
 void AMyProjectCharacter::WallrunEnd()
 {
+	OnWallRunEndBpEvent();
+
 	if (this->isWallRight == true)
 	{
 		this->movementComponent->GravityScale = gravitation;	// Set Gravity
@@ -1404,6 +1423,8 @@ void AMyProjectCharacter::WallrunEnd()
 }
 void AMyProjectCharacter::WallrunEndUp()
 {
+	OnWallRunEndBpEvent();
+
 	if (this->isWallRight == true)
 	{
 		this->movementComponent->GravityScale = gravitation;	// Set Gravity
@@ -1485,6 +1506,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 			if (this->wallCollisionCounter == 0)
 			{
 				this->GravitationOn();
+				OnWallRunEndBpEvent();
 				//this->WallrunEnd();																				// Call End Wallrun
 			}
 		}
@@ -1500,6 +1522,7 @@ void AMyProjectCharacter::EndWallDetected(class UPrimitiveComponent* hitComp, cl
 			if (this->wallCollisionCounter == 0)
 			{
 				this->GravitationOn();
+				OnWallRunEndBpEvent();
 				//this->WallrunEndUp();																				// Call End Wallrun
 			}
 		}

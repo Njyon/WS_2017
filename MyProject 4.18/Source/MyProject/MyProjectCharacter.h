@@ -319,6 +319,21 @@ public:								////// PUBLIC //////
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnCrankDamageBpEvent();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnClimbBPEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnClimbEndBPEvent();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnSlideBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnSlideEndBpEvent();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnWallRunBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnWallRunEndBpEvent();
+
 	/// Timeline Floats
 	UFUNCTION()
 		void WallrunFloatReturn(float value);									// Updates the Wallrun Timeline
@@ -361,6 +376,7 @@ private:								////// PRIVATE //////
 	bool ismovingTimer = false;
 	bool islosingHealth = false;
 	bool WallrunUp = false;
+	bool LadderDoOnce = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for allrun
