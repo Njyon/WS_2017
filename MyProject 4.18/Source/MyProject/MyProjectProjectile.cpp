@@ -56,6 +56,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	case collisionSwitch::player:
 		if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
 		{
+			OnHitBpEvent();
 			if (Hit.GetComponent() != NULL)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
@@ -86,12 +87,14 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 		{
+			OnHitBpEvent();
 			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
 
 			Destroy();
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 		{
+			OnHitBpEvent();
 			Destroy();
 		}
 		
