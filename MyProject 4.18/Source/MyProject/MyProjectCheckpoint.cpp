@@ -12,16 +12,13 @@ AMyProjectCheckpoint::AMyProjectCheckpoint()
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCheckpoint::OnOverlap);
-	
-	//spawn = CreateDefaultSubobject<USphereComponent>(TEXT("Spawn"));
 
-	/*spawn = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Spawn"));
+
+	spawn = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Spawn"));
 	spawn->SetOnlyOwnerSee(true);
-	spawn->SetupAttachment(CollisionComp);
+	spawn->SetupAttachment(RootComponent);
 	spawn->bCastDynamicShadow = false;
 	spawn->CastShadow = false;
-	spawn->RelativeRotation = FRotator(1.9f, -19.19f, 5.2f);
-	spawn->RelativeLocation = FVector(-0.5f, -4.4f, -155.7f);*/
 
 	// Set as root component
 	RootComponent = CollisionComp;
@@ -32,13 +29,13 @@ void AMyProjectCheckpoint::BeginPlay()
 {
 	Super::BeginPlay();
 
-	vector = GetActorLocation();
-	rotator = GetActorRotation();
+	/*vector = GetActorLocation();
+	rotator = GetActorRotation();*/
 
-	//UE_LOG(LogTemp, Warning, TEXT("Spawn Location is %s"), *spawn->GetComponentLocation().ToString());
+	vector = spawn->GetComponentLocation();
+	rotator = spawn->GetComponentRotation();
 
-	//vector = spawn->GetComponentTransform().GetLocation();
-	//rotator = spawn->GetComponentTransform().GetRotation().Rotator();
+	UE_LOG(LogTemp, Warning, TEXT("Spawn Location is %s"), *spawn->GetComponentLocation().ToString());
 
 	this->lenght = spawns.Num();
 }
