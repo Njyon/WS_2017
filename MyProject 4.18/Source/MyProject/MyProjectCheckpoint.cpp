@@ -14,11 +14,11 @@ AMyProjectCheckpoint::AMyProjectCheckpoint()
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCheckpoint::OnOverlap);
 
 
-	spawn = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Spawn"));
+	/*spawn = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Spawn"));
 	spawn->SetOnlyOwnerSee(true);
 	spawn->SetupAttachment(RootComponent);
 	spawn->bCastDynamicShadow = false;
-	spawn->CastShadow = false;
+	spawn->CastShadow = false;*/
 
 	// Set as root component
 	RootComponent = CollisionComp;
@@ -29,13 +29,13 @@ void AMyProjectCheckpoint::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*vector = GetActorLocation();
-	rotator = GetActorRotation();*/
+	vector = GetActorLocation();
+	rotator = GetActorRotation();
 
-	vector = spawn->GetComponentLocation();
+	/*vector = spawn->GetComponentLocation();
 	rotator = spawn->GetComponentRotation();
 
-	UE_LOG(LogTemp, Warning, TEXT("Spawn Location is %s"), *spawn->GetComponentLocation().ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Spawn Location is %s"), *spawn->GetComponentLocation().ToString());*/
 
 	this->lenght = spawns.Num();
 }
