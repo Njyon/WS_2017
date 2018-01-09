@@ -76,6 +76,8 @@ public:								////// PUBLIC //////
 	FVector playerpos;
 	
 										// UPROPERTY //
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool canJumpNow = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isSpacebarPressed = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
@@ -92,6 +94,10 @@ public:								////// PUBLIC //////
 		bool isShootingLeft = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isReloading = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ladder)
+		bool isWallRight = false;                    // is on wall Right?
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ladder)
+		bool isWallLeft = false;                    // is on wall Left?
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		int magazineSize = 12;
@@ -364,8 +370,6 @@ private:								////// PRIVATE //////
 	bool isBulletFired = false;
 	bool isShootingInNormalSpeed;				// Check you switched the Time Dilation
 	bool isOnWall = false;						// is on wall?
-	bool isWallRight = false;					// is on wall Right?
-	bool isWallLeft = false;					// is on wall Left?
 	bool wallrunDoOnce = true;
 	bool ishiftButtonPressed = false;
 	bool isFalling = false;
