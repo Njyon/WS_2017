@@ -76,6 +76,8 @@ public:								////// PUBLIC //////
 	FVector playerpos;
 	
 										// UPROPERTY //
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool canJumpNow = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isSpacebarPressed = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
