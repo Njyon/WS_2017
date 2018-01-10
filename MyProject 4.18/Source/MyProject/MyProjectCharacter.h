@@ -116,15 +116,15 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float airControll = 0.2f;													// Set AirControll
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float wallJumpForce = 1000;													// Set the force to Jump from the wall
+		float wallJumpForce = 500;													// Set the force to Jump from the wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float wallJumpForceForward = 400;											// Set the force to Jump from the wall in View direction
+		float wallJumpForceForward = 1100;											// Set the force to Jump from the wall in View direction
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float jumpHeight = 1000;													// Set Jump Height
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float jumpHeightOnWall = 600;												// Set Jump Height on Wall
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
-		float jumpHeightOnWallUp = 1200;
+		float jumpHeightOnWallUp = 1100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GeneralMovementCPP)
 		float climbEndBoost = -500;													// Set Climb End Boost
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ressources)
@@ -281,6 +281,11 @@ public:								////// PUBLIC //////
 		class USoundCue* RunningAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* RunningAudioComponent;
+	//Reload
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* ReloadAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* ReloadAudioComponent;
 
 										// UFUNCTION //
 	void Damage(int damage, FVector damageCauser);
