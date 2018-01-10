@@ -89,6 +89,28 @@ AMyProjectCharacter::AMyProjectCharacter()
 	JumpAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("JumpAudioComp"));
 	JumpAudioComponent->bAutoActivate = false;
 	JumpAudioComponent->SetupAttachment(RootComponent);
+
+	//PlayerHitSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitCue(TEXT("'/Game/Sound/SFX/HIts/sfx_PlayerHit'"));
+	PlayerHitAudioCue = HitCue.Object;
+	PlayerHitAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("HitAudioComp"));
+	PlayerHitAudioComponent->bAutoActivate = false;
+	PlayerHitAudioComponent->SetupAttachment(RootComponent);
+
+	//DeathSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> DeathCue(TEXT("'/Game/Sound/SFX/Character/Death/sfx_Death'"));
+	DeathAudioCue = DeathCue.Object;
+	DeathAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("DeathAudioComp"));															
+	DeathAudioComponent->bAutoActivate = false;
+	DeathAudioComponent->SetupAttachment(RootComponent);
+
+	//PlayerHitSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> SlowmoEndCue(TEXT("'/Game/Sound/SFX/other/sfx_SlowMoOut'"));
+	SlowmoEndAudioCue = SlowmoEndCue.Object;
+	SlowmoEndAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("SlowmoEndAudioComp"));
+	SlowmoEndAudioComponent->bAutoActivate = false;
+	SlowmoEndAudioComponent->SetupAttachment(RootComponent);
+
 	
 			////////////End Sounds////////////////
 
@@ -132,10 +154,12 @@ AMyProjectCharacter::AMyProjectCharacter()
 	FP_MuzzleLocationRight = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationRight"));
 	FP_MuzzleLocationRight->SetupAttachment(FP_Gun);
 	FP_MuzzleLocationRight->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	FP_MuzzleLocationRight->AttachTo(FP_Gun, "Muzzle");
 
 	FP_MuzzleLocationLeft = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationLeft"));
 	FP_MuzzleLocationLeft->SetupAttachment(FP_Gun_1);
 	FP_MuzzleLocationLeft->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	FP_MuzzleLocationLeft->AttachTo(FP_Gun_1, "Muzzle");
 
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
@@ -313,6 +337,18 @@ void AMyProjectCharacter::PostInitializeComponents()
 	{	
 		JumpAudioComponent->SetSound(JumpAudioCue);
 	}
+	if (PlayerHitAudioCue->IsValidLowLevelFast())                    //HitSound
+	{
+		PlayerHitAudioComponent->SetSound(PlayerHitAudioCue);
+	}
+	if (DeathAudioCue->IsValidLowLevelFast())                    //DeathSound
+	{
+		DeathAudioComponent->SetSound(DeathAudioCue);														
+	}
+	if (SlowmoEndAudioCue->IsValidLowLevelFast())                    //SlowmoEndSound
+	{
+		SlowmoEndAudioComponent->SetSound(SlowmoEndAudioCue);
+	}
 }
 
 
@@ -366,7 +402,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 
 	if (isOnLadder == true)
 	{
-		if (LadderDoOnce == true)
+		if (LadderDoOnce == false)
 		{
 			OnClimbBPEvent();
 		}
@@ -413,8 +449,8 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	SlideAudioComponent->SetFloatParameter(FName("sfx_SlidingSlowmo"), soundTimeDilation);				//SlideSound		
 	WallrunAudioComponent->SetFloatParameter(FName("sfx_WallrunSlowmo"), soundTimeDilation);				//WallrunSound		
 	ClimbAudioComponent->SetFloatParameter(FName("sfx_ClimbWallSlowmo"), soundTimeDilation);			//ClimbSound
-	ShootAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);			//WalkSound
-	ShootAudioComponent->SetFloatParameter(FName("sfx_JumpSlowmo"), soundTimeDilation);			//JumpSound
+	WalkAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);			//WalkSound
+	JumpAudioComponent->SetFloatParameter(FName("sfx_JumpSlowmo"), soundTimeDilation);			//JumpSound
 
 
 	if (isOnLadder == true && climbingSoundDoOnce == false)													//climbSound gets played and stopped
@@ -561,6 +597,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		Health = MaxHealth;
 	}
+	if (Health > 30.0f && gothitlessthan30 == true)
+	{
+		gothitlessthan30 = false;
+	}
 }
 
 			//////////////////////////////////////
@@ -606,6 +646,7 @@ void AMyProjectCharacter::RMBPressed()
 			isSlomoActive = true;
 			UGameplayStatics::SetGlobalTimeDilation(world, slomoTimeDilation); // Set Time to Slomo Time Dilation
 			SlowmoAudioComponent->Play();
+			SlowmoEndAudioComponent->Stop();
 		}
 	/*}*/
 }
@@ -615,6 +656,7 @@ void AMyProjectCharacter::RMBReleased()
 	isSlomoActive = false;
 	UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time to Noraml
 	SlowmoAudioComponent->Stop();
+	SlowmoEndAudioComponent->Play();
 }
 
 						// Keyboard WASD //
@@ -886,11 +928,20 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 		hitAngle = FMath::Acos(FVector::DotProduct(damageCauser, playerpos));
 		hitAngle = FMath::RadiansToDegrees(hitAngle);
 		UE_LOG(LogTemp, Warning, TEXT("Hit Angle: %f %"), this->hitAngle);
+		if (Health <= 30.0f)
+		{
+			if (!gothitlessthan30)
+			{
+				gothitlessthan30 = true;
+				PlayerHitAudioComponent->Play();
+			}
+		}
 
-		if (Health <= 0.0f)
+		else if (Health <= 0.0f)
 		{
 			if (dead == false)
 			{
+				DeathAudioComponent->Play();
 				OnIsDeadBpEvent();
 				LMBReleased();
 				dead = true;
@@ -939,6 +990,14 @@ void AMyProjectCharacter::LosingHealth()
 		//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 		//}
 	}
+	if (Health <= 30.0f)
+	{
+		if (!gothitlessthan30)
+		{
+			gothitlessthan30 = true;
+			PlayerHitAudioComponent->Play();
+		}
+	}
 }
 
 void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
@@ -964,6 +1023,11 @@ void AMyProjectCharacter::Respawn()
 	{
 		it->EnemyRespawn();
 	}
+}
+
+void AMyProjectCharacter::RespawnSound()
+{
+	DeathAudioComponent->Play();
 }
 
 void AMyProjectCharacter::Healthrecharge()
