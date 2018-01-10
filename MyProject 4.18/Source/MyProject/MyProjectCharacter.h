@@ -276,6 +276,16 @@ public:								////// PUBLIC //////
 		class USoundCue* DeathAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* DeathAudioComponent;
+	//Running
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* RunningAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* RunningAudioComponent;
+	//Reload
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* ReloadAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* ReloadAudioComponent;
 
 										// UFUNCTION //
 	void Damage(int damage, FVector damageCauser);
