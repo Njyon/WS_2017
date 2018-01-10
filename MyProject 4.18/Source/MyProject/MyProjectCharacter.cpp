@@ -111,6 +111,13 @@ AMyProjectCharacter::AMyProjectCharacter()
 	SlowmoEndAudioComponent->bAutoActivate = false;
 	SlowmoEndAudioComponent->SetupAttachment(RootComponent);
 
+	//RunningSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> RunningCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Running'"));
+	RunningAudioCue = RunningCue.Object;
+	RunningAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("RunningAudioComp"));
+	RunningAudioComponent->bAutoActivate = false;
+	RunningAudioComponent->SetupAttachment(RootComponent);
+
 	
 			////////////End Sounds////////////////
 
@@ -349,6 +356,10 @@ void AMyProjectCharacter::PostInitializeComponents()
 	{
 		SlowmoEndAudioComponent->SetSound(SlowmoEndAudioCue);
 	}
+	if (RunningAudioCue->IsValidLowLevelFast())                    //RunningSound
+	{
+		RunningAudioComponent->SetSound(RunningAudioCue);
+	}
 }
 
 
@@ -451,6 +462,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	ClimbAudioComponent->SetFloatParameter(FName("sfx_ClimbWallSlowmo"), soundTimeDilation);			//ClimbSound
 	WalkAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);			//WalkSound
 	JumpAudioComponent->SetFloatParameter(FName("sfx_JumpSlowmo"), soundTimeDilation);			//JumpSound
+	RunningAudioComponent->SetFloatParameter(FName("sfx_RunningSlowmo"), soundTimeDilation);			//JumpSound
 
 
 	if (isOnLadder == true && climbingSoundDoOnce == false)													//climbSound gets played and stopped
@@ -675,7 +687,12 @@ void AMyProjectCharacter::MoveForward(float value)
 		this->VAxis = value;
 	}
 	else if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
-	{
+	{  
+		if (RunningAudioComponent->IsPlaying() == false)
+		{
+			RunningAudioComponent->Play();
+		}
+
 		if (WalkAudioComponent->IsPlaying() == false)
 		{
 			FVector rayStart = this->GetActorLocation();
