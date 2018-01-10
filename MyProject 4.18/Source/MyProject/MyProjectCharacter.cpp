@@ -895,6 +895,7 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 {
 	if (godMode == false)
 	{
+		PlayerHitAudioComponent->Play();
 		Health = Health - damage;
 		this->OnDamageBPEvent();
 		isHit = true;
