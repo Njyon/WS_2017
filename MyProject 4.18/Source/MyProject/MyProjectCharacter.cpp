@@ -366,7 +366,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 
 	if (isOnLadder == true)
 	{
-		if (LadderDoOnce == true)
+		if (LadderDoOnce == false)
 		{
 			OnClimbBPEvent();
 		}
