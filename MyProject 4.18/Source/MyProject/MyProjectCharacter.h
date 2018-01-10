@@ -251,6 +251,11 @@ public:								////// PUBLIC //////
 		class USoundCue* SlowmoAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* SlowmoAudioComponent;
+	//SlowmoEnd
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* SlowmoEndAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* SlowmoEndAudioComponent;
 	//Walk
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* WalkAudioCue;
@@ -261,6 +266,16 @@ public:								////// PUBLIC //////
 		class USoundCue* JumpAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* JumpAudioComponent;
+	//PlayerHit
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* PlayerHitAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* PlayerHitAudioComponent;
+	//Death
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* DeathAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* DeathAudioComponent;
 
 										// UFUNCTION //
 	void Damage(int damage, FVector damageCauser);
@@ -296,6 +311,8 @@ public:								////// PUBLIC //////
 
 	UFUNCTION(BlueprintCallable)
 		void Respawn();
+	UFUNCTION(BlueprintCallable)
+		void RespawnSound();
 	UFUNCTION(BlueprintCallable)
 		void SlideCam();
 	UFUNCTION(BlueprintCallable)
@@ -381,6 +398,7 @@ private:								////// PRIVATE //////
 	bool islosingHealth = false;
 	bool WallrunUp = false;
 	bool LadderDoOnce = false;
+	bool gothitlessthan30 = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for allrun
