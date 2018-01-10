@@ -1805,8 +1805,8 @@ void AMyProjectCharacter::TiltCamRightFloatReturn(float value)
 	if (this->isWallRight == true)
 	{
 		FRotator lerpCamTilt = FMath::Lerp(
-			FRotator(this->currentCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
-			FRotator(this->tiltedCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->tiltedCamRotation.Roll),
+			FRotator(this->FirstPersonCameraComponent->GetComponentRotation().Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
+			FRotator(this->FirstPersonCameraComponent->GetComponentRotation().Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->tiltedCamRotation.Roll),
 			value
 		);
 
@@ -1815,8 +1815,8 @@ void AMyProjectCharacter::TiltCamRightFloatReturn(float value)
 	else
 	{
 		FRotator lerpCamTilt = FMath::Lerp(
-			FRotator(this->normalCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->normalCamRotation.Roll),
-			FRotator(this->currentCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
+			FRotator(this->FirstPersonCameraComponent->GetComponentRotation().Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->normalCamRotation.Roll),
+			FRotator(this->FirstPersonCameraComponent->GetComponentRotation().Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
 			value
 		);
 
@@ -1829,8 +1829,8 @@ void AMyProjectCharacter::TiltCamLeftFloatReturn(float value)
 	if (this->isWallLeft == true)
 	{
 		FRotator lerpCamTilt = FMath::Lerp(
-			FRotator(this->currentCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
-			FRotator(this->tiltedCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->tiltedCamRotation.Roll),
+			FRotator(this->FirstPersonCameraComponent->GetComponentRotation().Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
+			FRotator(this->FirstPersonCameraComponent->GetComponentRotation().Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->tiltedCamRotation.Roll),
 			value
 		);
 		this->playerController->SetControlRotation(lerpCamTilt);
@@ -1838,8 +1838,8 @@ void AMyProjectCharacter::TiltCamLeftFloatReturn(float value)
 	else
 	{
 		FRotator lerpCamTilt = FMath::Lerp(
-			FRotator(this->normalCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->normalCamRotation.Roll),
-			FRotator(this->currentCamRotation.Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
+			FRotator(this->FirstPersonCameraComponent->GetComponentRotation().Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->normalCamRotation.Roll),
+			FRotator(this->FirstPersonCameraComponent->GetComponentRotation().Pitch, this->FirstPersonCameraComponent->GetComponentRotation().Yaw, this->currentCamRotation.Roll),
 			value
 		);
 		this->playerController->SetControlRotation(lerpCamTilt);
