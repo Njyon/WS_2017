@@ -583,6 +583,10 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		Health = MaxHealth;
 	}
+	if (Health > 30.0f && gothitlessthan30 == true)
+	{
+		gothitlessthan30 = false;
+	}
 }
 
 			//////////////////////////////////////
@@ -895,7 +899,6 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 {
 	if (godMode == false)
 	{
-		PlayerHitAudioComponent->Play();
 		Health = Health - damage;
 		this->OnDamageBPEvent();
 		isHit = true;
@@ -909,8 +912,16 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 		hitAngle = FMath::Acos(FVector::DotProduct(damageCauser, playerpos));
 		hitAngle = FMath::RadiansToDegrees(hitAngle);
 		UE_LOG(LogTemp, Warning, TEXT("Hit Angle: %f %"), this->hitAngle);
+		if (Health <= 30.0f)
+		{
+			if (!gothitlessthan30)
+			{
+				gothitlessthan30 = true;
+				PlayerHitAudioComponent->Play();
+			}
+		}
 
-		if (Health <= 0.0f)
+		else if (Health <= 0.0f)
 		{
 			if (dead == false)
 			{
@@ -962,6 +973,14 @@ void AMyProjectCharacter::LosingHealth()
 		//	this->PlayDeathAnim();
 		//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
 		//}
+	}
+	if (Health <= 30.0f)
+	{
+		if (!gothitlessthan30)
+		{
+			gothitlessthan30 = true;
+			PlayerHitAudioComponent->Play();
+		}
 	}
 }
 

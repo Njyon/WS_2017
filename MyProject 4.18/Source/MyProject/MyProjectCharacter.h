@@ -393,6 +393,7 @@ private:								////// PRIVATE //////
 	bool islosingHealth = false;
 	bool WallrunUp = false;
 	bool LadderDoOnce = false;
+	bool gothitlessthan30 = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for allrun
