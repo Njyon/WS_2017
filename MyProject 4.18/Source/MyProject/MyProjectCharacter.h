@@ -251,6 +251,11 @@ public:								////// PUBLIC //////
 		class USoundCue* SlowmoAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* SlowmoAudioComponent;
+	//SlowmoEnd
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* SlowmoEndAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* SlowmoEndAudioComponent;
 	//Walk
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* WalkAudioCue;
