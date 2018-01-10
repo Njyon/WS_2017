@@ -89,6 +89,20 @@ AMyProjectCharacter::AMyProjectCharacter()
 	JumpAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("JumpAudioComp"));
 	JumpAudioComponent->bAutoActivate = false;
 	JumpAudioComponent->SetupAttachment(RootComponent);
+
+	//PlayerHitSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitCue(TEXT("SoundCue'/Game/Sound/SFX/HIts/sfx_PlayerHit'"));
+	PlayerHitAudioCue = HitCue.Object;
+	PlayerHitAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("HitAudioComp"));
+	PlayerHitAudioComponent->bAutoActivate = false;
+	PlayerHitAudioComponent->SetupAttachment(RootComponent);
+
+	//DeathSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> DeathCue(TEXT("SoundCue'/Game/Sound/SFX/Character/Death/sfx_Death'"));
+	DeathAudioCue = DeathCue.Object;
+	DeathAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("DeathAudioComp"));
+	DeathAudioComponent->bAutoActivate = false;
+	DeathAudioComponent->SetupAttachment(RootComponent);
 	
 			////////////End Sounds////////////////
 
@@ -312,6 +326,14 @@ void AMyProjectCharacter::PostInitializeComponents()
 	if (JumpAudioCue->IsValidLowLevelFast())					//JumpSound
 	{	
 		JumpAudioComponent->SetSound(JumpAudioCue);
+	}
+	if (PlayerHitAudioCue->IsValidLowLevelFast())                    //HitSound
+	{
+		PlayerHitAudioComponent->SetSound(PlayerHitAudioCue);
+	}
+	if (DeathAudioCue->IsValidLowLevelFast())                    //DeathSound
+	{
+		DeathAudioComponent->SetSound(DeathAudioCue);
 	}
 }
 
@@ -891,6 +913,7 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 		{
 			if (dead == false)
 			{
+				DeathAudioComponent->Play();
 				OnIsDeadBpEvent();
 				LMBReleased();
 				dead = true;
@@ -964,6 +987,11 @@ void AMyProjectCharacter::Respawn()
 	{
 		it->EnemyRespawn();
 	}
+}
+
+void AMyProjectCharacter::RespawnSound()
+{
+	DeathAudioComponent->Play();
 }
 
 void AMyProjectCharacter::Healthrecharge()

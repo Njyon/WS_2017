@@ -261,6 +261,16 @@ public:								////// PUBLIC //////
 		class USoundCue* JumpAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* JumpAudioComponent;
+	//PlayerHit
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* PlayerHitAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* PlayerHitAudioComponent;
+	//Death
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* DeathAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* DeathAudioComponent;
 
 										// UFUNCTION //
 	void Damage(int damage, FVector damageCauser);
@@ -296,6 +306,8 @@ public:								////// PUBLIC //////
 
 	UFUNCTION(BlueprintCallable)
 		void Respawn();
+	UFUNCTION(BlueprintCallable)
+		void RespawnSound();
 	UFUNCTION(BlueprintCallable)
 		void SlideCam();
 	UFUNCTION(BlueprintCallable)
