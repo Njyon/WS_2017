@@ -13,3 +13,35 @@ Saved
 *.xcworkspace
 
 MyProject 4\.18/Content/Levels/SonderMap/map_Sonder_PersistentLevel\.umap
+
+Buils/Gate02/WindowsNoEditor/Engine/Extras/Redist/en-us/UE4PrereqSetup_x64\.exe
+
+Buils/Gate02/WindowsNoEditor/Manifest_NonUFSFiles_Win64\.txt
+
+Buils/Gate02/WindowsNoEditor/MyProject\.exe
+
+Buils/Gate02/WindowsNoEditor/MyProject/Content/Paks/MyProject-WindowsNoEditor\.pak
+
+Buils/Gate02_01/WindowsNoEditor/Engine/Extras/Redist/en-us/UE4PrereqSetup_x64\.exe
+
+Buils/Gate02_01/WindowsNoEditor/Manifest_NonUFSFiles_Win64\.txt
+
+Buils/Gate02_01/WindowsNoEditor/MyProject\.exe
+
+Buils/Gate02_01/WindowsNoEditor/MyProject/Content/Movies/Intro\.mp4
+
+Buils/Gate02_01/WindowsNoEditor/MyProject/Content/Movies/Outro\.mp4
+
+Buils/Gate02_01/WindowsNoEditor/MyProject/Content/Movies/Tusun\.mp4
+
+Buils/Gate02_01/WindowsNoEditor/MyProject/Content/Movies/Tusun_Team_Logo_Anim_720pHD\.mp4
+
+Buils/Gate02_01/WindowsNoEditor/MyProject/Content/Movies/UE4_Animated_Logo_HD_720p29\.97\.mp4
+
+Buils/Gate02_01/WindowsNoEditor/MyProject/Content/Paks/MyProject-WindowsNoEditor\.pak
+
+MyProject 4\.18/Build/WindowsNoEditor/FileOpenOrder/CookerOpenOrder\.log
+
+MyProject 4\.18/Build/WindowsNoEditor/FileOpenOrder/EditorOpenOrder\.log
+
+MyProject 4\.18/Config/DefaultEngine\.ini
