@@ -945,6 +945,7 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 {
 	if (godMode == false)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->Health);
 		Health = Health - damage;
 		this->OnDamageBPEvent();
 		isHit = true;
@@ -967,7 +968,7 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 			}
 		}
 
-		else if (Health <= 0.0f)
+		if (Health <= 0.0f)
 		{
 			if (dead == false)
 			{
@@ -1004,7 +1005,7 @@ void AMyProjectCharacter::LosingHealth()
 	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
 	Health = Health - crankDamage;
 	this->OnCrankDamageBpEvent();
-	if (Health <= crankHealthThreshhold && isHit == false)
+	if (Health <= crankHealthThreshhold /*&& isHit == false*/)
 	{
 		Health = crankHealthThreshhold;
 		//if (dead == false)
