@@ -1070,6 +1070,7 @@ void AMyProjectCharacter::Healthrecharge()
 void AMyProjectCharacter::RessoourceRefill(float amount)
 {
 	ressource = ressource + amount;
+	OnResourceChange();
 }
 
 void AMyProjectCharacter::Slide()
