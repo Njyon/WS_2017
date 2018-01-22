@@ -821,95 +821,93 @@ void AMyProjectCharacter::Reload()
 void AMyProjectCharacter::Jump()
 {
 	this->isSpacebarPressed = true;
-	if (canJumpNow)
+	if (this->movementComponent->IsMovingOnGround() == true)
 	{
-		if (this->movementComponent->IsMovingOnGround() == true)
+		this->movementComponent->GravityScale = gravitation;	// Set Gravity
+
+		this->LaunchCharacter(									// Launch Character (Jump Up)
+			FVector(0.0f, 0.0f, this->jumpHeight),				// Where to Launch
+			false,												// XY Override
+			true												// Z Override
+		);
+
+		//JumpSound
+
+		if (JumpAudioComponent->IsPlaying() == false)
 		{
-			this->movementComponent->GravityScale = gravitation;	// Set Gravity
+			FVector rayStart = this->GetActorLocation();
+			FVector rayEnd = rayStart + this->GetActorUpVector() * -500;
 
-			this->LaunchCharacter(									// Launch Character (Jump Up)
-				FVector(0.0f, 0.0f, this->jumpHeight),				// Where to Launch
-				false,												// XY Override
-				true												// Z Override
-			);
 
-			//JumpSound
+			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+			rayParams.bTraceComplex = false;
+			rayParams.bTraceAsyncScene = true;
+			rayParams.AddIgnoredActor(this);
+			rayParams.bReturnPhysicalMaterial = true;
 
-			if (JumpAudioComponent->IsPlaying() == false)
+			FHitResult hitMat(ForceInit);
+			world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
+
+			if (hitMat.IsValidBlockingHit() == true)
 			{
-				FVector rayStart = this->GetActorLocation();
-				FVector rayEnd = rayStart + this->GetActorUpVector() * -500;
-
-
-				FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
-				rayParams.bTraceComplex = false;
-				rayParams.bTraceAsyncScene = true;
-				rayParams.AddIgnoredActor(this);
-				rayParams.bReturnPhysicalMaterial = true;
-
-				FHitResult hitMat(ForceInit);
-				world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
-
-				if (hitMat.IsValidBlockingHit() == true)
+				if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 				{
-					if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
-					{
-						JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 1);
-					}
-
-					else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
-					{
-						JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 0);
-					}
-					JumpAudioComponent->Play();
+					JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 1);
 				}
+
+				else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 0);
+				}
+				JumpAudioComponent->Play();
 			}
-		}
-		else if (this->isWallRight == true)
-		{
-			if (this->WallrunUp == true)
-			{
-				WallrunEndUp();
-			}
-			else
-			{
-				WallrunEnd();
-			}
-
-		}
-		else if (this->isWallLeft == true)
-		{
-			if (this->WallrunUp == true)
-			{
-				WallrunEndUp();
-			}
-
-			else
-			{
-				WallrunEnd();
-			}
-
-		}
-		else if (this->isOnLadder == true)
-		{
-
-			this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
-			this->isOnLadder = false;
-			FVector launchVector = this->GetActorForwardVector() * this->climbEndBoost;
-
-			this->LaunchCharacter(FVector(
-				launchVector.X,
-				launchVector.Y,
-				this->jumpHeight),
-				true,
-				true
-			);
-
-			JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 3);
-			JumpAudioComponent->Play();
 		}
 	}
+	else if (this->isWallRight == true)
+	{
+		if (this->WallrunUp == true)
+		{
+			WallrunEndUp();
+		}
+		else
+		{
+			WallrunEnd();
+		}
+
+	}
+	else if (this->isWallLeft == true)
+	{
+		if (this->WallrunUp == true)
+		{
+			WallrunEndUp();
+		}
+
+		else
+		{
+			WallrunEnd();
+		}
+
+	}
+	else if (this->isOnLadder == true)
+	{
+
+		this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
+		this->isOnLadder = false;
+		FVector launchVector = this->GetActorForwardVector() * this->climbEndBoost;
+
+		this->LaunchCharacter(FVector(
+			launchVector.X,
+			launchVector.Y,
+			this->jumpHeight),
+			true,
+			true
+		);
+
+		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 3);
+		JumpAudioComponent->Play();
+	}
 }
+
 
 void AMyProjectCharacter::EndJumping()
 {
