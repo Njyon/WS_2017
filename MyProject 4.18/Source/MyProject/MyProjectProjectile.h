@@ -51,6 +51,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnHitBpEvent();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnEnemyHitBpEvent();
+
 	UPROPERTY(EditAnywhere, Category = CollisionSwitch)
 		collisionSwitch state;
 

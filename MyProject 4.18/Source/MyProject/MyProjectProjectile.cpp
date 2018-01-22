@@ -56,7 +56,6 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	case collisionSwitch::player:
 		if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedNPC != NULL)
 		{
-			OnHitBpEvent();
 			if (Hit.GetComponent() != NULL)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("BoneName: %s"), *Hit.BoneName.ToString());
@@ -67,6 +66,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 					source->RessoourceRefill(ressourceRefill);
 					hittedNPC->Damage(headshotdamage);
 					//source = GetWorld()->GetFirstPlayerController();
+					OnEnemyHitBpEvent();
 				
 				}
 
@@ -74,10 +74,12 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 				{
 					//UE_LOG(LogTemp, Warning, TEXT("hit body"));
 					hittedNPC->Damage(projectileDamage);
+					OnEnemyHitBpEvent();
 				}
 
 				else
 				{
+					OnHitBpEvent();
 					Destroy();
 				}
 
@@ -106,7 +108,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 		{
 			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
-
+			OnHitBpEvent();
 			Destroy();
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
@@ -117,14 +119,9 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			//ProjectileMovement->bShouldBounce = false;
 			Destroy();
 		}
-		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
-		{
-			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
-
-			Destroy();
-		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 		{
+			OnHitBpEvent();
 			Destroy();
 		}
 
