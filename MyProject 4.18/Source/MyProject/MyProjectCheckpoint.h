@@ -28,7 +28,9 @@ public:
 		TArray<ASpawn*> spawns;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
 		int amountOfEnemys;
-
+	
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnCheckpoint();
 	
 
 

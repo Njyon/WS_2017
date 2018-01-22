@@ -102,7 +102,7 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		int magazineSize = 12;
 	UPROPERTY(BlueprintReadOnly, Category = Gun)
-		int currentAmmo;
+		int currentAmmo = magazineSize;
 
 	//FireRate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)

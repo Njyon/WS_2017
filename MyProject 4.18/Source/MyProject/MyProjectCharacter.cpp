@@ -308,7 +308,7 @@ void AMyProjectCharacter::BeginPlay()
 	this->movementComponent->MaxWalkSpeed = this->walkSpeed;
 
 	this->ressource = this->maxRessource;
-	this->currentAmmo = this->magazineSize;
+	//this->currentAmmo = this->magazineSize;
 }
 
 			///////////////////////////////////////

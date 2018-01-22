@@ -51,6 +51,7 @@ void AMyProjectCheckpoint::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("success"));
 			this->hasUsed = true;
 			hittedplayer->SetRespawn(vector, rotator);
+			OnCheckpoint();
 
 
 			for (int i = 0; i <= this->lenght + 1; i++)
