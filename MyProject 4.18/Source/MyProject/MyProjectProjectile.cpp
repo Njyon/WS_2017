@@ -108,7 +108,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 		{
 			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
-
+			OnHitBpEvent();
 			Destroy();
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
@@ -119,14 +119,9 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			//ProjectileMovement->bShouldBounce = false;
 			Destroy();
 		}
-		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
-		{
-			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
-
-			Destroy();
-		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 		{
+			OnHitBpEvent();
 			Destroy();
 		}
 
