@@ -12,6 +12,14 @@
 
 class UInputComponent;
 
+
+UENUM()
+enum ShootState
+{
+	LeftShooting,
+	RightShooting
+};
+
 UCLASS(config=Game)
 class AMyProjectCharacter : public ACharacter
 {
@@ -76,11 +84,18 @@ public:								////// PUBLIC //////
 		FRotator spawnRotation;
 
 	FVector playerpos;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+		TEnumAsByte<ShootState> shootingState = ShootState::LeftShooting;
+
 										// UPROPERTY //
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isSpacebarPressed = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Vault)
+		bool isVaulting = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Vault)
+		bool FUCK = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isFlying = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
@@ -91,8 +106,6 @@ public:								////// PUBLIC //////
 		bool canSprint = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Slide)
 		bool sliding = false;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-		bool isShootingLeft = false; 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Weapon)
 		bool canShoot = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
@@ -167,11 +180,11 @@ public:								////// PUBLIC //////
 		float slomoTimeDilation = 0.05f;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
 		float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
 		float BaseLookUpRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -550,4 +563,3 @@ protected:								////// Protected //////
 	 * @returns true if touch controls were enabled.
 	 */
 };
-
