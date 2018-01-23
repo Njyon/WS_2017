@@ -24,11 +24,15 @@ public:
 	// Sets default values for this actor's properties
 	AMyProjectCheckpoint();
 
+	//Set Spawn points for enemies
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
 		TArray<ASpawn*> spawns;
+
+	//Enemies to Spawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
 		int amountOfEnemys;
 	
+	//Set the Next Checkpoint to highlight upon entering this Checkpoint
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Checkpoint)
 		class AMyProjectCheckpoint* nextCP;
 
@@ -41,6 +45,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void ActivateNextCP();
 
+	//Is this the first Checkpoint
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool firstCP;
 
