@@ -40,6 +40,14 @@ void AMyProjectCheckpoint::BeginPlay()
 	this->lenght = spawns.Num();
 }
 
+void AMyProjectCheckpoint::NextCheckpoint()
+{
+	if (nextCP != NULL)
+	{
+		nextCP->ActivateNextCP();
+	}
+}
+
   void AMyProjectCheckpoint::OnOverlap(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResult)
 {
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(otherActor);
@@ -52,7 +60,7 @@ void AMyProjectCheckpoint::BeginPlay()
 			this->hasUsed = true;
 			hittedplayer->SetRespawn(vector, rotator);
 			OnCheckpoint();
-
+			NextCheckpoint();
 
 			for (int i = 0; i <= this->lenght + 1; i++)
 			{
