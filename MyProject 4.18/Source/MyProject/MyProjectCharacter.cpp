@@ -1186,6 +1186,11 @@ void AMyProjectCharacter::BulletCooldown()
 
 void AMyProjectCharacter::SpawnBullet()
 {
+	if (this->isVaulting == true)
+	{
+		shootingState = ShootState::RightShooting;
+	}
+
 	////////////////////////////////////////////////
 	// Cast A Ray form the Camera to the Crosshair
 	////////////////////////////////////////////////
@@ -1213,31 +1218,32 @@ void AMyProjectCharacter::SpawnBullet()
 
 	if (hitResult.IsValidBlockingHit() == true)																		// Does the RayHit?
 	{
-		if (!isShootingLeft)
+		if (shootingState == ShootState::RightShooting)
 		{
-		isShootingLeft = true;
-		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
-			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
-			hitResult.ImpactPoint);																					// Get Impact Point in World
+			UE_LOG(LogTemp, Warning, TEXT("Right"));
+			shootingState = ShootState::LeftShooting;
+			FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
+				FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
+				hitResult.ImpactPoint);																					// Get Impact Point in World
 
-		FActorSpawnParameters spawnInfo;																			// Spawn Info
-		spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always
-		spawnInfo.Owner = this;																						// Owner of Spawned Actor is this Class
-		spawnInfo.Instigator = this;																				// if you spawn a projectile and pass over instigator as say, your pawn. then when the projectile wants to do damage, you can pass it over to the damage function. So you know who fire the projectile, you can then decide if you want friendly fire, and all sorts of things can be done after you know this bit of info.
+			FActorSpawnParameters spawnInfo;																			// Spawn Info
+			spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always
+			spawnInfo.Owner = this;																						// Owner of Spawned Actor is this Class
+			spawnInfo.Instigator = this;																				// if you spawn a projectile and pass over instigator as say, your pawn. then when the projectile wants to do damage, you can pass it over to the damage function. So you know who fire the projectile, you can then decide if you want friendly fire, and all sorts of things can be done after you know this bit of info.
 
-		AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
-			playerProjectile,															// SubClass
-			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),				// SpawnLocation
-			newRotation,																// SpawnRotation
-			spawnInfo);																	// Set Spawn Info
-			
-		projectile->Initialize(this);
-		OnBulletSpawnBpEvent();
+			AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
+				playerProjectile,															// SubClass
+				FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),				// SpawnLocation
+				newRotation,																// SpawnRotation
+				spawnInfo);																	// Set Spawn Info
+
+			projectile->Initialize(this);
+			OnBulletSpawnBpEvent();
 		}
-
-		else if (isShootingLeft)
+		else if (shootingState == ShootState::LeftShooting)
 		{
-			isShootingLeft = false;
+			UE_LOG(LogTemp, Warning, TEXT("Left"));
+			shootingState = ShootState::RightShooting;
 			FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 				hitResult.ImpactPoint);																					// Get Impact Point in World
@@ -1256,14 +1262,15 @@ void AMyProjectCharacter::SpawnBullet()
 			OnBulletSpawnBpEvent();
 		}
 
-
 		ShootAudioComponent->Play();
 	}
 	else																				// Ray does not hit anything
 	{
-		if (!isShootingLeft)
+
+		if (shootingState == ShootState::RightShooting)
 		{
-			isShootingLeft = true;
+			UE_LOG(LogTemp, Warning, TEXT("Right"));
+			shootingState = ShootState::LeftShooting;
 			FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 				FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 				hitResult.TraceEnd);																					// Get Trace end in World
@@ -1291,10 +1298,10 @@ void AMyProjectCharacter::SpawnBullet()
 				}
 			}
 		}
-
-		else if (isShootingLeft)
+		else if (shootingState == ShootState::LeftShooting)
 		{
-			isShootingLeft = false;
+			UE_LOG(LogTemp, Warning, TEXT("Left"));
+			shootingState = ShootState::RightShooting;
 			FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
 				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
 				hitResult.TraceEnd);																					// Get Trace end in World
@@ -1308,7 +1315,7 @@ void AMyProjectCharacter::SpawnBullet()
 				playerProjectile,															// SubClass
 				FP_MuzzleLocationLeft->GetComponentTransform().GetLocation(),				// SpawnLocation
 				newRotation,																// SpawnRotation
-				spawnInfo);	
+				spawnInfo);
 			projectile->Initialize(this);// Set Spawn Info
 			OnBulletSpawnBpEvent();
 
@@ -1321,8 +1328,6 @@ void AMyProjectCharacter::SpawnBullet()
 				}
 			}
 		}
-
-
 		ShootAudioComponent->Play();
 	}
 
@@ -1335,8 +1340,6 @@ void AMyProjectCharacter::SpawnBullet()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
-
-	
 }
 
 // Wallrun (MovePlayer)
