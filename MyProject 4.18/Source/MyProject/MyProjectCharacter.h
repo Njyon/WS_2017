@@ -70,9 +70,11 @@ public:								////// PUBLIC //////
 	AMyProjectCharacter();   // Konstructor
 
 										//Variables//
-	UPROPERTY(EditAnywhere, Category = Spawn)
-	FVector spawnPoint;
-	FRotator spawnRotation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Spawn)
+		FVector spawnPoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Spawn)
+		FRotator spawnRotation;
+
 	FVector playerpos;
 	
 										// UPROPERTY //
@@ -90,13 +92,17 @@ public:								////// PUBLIC //////
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Slide)
 		bool sliding = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-		bool isShootingLeft = false;
+		bool isShootingLeft = false; 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Weapon)
+		bool canShoot = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Ladder)
 		bool isReloading = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ladder)
 		bool isWallRight = false;                    // is on wall Right?
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ladder)
 		bool isWallLeft = false;                    // is on wall Left?
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement)
+		bool blockInput = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		int magazineSize = 12;
@@ -198,7 +204,9 @@ public:								////// PUBLIC //////
 
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		class UAnimMontage* FireAnimation;
+		class UAnimMontage* fireAnimationRight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		class UAnimMontage* fireAnimationLeft;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		class UAnimInstance* AnimInstance;

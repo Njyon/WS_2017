@@ -503,7 +503,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	///Shoot
 	if (isLMBPressed == true)
 	{
-		if (this->isBulletFired == false)
+		if (this->isBulletFired == false && this->canShoot == true)
 		{
 			this->isBulletFired = true;
 
@@ -519,7 +519,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			}
 		}
 
-		else if (this->isBulletFired == true)
+		else if (this->isBulletFired == true || this->canShoot == false)
 		{
 			OnCanNotShootBpEvent();
 		}
@@ -641,30 +641,44 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 
 void AMyProjectCharacter::TurnAtRate(float rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(rate /** BaseTurnRate * GetWorld()->GetDeltaSeconds()*/);
+	if (this->blockInput == false)
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerYawInput(rate /** BaseTurnRate * GetWorld()->GetDeltaSeconds()*/);
+	}
 }
 
 void AMyProjectCharacter::LookUpAtRate(float rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(rate /** BaseLookUpRate * GetWorld()->GetDeltaSeconds()*/);
+	if (this->blockInput == false)
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerPitchInput(rate /** BaseLookUpRate * GetWorld()->GetDeltaSeconds()*/);
+	}
 }
 
 void AMyProjectCharacter::LMBPressed()
 {
-	isLMBPressed = true;
+	if (this->blockInput == false)
+	{
+		isLMBPressed = true;
+	}
 }
 
 void AMyProjectCharacter::LMBReleased()
 {
-	isLMBPressed = false;
+	if (this->blockInput == false)
+	{
+		isLMBPressed = false;
+	}
 }
 
 void AMyProjectCharacter::RMBPressed()
 {
-	//if (movementComponent->IsFalling() == true || this->sliding == true) // Check if you can Set Slomo to Active
-	//{
+	if (this->blockInput == false)
+	{
+		//if (movementComponent->IsFalling() == true || this->sliding == true) // Check if you can Set Slomo to Active
+		//{
 		if (this->ressource > 0)
 		{
 			isSlomoActive = true;
@@ -672,145 +686,158 @@ void AMyProjectCharacter::RMBPressed()
 			SlowmoAudioComponent->Play();
 			SlowmoEndAudioComponent->Stop();
 		}
+	}
 	/*}*/
 }
 
 void AMyProjectCharacter::RMBReleased()
 {
-	isSlomoActive = false;
-	UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time to Noraml
-	SlowmoAudioComponent->Stop();
-	SlowmoEndAudioComponent->Play();
+	if (this->blockInput == false)
+	{
+		isSlomoActive = false;
+		UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time to Noraml
+		SlowmoAudioComponent->Stop();
+		SlowmoEndAudioComponent->Play();
+	}
 }
 
 						// Keyboard WASD //
 
 void AMyProjectCharacter::MoveForward(float value)
 {
-	if (value != 0.0f && isOnLadder == true)
+	if (this->blockInput == false)
 	{
-		if (this->isFlying == false)
+		if (value != 0.0f && isOnLadder == true)
 		{
-			this->isFlying = true;
-			this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
-		}
-
-		AddMovementInput(GetActorUpVector(), value);
-		this->VAxis = value;
-	}
-	else if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
-	{  
-		if (RunningAudioComponent->IsPlaying() == false)
-		{
-			RunningAudioComponent->Play();
-		}
-
-		if (WalkAudioComponent->IsPlaying() == false)
-		{
-			FVector rayStart = this->GetActorLocation();
-			FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
-
-
-			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
-			rayParams.bTraceComplex = false;
-			rayParams.bTraceAsyncScene = true;
-			rayParams.AddIgnoredActor(this);
-			rayParams.bReturnPhysicalMaterial = true;
-
-			FHitResult hitMat(ForceInit);
-			world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
-
-			if (hitMat.IsValidBlockingHit() == true)
+			if (this->isFlying == false)
 			{
-				if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
-				{
-					if (canSprint)
-					{
-						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 2);
-					}
-					else
-					{
-						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
-					}
-				}
-
-				else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
-				{
-					if (canSprint)
-					{
-						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 3);
-					}
-					else
-					{
-						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
-					}
-				}
-				OnWalkingBpEvent();
-				WalkAudioComponent->Play();
+				this->isFlying = true;
+				this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
 			}
 
-			else
-			{
-				WalkAudioComponent->Stop();
-			}
+			AddMovementInput(GetActorUpVector(), value);
+			this->VAxis = value;
 		}
-		// add movement in that direction
+		else if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
+		{
+			if (RunningAudioComponent->IsPlaying() == false)
+			{
+				RunningAudioComponent->Play();
+			}
+
+			if (WalkAudioComponent->IsPlaying() == false)
+			{
+				FVector rayStart = this->GetActorLocation();
+				FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
+
+
+				FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+				rayParams.bTraceComplex = false;
+				rayParams.bTraceAsyncScene = true;
+				rayParams.AddIgnoredActor(this);
+				rayParams.bReturnPhysicalMaterial = true;
+
+				FHitResult hitMat(ForceInit);
+				world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
+
+				if (hitMat.IsValidBlockingHit() == true)
+				{
+					if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+					{
+						if (canSprint)
+						{
+							WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 2);
+						}
+						else
+						{
+							WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+						}
+					}
+
+					else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+					{
+						if (canSprint)
+						{
+							WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 3);
+						}
+						else
+						{
+							WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
+						}
+					}
+					OnWalkingBpEvent();
+					WalkAudioComponent->Play();
+				}
+
+				else
+				{
+					WalkAudioComponent->Stop();
+				}
+			}
+			// add movement in that direction
 			AddMovementInput(GetActorForwardVector(), value);
 			this->VAxis = value;
+		}
 	}
 }
 
 void AMyProjectCharacter::MoveRight(float value)
 {
-	if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
+	if (this->blockInput == false)
 	{
-		if (WalkAudioComponent->IsPlaying() == false)
+		if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
 		{
-			OnWalkingBpEvent();
-			FVector rayStart = this->GetActorLocation();
-			FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
-
-
-			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
-			rayParams.bTraceComplex = false;
-			rayParams.bTraceAsyncScene = true;
-			rayParams.bReturnPhysicalMaterial = true;
-
-			FHitResult hitMat(ForceInit);
-
-			if (world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_Pawn, rayParams))
+			if (WalkAudioComponent->IsPlaying() == false)
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
+				OnWalkingBpEvent();
+				FVector rayStart = this->GetActorLocation();
+				FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
 
-				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
 
-				if (hitMat.PhysMaterial->SurfaceType == 0)
+				FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+				rayParams.bTraceComplex = false;
+				rayParams.bTraceAsyncScene = true;
+				rayParams.bReturnPhysicalMaterial = true;
+
+				FHitResult hitMat(ForceInit);
+
+				if (world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_Pawn, rayParams))
 				{
-					WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+					//UE_LOG(LogTemp, Warning, TEXT("%f"), hitMat.PhysMaterial);
+
+					//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
+
+					if (hitMat.PhysMaterial->SurfaceType == 0)
+					{
+						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+					}
+
+					WalkAudioComponent->Play();
 				}
 
-				WalkAudioComponent->Play();
+				else
+				{
+					WalkAudioComponent->Stop();
+				}
 			}
-
-			else
-			{
-				WalkAudioComponent->Stop();
-			}
+			// add movement in that direction
+			AddMovementInput(GetActorRightVector(), value);
+			this->HAxis = value;
 		}
-		// add movement in that direction
-		AddMovementInput(GetActorRightVector(), value);
-		this->HAxis = value;
 	}
 }
 
 void AMyProjectCharacter::Reload()
 {
-	if (this->currentAmmo < this->magazineSize)
+	if (this->blockInput == false)
 	{
-		ReloadAudioComponent->Play();
-		isReloading = true;
-		this->currentAmmo = this->magazineSize;
-		OnAmmoChange();
+		if (this->currentAmmo < this->magazineSize)
+		{
+			ReloadAudioComponent->Play();
+			isReloading = true;
+			this->currentAmmo = this->magazineSize;
+			OnAmmoChange();
+		}
 	}
 }
 
@@ -820,91 +847,94 @@ void AMyProjectCharacter::Reload()
 
 void AMyProjectCharacter::Jump()
 {
-	this->isSpacebarPressed = true;
-	if (this->movementComponent->IsMovingOnGround() == true)
+	if (this->blockInput == false)
 	{
-		this->movementComponent->GravityScale = gravitation;	// Set Gravity
-
-		this->LaunchCharacter(									// Launch Character (Jump Up)
-			FVector(0.0f, 0.0f, this->jumpHeight),				// Where to Launch
-			false,												// XY Override
-			true												// Z Override
-		);
-
-		//JumpSound
-
-		if (JumpAudioComponent->IsPlaying() == false)
+		this->isSpacebarPressed = true;
+		if (this->movementComponent->IsMovingOnGround() == true)
 		{
-			FVector rayStart = this->GetActorLocation();
-			FVector rayEnd = rayStart + this->GetActorUpVector() * -500;
+			this->movementComponent->GravityScale = gravitation;	// Set Gravity
 
+			this->LaunchCharacter(									// Launch Character (Jump Up)
+				FVector(0.0f, 0.0f, this->jumpHeight),				// Where to Launch
+				false,												// XY Override
+				true												// Z Override
+			);
 
-			FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
-			rayParams.bTraceComplex = false;
-			rayParams.bTraceAsyncScene = true;
-			rayParams.AddIgnoredActor(this);
-			rayParams.bReturnPhysicalMaterial = true;
+			//JumpSound
 
-			FHitResult hitMat(ForceInit);
-			world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
-
-			if (hitMat.IsValidBlockingHit() == true)
+			if (JumpAudioComponent->IsPlaying() == false)
 			{
-				if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
-				{
-					JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 1);
-				}
+				FVector rayStart = this->GetActorLocation();
+				FVector rayEnd = rayStart + this->GetActorUpVector() * -500;
 
-				else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+
+				FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+				rayParams.bTraceComplex = false;
+				rayParams.bTraceAsyncScene = true;
+				rayParams.AddIgnoredActor(this);
+				rayParams.bReturnPhysicalMaterial = true;
+
+				FHitResult hitMat(ForceInit);
+				world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
+
+				if (hitMat.IsValidBlockingHit() == true)
 				{
-					JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 0);
+					if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+					{
+						JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 1);
+					}
+
+					else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+					{
+						JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 0);
+					}
+					JumpAudioComponent->Play();
 				}
-				JumpAudioComponent->Play();
 			}
 		}
-	}
-	else if (this->isWallRight == true)
-	{
-		if (this->WallrunUp == true)
+		else if (this->isWallRight == true)
 		{
-			WallrunEndUp();
+			if (this->WallrunUp == true)
+			{
+				WallrunEndUp();
+			}
+			else
+			{
+				WallrunEnd();
+			}
+
 		}
-		else
+		else if (this->isWallLeft == true)
 		{
-			WallrunEnd();
-		}
+			if (this->WallrunUp == true)
+			{
+				WallrunEndUp();
+			}
 
-	}
-	else if (this->isWallLeft == true)
-	{
-		if (this->WallrunUp == true)
+			else
+			{
+				WallrunEnd();
+			}
+
+		}
+		else if (this->isOnLadder == true)
 		{
-			WallrunEndUp();
+
+			this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
+			this->isOnLadder = false;
+			FVector launchVector = this->GetActorForwardVector() * this->climbEndBoost;
+
+			this->LaunchCharacter(FVector(
+				launchVector.X,
+				launchVector.Y,
+				this->jumpHeight),
+				true,
+				true
+			);
+
+			JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 3);
+			JumpAudioComponent->Play();
 		}
-
-		else
-		{
-			WallrunEnd();
-		}
-
-	}
-	else if (this->isOnLadder == true)
-	{
-
-		this->movementComponent->SetMovementMode(EMovementMode::MOVE_Flying, 0);
-		this->isOnLadder = false;
-		FVector launchVector = this->GetActorForwardVector() * this->climbEndBoost;
-
-		this->LaunchCharacter(FVector(
-			launchVector.X,
-			launchVector.Y,
-			this->jumpHeight),
-			true,
-			true
-		);
-
-		JumpAudioComponent->SetIntParameter(FName("sfx_JumpMaterial"), 3);
-		JumpAudioComponent->Play();
 	}
 }
 
@@ -1033,6 +1063,8 @@ void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
 {
 	spawnRotation = spawnRotator;
 	spawnPoint = spawnVector;
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *this->spawnRotation.ToString());
 }
 
 void AMyProjectCharacter::Respawn()
@@ -1231,23 +1263,33 @@ void AMyProjectCharacter::SpawnBullet()
 	{
 		if (!isShootingLeft)
 		{
-		isShootingLeft = true;
-		FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
-			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
-			hitResult.TraceEnd);																					// Get Trace end in World
+			isShootingLeft = true;
+			FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(												// Set a Rotater from MuzzelLocation to Ray Imapact Point
+				FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),												// Get Muzzel Location in World
+				hitResult.TraceEnd);																					// Get Trace end in World
 
-		FActorSpawnParameters spawnInfo;																			// Spawn Info
-		spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always
-		spawnInfo.Owner = this;																						// Owner of Spawned Actor is this Class
-		spawnInfo.Instigator = this;																				// if you spawn a projectile and pass over instigator as say, your pawn. then when the projectile wants to do damage, you can pass it over to the damage function. So you know who fire the projectile, you can then decide if you want friendly fire, and all sorts of things can be done after you know this bit of info.
+			FActorSpawnParameters spawnInfo;																			// Spawn Info
+			spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;					// Spawn Actor Always
+			spawnInfo.Owner = this;																						// Owner of Spawned Actor is this Class
+			spawnInfo.Instigator = this;																				// if you spawn a projectile and pass over instigator as say, your pawn. then when the projectile wants to do damage, you can pass it over to the damage function. So you know who fire the projectile, you can then decide if you want friendly fire, and all sorts of things can be done after you know this bit of info.
 
-		AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
-			playerProjectile,															// SubClass
-			FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),				// SpawnLocation
-			newRotation,																// SpawnRotation
-			spawnInfo);
-		projectile->Initialize(this);// Set Spawn Info
-		OnBulletSpawnBpEvent();
+			AMyProjectProjectile* projectile = world->SpawnActor<AMyProjectProjectile>(		// Spawn the Bullet
+				playerProjectile,															// SubClass
+				FP_MuzzleLocationRight->GetComponentTransform().GetLocation(),				// SpawnLocation
+				newRotation,																// SpawnRotation
+				spawnInfo);
+			projectile->Initialize(this);// Set Spawn Info
+			OnBulletSpawnBpEvent();
+
+			// try and play a firing animation if specified
+			if (fireAnimationRight != NULL)
+			{
+				UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+				if (AnimInstance != NULL)
+				{
+					AnimInstance->Montage_Play(fireAnimationRight, 1.f);
+				}
+			}
 		}
 
 		else if (isShootingLeft)
@@ -1269,6 +1311,15 @@ void AMyProjectCharacter::SpawnBullet()
 				spawnInfo);	
 			projectile->Initialize(this);// Set Spawn Info
 			OnBulletSpawnBpEvent();
+
+			if (fireAnimationLeft != NULL)
+			{
+				UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+				if (AnimInstance != NULL)
+				{
+					AnimInstance->Montage_Play(fireAnimationLeft, 1.f);
+				}
+			}
 		}
 
 
@@ -1285,15 +1336,7 @@ void AMyProjectCharacter::SpawnBullet()
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
 
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != NULL)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
+	
 }
 
 // Wallrun (MovePlayer)

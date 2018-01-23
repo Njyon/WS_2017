@@ -29,10 +29,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
 		int amountOfEnemys;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Checkpoint)
+		class AMyProjectCheckpoint* nextCP;
+
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnCheckpoint();
 	
+	UFUNCTION()
+		void NextCheckpoint();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void ActivateNextCP();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		bool firstCP;
 
 
 	FVector vector;
