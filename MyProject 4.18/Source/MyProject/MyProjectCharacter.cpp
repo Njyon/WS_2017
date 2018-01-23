@@ -132,8 +132,8 @@ AMyProjectCharacter::AMyProjectCharacter()
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
 	// set our turn rates for input
-	BaseTurnRate = 45.f;
-	BaseLookUpRate = 45.f;
+	BaseTurnRate = 0.45f;
+	BaseLookUpRate = 0.45f;
 
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -644,7 +644,7 @@ void AMyProjectCharacter::TurnAtRate(float rate)
 	if (this->blockInput == false)
 	{
 		// calculate delta for this frame from the rate information
-		AddControllerYawInput(rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+		AddControllerYawInput(rate * BaseTurnRate /** GetWorld()->GetDeltaSeconds()*/);
 	}
 }
 
@@ -653,7 +653,7 @@ void AMyProjectCharacter::LookUpAtRate(float rate)
 	if (this->blockInput == false)
 	{
 		// calculate delta for this frame from the rate information
-		AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+		AddControllerPitchInput(rate * BaseLookUpRate /** GetWorld()->GetDeltaSeconds()*/);
 	}
 }
 
