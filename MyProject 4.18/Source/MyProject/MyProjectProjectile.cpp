@@ -34,6 +34,16 @@ AMyProjectProjectile::AMyProjectProjectile()
 
 }
 
+void AMyProjectProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (state == collisionSwitch::player)
+	{
+		this->CustomTimeDilation = 1;
+	}
+}
+
 void AMyProjectProjectile::Initialize(AMyProjectCharacter* character)
 {
 	this->source = character;
