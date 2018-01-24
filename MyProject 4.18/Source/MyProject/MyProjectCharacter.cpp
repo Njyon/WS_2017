@@ -620,6 +620,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	if (Health > MaxHealth)
 	{
 		Health = MaxHealth;
+		OnCrankDamageBpEvent();
 	}
 	if (Health > 30.0f && gothitlessthan30 == true)
 	{
