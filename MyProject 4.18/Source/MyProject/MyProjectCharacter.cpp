@@ -571,6 +571,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time Dilation to Normal
 			SlowmoAudioComponent->Stop();
 			EndSprint();
+			OnSlomoOff();
 		}
 	}
 
