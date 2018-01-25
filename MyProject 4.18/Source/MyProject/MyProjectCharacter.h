@@ -373,6 +373,11 @@ public:								////// PUBLIC //////
 		void OnCrankDamageBpEvent();
 
 	UFUNCTION(BlueprintImplementableEvent)
+		void OnSlomoOn();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnSlomoOff();
+
+	UFUNCTION(BlueprintImplementableEvent)
 		void OnClimbBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnClimbEndBPEvent();

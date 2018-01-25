@@ -684,6 +684,7 @@ void AMyProjectCharacter::RMBPressed()
 		{
 			isSlomoActive = true;
 			UGameplayStatics::SetGlobalTimeDilation(world, slomoTimeDilation); // Set Time to Slomo Time Dilation
+			OnSlomoOn();
 			SlowmoAudioComponent->Play();
 			SlowmoEndAudioComponent->Stop();
 		}
@@ -697,6 +698,7 @@ void AMyProjectCharacter::RMBReleased()
 	{
 		isSlomoActive = false;
 		UGameplayStatics::SetGlobalTimeDilation(world, 1); // Set Time to Noraml
+		OnSlomoOff();
 		SlowmoAudioComponent->Stop();
 		SlowmoEndAudioComponent->Play();
 	}
