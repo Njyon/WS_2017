@@ -1311,6 +1311,15 @@ void AMyProjectCharacter::SpawnBullet()
 
 			projectile->Initialize(this);
 			OnBulletSpawnBpEvent();
+			// try and play a firing animation if specified
+			if (fireAnimationRight != NULL)
+			{
+				UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+				if (AnimInstance != NULL)
+				{
+					AnimInstance->Montage_Play(fireAnimationRight, 1.f);
+				}
+			}
 		}
 		else if (shootingState == ShootState::LeftShooting)
 		{
@@ -1332,8 +1341,16 @@ void AMyProjectCharacter::SpawnBullet()
 				spawnInfo);
 			projectile->Initialize(this);
 			OnBulletSpawnBpEvent();
-		}
 
+			if (fireAnimationLeft != NULL)
+			{
+				UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+				if (AnimInstance != NULL)
+				{
+					AnimInstance->Montage_Play(fireAnimationLeft, 1.f);
+				}
+			}
+		}
 		ShootAudioComponent->Play();
 	}
 	else																				// Ray does not hit anything
