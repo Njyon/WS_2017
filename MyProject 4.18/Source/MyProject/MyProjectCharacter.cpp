@@ -125,6 +125,20 @@ AMyProjectCharacter::AMyProjectCharacter()
 	ReloadAudioComponent->bAutoActivate = false;
 	ReloadAudioComponent->SetupAttachment(RootComponent);
 
+	//LandingSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> LandingCue(TEXT("'/Game/Sound/SFX/Movement/sfx_LandingCue'"));
+	LandingAudioCue = LandingCue.Object;
+	LandingAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LandingAudioComp"));
+	LandingAudioComponent->bAutoActivate = false;
+	LandingAudioComponent->SetupAttachment(RootComponent);
+
+	//VaultSound
+	static ConstructorHelpers::FObjectFinder<USoundCue> VaultCue(TEXT("'/Game/Sound/SFX/Movement/sfx_Vault'"));
+	VaultAudioCue = VaultCue.Object;
+	VaultAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("VaultAudioComp"));
+	VaultAudioComponent->bAutoActivate = false;
+	VaultAudioComponent->SetupAttachment(RootComponent);
+
 	
 			////////////End Sounds////////////////
 
@@ -367,9 +381,17 @@ void AMyProjectCharacter::PostInitializeComponents()
 	{
 		RunningAudioComponent->SetSound(RunningAudioCue);
 	}
-	if (ReloadAudioCue->IsValidLowLevelFast())                    //RunningSound
+	if (ReloadAudioCue->IsValidLowLevelFast())                    //ReloadSound
 	{
 		ReloadAudioComponent->SetSound(ReloadAudioCue);
+	}
+	if (LandingAudioCue->IsValidLowLevelFast())                    //LandingSound
+	{
+		LandingAudioComponent->SetSound(LandingAudioCue);
+	}
+	if (VaultAudioCue->IsValidLowLevelFast())                    //LandingSound
+	{
+		VaultAudioComponent->SetSound(VaultAudioCue);
 	}
 }
 
@@ -961,8 +983,54 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 	);
 
 	
+
+	if (LandingAudioComponent->IsPlaying() == false)
+	{
+		FVector rayStart = this->GetActorLocation();
+		FVector rayEnd = rayStart + this->GetActorUpVector() * -200;
+
+
+		FCollisionQueryParams rayParams = FCollisionQueryParams("Detection", false, this);		// Params for the RayCast
+		rayParams.bTraceComplex = false;
+		rayParams.bTraceAsyncScene = true;
+		rayParams.AddIgnoredActor(this);
+		rayParams.bReturnPhysicalMaterial = true;
+
+		FHitResult hitMat(ForceInit);
+		world->LineTraceSingleByChannel(hitMat, rayStart, rayEnd, ECC_MAX, rayParams);
+
+		if (hitMat.IsValidBlockingHit() == true)
+		{
+			if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+			{
+					LandingAudioComponent->SetIntParameter(FName("sfx_LandingMaterial"), 1);
+			}
+
+			else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+			{
+					LandingAudioComponent->SetIntParameter(FName("sfx_LandingMaterial"), 0);
+			}
+			OnWalkingBpEvent();
+			LandingAudioComponent->Play();
+		}
+
+		else
+		{
+			LandingAudioComponent->Stop();
+		}
+	}
 	//this->WallrunEnd();
 
+}
+
+void AMyProjectCharacter::VaultSound()
+{
+	VaultAudioComponent->Play();
+}
+
+void AMyProjectCharacter::ClimbSound()
+{
+	ClimbAudioComponent->Play();
 }
 
 					// Keyboard left Shift //

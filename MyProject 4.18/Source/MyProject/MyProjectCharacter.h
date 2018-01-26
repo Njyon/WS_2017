@@ -306,6 +306,16 @@ public:								////// PUBLIC //////
 		class USoundCue* ReloadAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* ReloadAudioComponent;
+	//Landing
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* LandingAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* LandingAudioComponent;
+	//Vault
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* VaultAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* VaultAudioComponent;
 
 										// UFUNCTION //
 	void Damage(int damage, FVector damageCauser);
@@ -347,6 +357,10 @@ public:								////// PUBLIC //////
 		void SlideCam();
 	UFUNCTION(BlueprintCallable)
 		void RevertedSlideCam();
+	UFUNCTION(BlueprintCallable)
+		void VaultSound();
+	UFUNCTION(BlueprintCallable)
+		void ClimbSound();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnDamageBPEvent();
 	UFUNCTION(BlueprintImplementableEvent)
