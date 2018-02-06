@@ -346,6 +346,10 @@ public:								////// PUBLIC //////
 		void EndSprint();	// left Shift Released
 	UFUNCTION()
 		void Reload();
+	UFUNCTION()
+		void RunningAudioBegin();
+	UFUNCTION()
+		void RunningAudioEnd();
 
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
@@ -436,6 +440,7 @@ private:								////// PRIVATE //////
 	int wallCollisionCounter = 0;	// Counts the Collision overlaps (Prevents bug)
 	float soundTimeDilation;
 	float helperWallJumpNegativeFloat = 0;
+	float breathingDelay;
 	bool isLMBPressed;
 	bool isBulletFired = false;
 	bool isShootingInNormalSpeed;				// Check you switched the Time Dilation
@@ -452,6 +457,7 @@ private:								////// PRIVATE //////
 	bool WallrunUp = false;
 	bool LadderDoOnce = false;
 	bool gothitlessthan30 = false;
+	bool isBreathing = false;
 	
 	///Struct
 	FVector wallRunDirection;								// Helper for allrun
@@ -465,6 +471,7 @@ private:								////// PRIVATE //////
 	FTimerHandle healthrecharge;
 	FTimerHandle respawn;
 	FTimerHandle noMoving;
+	FTimerHandle breathing;
 	FTimerHandle losingHealth;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
