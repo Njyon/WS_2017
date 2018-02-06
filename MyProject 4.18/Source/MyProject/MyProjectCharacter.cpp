@@ -457,6 +457,11 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		OnClimbEndBPEvent();
 	}
 
+	if (this->sliding)
+	{
+		shootingState = ShootState::LeftShooting;
+	}
+
 	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
 	{
 		if (!ismovingTimer)
@@ -2033,4 +2038,16 @@ void AMyProjectCharacter::SlideRadiusFloatReturn(float radius)
 	{
 		this->capsuleComponent->SetCapsuleRadius(radius, true);
 	}
+}
+
+// ALI
+
+void AMyProjectCharacter::SetShootingLeft()
+{
+	shootingState = ShootState::LeftShooting;
+}
+
+void AMyProjectCharacter::SetShootingRight()
+{
+	shootingState = ShootState::RightShooting;
 }

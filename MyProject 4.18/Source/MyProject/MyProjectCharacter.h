@@ -350,6 +350,10 @@ public:								////// PUBLIC //////
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
 	UFUNCTION(BlueprintCallable)
+		void SetShootingLeft();
+	UFUNCTION(BlueprintCallable)
+		void SetShootingRight();
+	UFUNCTION(BlueprintCallable)
 		void Respawn();
 	UFUNCTION(BlueprintCallable)
 		void RespawnSound();
