@@ -444,6 +444,34 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+			//////////////////////////////////////
+			//////////	Breathing Sound	//////////
+			//////////////////////////////////////
+
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == false)
+	{
+		if (!isBreathing)
+		{
+			breathingDelay = FMath::RandRange(2.0f, 6.0f);
+			isBreathing = true;
+			world->GetTimerManager().SetTimer(breathing, this, &AMyProjectCharacter::RunningAudioBegin, breathingDelay, false);
+		}
+	}
+
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == true)
+	{
+		if (isBreathing)
+		{
+			isBreathing = false;
+			RunningAudioEnd();
+		}
+	}
+
+			//////////////////////////////////////
+			//////////	  Rest Tick 	//////////
+			//////////////////////////////////////
+
+
 	if (isOnLadder == true)
 	{
 		if (LadderDoOnce == false)
@@ -2033,4 +2061,17 @@ void AMyProjectCharacter::SlideRadiusFloatReturn(float radius)
 	{
 		this->capsuleComponent->SetCapsuleRadius(radius, true);
 	}
+}
+
+void AMyProjectCharacter::RunningAudioBegin()
+{
+	if (RunningAudioComponent->IsPlaying() == false)
+	{
+		RunningAudioComponent->FadeIn(FMath::RandRange(3.0f, 5.0f), 1.0, 0.0);
+	}
+}
+
+void AMyProjectCharacter::RunningAudioEnd()
+{
+	RunningAudioComponent->FadeOut(FMath::RandRange(3.0f, 5.0f), 0.0);
 }
