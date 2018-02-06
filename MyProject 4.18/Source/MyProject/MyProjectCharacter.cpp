@@ -444,6 +444,34 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+			//////////////////////////////////////
+			//////////	Breathing Sound	//////////
+			//////////////////////////////////////
+
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == false)
+	{
+		if (!isBreathing)
+		{
+			breathingDelay = FMath::RandRange(2.0f, 6.0f);
+			isBreathing = true;
+			world->GetTimerManager().SetTimer(breathing, this, &AMyProjectCharacter::RunningAudioBegin, breathingDelay, false);
+		}
+	}
+
+	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == true)
+	{
+		if (isBreathing)
+		{
+			isBreathing = false;
+			RunningAudioEnd();
+		}
+	}
+
+			//////////////////////////////////////
+			//////////	  Rest Tick 	//////////
+			//////////////////////////////////////
+
+
 	if (isOnLadder == true)
 	{
 		if (LadderDoOnce == false)
@@ -455,6 +483,11 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		LadderDoOnce = false;
 		OnClimbEndBPEvent();
+	}
+
+	if (this->sliding)
+	{
+		shootingState = ShootState::LeftShooting;
 	}
 
 	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
@@ -746,10 +779,10 @@ void AMyProjectCharacter::MoveForward(float value)
 		}
 		else if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
 		{
-			if (RunningAudioComponent->IsPlaying() == false)
+			/*if (RunningAudioComponent->IsPlaying() == false)
 			{
-				RunningAudioComponent->Play();
-			}
+				RunningAudioComponent->FadeIn(3, 1, 0);
+			}*/
 
 			if (WalkAudioComponent->IsPlaying() == false)
 			{
@@ -2033,4 +2066,29 @@ void AMyProjectCharacter::SlideRadiusFloatReturn(float radius)
 	{
 		this->capsuleComponent->SetCapsuleRadius(radius, true);
 	}
+}
+
+void AMyProjectCharacter::RunningAudioBegin()
+{
+	if (RunningAudioComponent->IsPlaying() == false)
+	{
+		RunningAudioComponent->FadeIn(FMath::RandRange(3.0f, 5.0f), 1.0, 0.0);
+	}
+}
+
+void AMyProjectCharacter::RunningAudioEnd()
+{
+	RunningAudioComponent->FadeOut(FMath::RandRange(3.0f, 5.0f), 0.0);
+}
+
+// ALI
+
+void AMyProjectCharacter::SetShootingLeft()
+{
+	shootingState = ShootState::LeftShooting;
+}
+
+void AMyProjectCharacter::SetShootingRight()
+{
+	shootingState = ShootState::RightShooting;
 }

@@ -8,6 +8,25 @@
 
 AMyProjectProjectile::AMyProjectProjectile() 
 {
+
+	world = GetWorld();
+
+	static ConstructorHelpers::FClassFinder<AMyHitWall> HitWallSound(TEXT("'/Game/Blueprints/Player/Behaviour/HitSounds/HitWall'"));
+	if (HitWallSound.Class != NULL)
+	{
+		HitWall = HitWallSound.Class;
+	}
+	static ConstructorHelpers::FClassFinder<AMyHitNPC> HitNPCSound(TEXT("'/Game/Blueprints/Player/Behaviour/HitSounds/HitNPC'"));
+	if (HitNPCSound.Class != NULL)
+	{
+		HitNPC = HitNPCSound.Class;
+	}
+	static ConstructorHelpers::FClassFinder<AMyHitHead> HitHeadSound(TEXT("'/Game/Blueprints/Player/Behaviour/HitSounds/HitHead'"));
+	if (HitHeadSound.Class != NULL)
+	{
+		HitHead = HitHeadSound.Class;
+	}
+
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
@@ -29,6 +48,10 @@ AMyProjectProjectile::AMyProjectProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
+	SoundSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("SoundSpawn"));
+	SoundSpawn->SetupAttachment(RootComponent);
+	SoundSpawn->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 
@@ -42,6 +65,11 @@ void AMyProjectProjectile::BeginPlay()
 	{
 		this->CustomTimeDilation = 1;
 	}
+}
+
+void AMyProjectProjectile::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);	
 }
 
 void AMyProjectProjectile::Initialize(AMyProjectCharacter* character)
@@ -58,6 +86,8 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(OtherActor);
 	ATP_ThirdPersonCharacter* hittedNPC = Cast<ATP_ThirdPersonCharacter>(OtherActor);
 
+	FActorSpawnParameters spawnInfo;
+	spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
 	// Only add impulse and destroy projectile if we hit a physics
 
@@ -77,20 +107,39 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 					hittedNPC->Damage(headshotdamage);
 					//source = GetWorld()->GetFirstPlayerController();
 					OnEnemyHitBpEvent();
+					
+					AMyHitHead* soundhead = world->SpawnActor<AMyHitHead>(
+						HitHead,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+					
 				
 				}
 
-				else if (Hit.GetComponent()->ComponentHasTag("Body")/* || Hit.GetComponent()->ComponentHasTag("LLeg") || Hit.GetComponent()->ComponentHasTag("RLeg")*/)
+				else if (Hit.GetComponent()->ComponentHasTag("Body"))
 				{
 					//UE_LOG(LogTemp, Warning, TEXT("hit body"));
 					hittedNPC->Damage(projectileDamage);
 					OnEnemyHitBpEvent();
+
+					AMyHitNPC* soundbody = world->SpawnActor<AMyHitNPC>(		
+						HitNPC,															
+						SoundSpawn->GetComponentTransform().GetLocation(),				
+						FRotator(0,0,0),																
+						spawnInfo);
 				}
 
 				else
 				{
 					OnHitBpEvent();
 					Destroy();
+
+					AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
+						HitWall,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
 				}
 
 				//ProjectileMovement->bShouldBounce = false;
@@ -102,12 +151,27 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			OnHitBpEvent();
 			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
 
+			AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
+				HitWall,
+				SoundSpawn->GetComponentTransform().GetLocation(),
+				FRotator(0, 0, 0),
+				spawnInfo);
+
 			Destroy();
+			
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 		{
 			OnHitBpEvent();
+
+			AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
+				HitWall,
+				SoundSpawn->GetComponentTransform().GetLocation(),
+				FRotator(0, 0, 0),
+				spawnInfo);
+
 			Destroy();
+			
 		}
 		
 
@@ -118,8 +182,16 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 		{
 			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
+
+			AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
+				HitWall,
+				SoundSpawn->GetComponentTransform().GetLocation(),
+				FRotator(0, 0, 0),
+				spawnInfo);
+
 			OnHitBpEvent();
 			Destroy();
+			
 		}
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedplayer != NULL)
 		{
@@ -132,7 +204,15 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 		{
 			OnHitBpEvent();
+
+			AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
+				HitWall,
+				SoundSpawn->GetComponentTransform().GetLocation(),
+				FRotator(0, 0, 0),
+				spawnInfo);
+
 			Destroy();
+			
 		}
 
 		break;
