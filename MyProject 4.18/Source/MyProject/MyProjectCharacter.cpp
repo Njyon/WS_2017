@@ -746,10 +746,10 @@ void AMyProjectCharacter::MoveForward(float value)
 		}
 		else if (value != 0.0f && this->isOnWall == false && this->sliding == false && this->isOnLadder == false)
 		{
-			if (RunningAudioComponent->IsPlaying() == false)
+			/*if (RunningAudioComponent->IsPlaying() == false)
 			{
-				RunningAudioComponent->Play();
-			}
+				RunningAudioComponent->FadeIn(3, 1, 0);
+			}*/
 
 			if (WalkAudioComponent->IsPlaying() == false)
 			{
