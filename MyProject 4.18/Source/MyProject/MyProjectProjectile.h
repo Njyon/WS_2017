@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "MyHitWall.h"
+#include "MyHitHead.h"
+#include "MyHitNPC.h"
 #include "MyProjectProjectile.generated.h"
 
 UENUM()
@@ -44,9 +47,22 @@ class AMyProjectProjectile : public AActor
 
 	class ATP_ThirdPersonCharacter* damageNPC;
 
+	UPROPERTY(EditAnywhere, Category = Mesh)
+		class USceneComponent* SoundSpawn;
+
 
 public:
 	AMyProjectProjectile();
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AMyHitWall> HitWall;
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AMyHitNPC> HitNPC;
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AMyHitHead> HitHead;
+
+	virtual void Tick(float DeltaSeconds) override;
+
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnHitBpEvent();
@@ -75,5 +91,8 @@ public:
 
 protected:
 	virtual void BeginPlay();
+
+private:
+	class UWorld* world;	// Safe the world
 };
 
