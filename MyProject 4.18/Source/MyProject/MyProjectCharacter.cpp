@@ -1175,6 +1175,7 @@ void AMyProjectCharacter::Respawn()
 	Health = MaxHealth;
 	Reload();
 	this->OnDamageBPEvent();
+	this->OnHealthRechargeBPEvent();
 	TeleportTo(spawnPoint, spawnRotation, false, true);
 	dead = false;
 	//this->playerController->Possess(this);
