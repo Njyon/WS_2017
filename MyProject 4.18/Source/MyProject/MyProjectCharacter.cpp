@@ -783,6 +783,7 @@ void AMyProjectCharacter::MoveForward(float value)
 			{
 				RunningAudioComponent->FadeIn(3, 1, 0);
 			}*/
+			OnWalkingBpEvent();
 
 			if (WalkAudioComponent->IsPlaying() == false)
 			{
@@ -803,26 +804,12 @@ void AMyProjectCharacter::MoveForward(float value)
 				{
 					if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 					{
-						if (canSprint)
-						{
-							WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 2);
-						}
-						else
-						{
 							WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
-						}
 					}
 
 					else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
 					{
-						if (canSprint)
-						{
-							WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 3);
-						}
-						else
-						{
 							WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
-						}
 					}
 					OnWalkingBpEvent();
 					WalkAudioComponent->Play();
@@ -866,17 +853,25 @@ void AMyProjectCharacter::MoveRight(float value)
 
 					//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "I see a Normal: " + hitMat);
 
-					if (hitMat.PhysMaterial->SurfaceType == 0)
+					if (hitMat.IsValidBlockingHit() == true)
 					{
-						WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+						if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+						{
+								WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 1);
+						}
+
+						else if (hitMat.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+						{
+								WalkAudioComponent->SetIntParameter(FName("sfx_WalkingMaterial"), 0);
+						}
+						OnWalkingBpEvent();
+						WalkAudioComponent->Play();
 					}
 
-					WalkAudioComponent->Play();
-				}
-
-				else
-				{
-					WalkAudioComponent->Stop();
+					else
+					{
+						WalkAudioComponent->Stop();
+					}
 				}
 			}
 			// add movement in that direction
@@ -1076,7 +1071,7 @@ void AMyProjectCharacter::ClimbSound()
 
 void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 {
-	if (godMode == false)
+	if (godMode == false || !this->blockInput)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->Health);
 		Health = Health - damage;
@@ -1135,31 +1130,34 @@ void AMyProjectCharacter::NotMoving()
 }
 void AMyProjectCharacter::LosingHealth()
 {
-	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
-	Health = Health - crankDamage;
-	this->OnCrankDamageBpEvent();
-	if (Health <= crankHealthThreshhold /*&& isHit == false*/)
+	if (!this->blockInput)
 	{
-		Health = crankHealthThreshhold;
-		//if (dead == false)
-		//{
-		//	OnCrankDamageBpEvent();
-		//	LMBReleased();
-		//	dead = true;
-		//	//this->playerController->UnPossess();
-		//	this->AActor::DisableInput(Cast<APlayerController>(this));
-		//	this->playerController->SetIgnoreLookInput(true);
-		//	this->playerController->SetIgnoreMoveInput(true);
-		//	this->PlayDeathAnim();
-		//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
-		//}
-	}
-	if (Health <= 30.0f)
-	{
-		if (!gothitlessthan30)
+		UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
+		Health = Health - crankDamage;
+		this->OnCrankDamageBpEvent();
+		if (Health <= crankHealthThreshhold /*&& isHit == false*/)
 		{
-			gothitlessthan30 = true;
-			PlayerHitAudioComponent->Play();
+			Health = crankHealthThreshhold;
+			//if (dead == false)
+			//{
+			//	OnCrankDamageBpEvent();
+			//	LMBReleased();
+			//	dead = true;
+			//	//this->playerController->UnPossess();
+			//	this->AActor::DisableInput(Cast<APlayerController>(this));
+			//	this->playerController->SetIgnoreLookInput(true);
+			//	this->playerController->SetIgnoreMoveInput(true);
+			//	this->PlayDeathAnim();
+			//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+			//}
+		}
+		if (Health <= 30.0f)
+		{
+			if (!gothitlessthan30)
+			{
+				gothitlessthan30 = true;
+				PlayerHitAudioComponent->Play();
+			}
 		}
 	}
 }
