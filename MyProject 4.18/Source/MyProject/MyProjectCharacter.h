@@ -317,6 +317,31 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* VaultAudioComponent;
 
+
+	//Dialogue_Intro
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* Dialogue_IntroAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* Dialogue_IntroAudioComponent;
+
+	//Dialogue_HalfWay
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* Dialogue_HalfWayAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* Dialogue_HalfWayAudioComponent;
+
+	//Dialogue_Almost
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* Dialogue_AlmostAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* Dialogue_AlmostAudioComponent;
+
+	//Dialogue_Outro
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* Dialogue_OutroAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* Dialogue_OutroAudioComponent;
+
 										// UFUNCTION //
 	void Damage(int damage, FVector damageCauser);
 	void SetRespawn(FVector spawnVector, FRotator spawnRotator);
@@ -415,6 +440,15 @@ public:								////// PUBLIC //////
 		void OnWallRunBpEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnWallRunEndBpEvent();
+
+	UFUNCTION(BlueprintCallable)
+		void OnIntroBPEvent();
+	UFUNCTION(BlueprintCallable)
+		void OnHalfwayBPEvent();
+	UFUNCTION(BlueprintCallable)
+		void OnAlmostBPEvent();
+	UFUNCTION(BlueprintCallable)
+		void OnOutroBPEvent();
 
 	/// Timeline Floats
 	UFUNCTION()
