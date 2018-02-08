@@ -1220,6 +1220,7 @@ void AMyProjectCharacter::Respawn()
 	Health = MaxHealth;
 	Reload();
 	this->OnDamageBPEvent();
+	this->OnHealthRechargeBPEvent();
 	TeleportTo(spawnPoint, spawnRotation, false, true);
 	dead = false;
 	//this->playerController->Possess(this);
@@ -1241,8 +1242,17 @@ void AMyProjectCharacter::RespawnSound()
 
 void AMyProjectCharacter::Healthrecharge()
 {
-	Health += healthPerDelay;
-	OnHealthRechargeBPEvent();
+	if (this->Health < this->MaxHealth)
+	{
+
+		Health += healthPerDelay;
+		OnHealthRechargeBPEvent();
+
+		if (this->Health >= this->MaxHealth)
+		{
+			this->OnHealthMaxed();
+		}
+	}
 }
 
 void AMyProjectCharacter::RessoourceRefill(float amount)

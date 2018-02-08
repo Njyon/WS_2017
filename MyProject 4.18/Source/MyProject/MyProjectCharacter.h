@@ -418,6 +418,8 @@ public:								////// PUBLIC //////
 		void OnWalkingBpEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnCrankDamageBpEvent();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnHealthMaxed();
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnSlomoOn();
