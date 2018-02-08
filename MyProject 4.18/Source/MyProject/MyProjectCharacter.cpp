@@ -139,6 +139,35 @@ AMyProjectCharacter::AMyProjectCharacter()
 	VaultAudioComponent->bAutoActivate = false;
 	VaultAudioComponent->SetupAttachment(RootComponent);
 
+	//Dialogue_Intro
+	static ConstructorHelpers::FObjectFinder<USoundCue> Dialogue_IntroCue(TEXT("'/Game/Sound/SFX/Character/Dialogue/sfx_Intro'"));
+	Dialogue_IntroAudioCue = Dialogue_IntroCue.Object;
+	Dialogue_IntroAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Dialogue_IntroAudioComp"));
+	Dialogue_IntroAudioComponent->bAutoActivate = false;
+	Dialogue_IntroAudioComponent->SetupAttachment(RootComponent);
+
+	//Dialogue_HalfWay
+	static ConstructorHelpers::FObjectFinder<USoundCue> Dialogue_HalfWayCue(TEXT("'/Game/Sound/SFX/Character/Dialogue/sfx_halfwayThere'"));
+	Dialogue_HalfWayAudioCue = Dialogue_HalfWayCue.Object;
+	Dialogue_HalfWayAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Dialogue_HalfWayAudioComp"));
+	Dialogue_HalfWayAudioComponent->bAutoActivate = false;
+	Dialogue_HalfWayAudioComponent->SetupAttachment(RootComponent);
+
+	//Dialogue_Almost
+	static ConstructorHelpers::FObjectFinder<USoundCue> Dialogue_AlmostCue(TEXT("'/Game/Sound/SFX/Character/Dialogue/sfx_AlmostThere'"));
+	Dialogue_AlmostAudioCue = Dialogue_AlmostCue.Object;
+	Dialogue_AlmostAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Dialogue_AlmostAudioComp"));
+	Dialogue_AlmostAudioComponent->bAutoActivate = false;
+	Dialogue_AlmostAudioComponent->SetupAttachment(RootComponent);
+
+	//Dialogue_Outro
+	static ConstructorHelpers::FObjectFinder<USoundCue> Dialogue_OutroCue(TEXT("'/Game/Sound/SFX/Character/Dialogue/sfx_Outro'"));
+	Dialogue_OutroAudioCue = Dialogue_OutroCue.Object;
+	Dialogue_OutroAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Dialogue_OutroAudioComp"));
+	Dialogue_OutroAudioComponent->bAutoActivate = false;
+	Dialogue_OutroAudioComponent->SetupAttachment(RootComponent);
+
+
 	
 			////////////End Sounds////////////////
 
@@ -392,6 +421,22 @@ void AMyProjectCharacter::PostInitializeComponents()
 	if (VaultAudioCue->IsValidLowLevelFast())                    //LandingSound
 	{
 		VaultAudioComponent->SetSound(VaultAudioCue);
+	}
+	if (Dialogue_IntroAudioCue->IsValidLowLevelFast())					//Dialogue_1
+	{
+		Dialogue_IntroAudioComponent->SetSound(Dialogue_IntroAudioCue);
+	}
+	if (Dialogue_HalfWayAudioCue->IsValidLowLevelFast())					//Dialogue_2
+	{
+		Dialogue_HalfWayAudioComponent->SetSound(Dialogue_HalfWayAudioCue);
+	}
+	if (Dialogue_AlmostAudioCue->IsValidLowLevelFast())					//Dialogue_3
+	{
+		Dialogue_AlmostAudioComponent->SetSound(Dialogue_AlmostAudioCue);
+	}
+	if (Dialogue_OutroAudioCue->IsValidLowLevelFast())					//Dialogue_3
+	{
+		Dialogue_OutroAudioComponent->SetSound(Dialogue_OutroAudioCue);
 	}
 }
 
@@ -2099,4 +2144,24 @@ void AMyProjectCharacter::SetShootingLeft()
 void AMyProjectCharacter::SetShootingRight()
 {
 	shootingState = ShootState::RightShooting;
+}
+
+void AMyProjectCharacter::OnIntroBPEvent()
+{
+	Dialogue_IntroAudioComponent->Play();
+}
+
+void AMyProjectCharacter::OnHalfwayBPEvent()
+{
+	Dialogue_HalfWayAudioComponent->Play();
+}
+
+void AMyProjectCharacter::OnAlmostBPEvent()
+{
+	Dialogue_AlmostAudioComponent->Play();
+}
+
+void AMyProjectCharacter::OnOutroBPEvent()
+{
+	Dialogue_OutroAudioComponent->Play();
 }
