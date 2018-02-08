@@ -1076,7 +1076,7 @@ void AMyProjectCharacter::ClimbSound()
 
 void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 {
-	if (godMode == false)
+	if (godMode == false || !this->blockInput)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Ressources at : %f %"), this->Health);
 		Health = Health - damage;
@@ -1135,31 +1135,34 @@ void AMyProjectCharacter::NotMoving()
 }
 void AMyProjectCharacter::LosingHealth()
 {
-	UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
-	Health = Health - crankDamage;
-	this->OnCrankDamageBpEvent();
-	if (Health <= crankHealthThreshhold /*&& isHit == false*/)
+	if (!this->blockInput)
 	{
-		Health = crankHealthThreshhold;
-		//if (dead == false)
-		//{
-		//	OnCrankDamageBpEvent();
-		//	LMBReleased();
-		//	dead = true;
-		//	//this->playerController->UnPossess();
-		//	this->AActor::DisableInput(Cast<APlayerController>(this));
-		//	this->playerController->SetIgnoreLookInput(true);
-		//	this->playerController->SetIgnoreMoveInput(true);
-		//	this->PlayDeathAnim();
-		//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
-		//}
-	}
-	if (Health <= 30.0f)
-	{
-		if (!gothitlessthan30)
+		UE_LOG(LogTemp, Warning, TEXT("losingHealth"));
+		Health = Health - crankDamage;
+		this->OnCrankDamageBpEvent();
+		if (Health <= crankHealthThreshhold /*&& isHit == false*/)
 		{
-			gothitlessthan30 = true;
-			PlayerHitAudioComponent->Play();
+			Health = crankHealthThreshhold;
+			//if (dead == false)
+			//{
+			//	OnCrankDamageBpEvent();
+			//	LMBReleased();
+			//	dead = true;
+			//	//this->playerController->UnPossess();
+			//	this->AActor::DisableInput(Cast<APlayerController>(this));
+			//	this->playerController->SetIgnoreLookInput(true);
+			//	this->playerController->SetIgnoreMoveInput(true);
+			//	this->PlayDeathAnim();
+			//	world->GetTimerManager().SetTimer(respawn, this, &AMyProjectCharacter::Respawn, 1.0f, false);
+			//}
+		}
+		if (Health <= 30.0f)
+		{
+			if (!gothitlessthan30)
+			{
+				gothitlessthan30 = true;
+				PlayerHitAudioComponent->Play();
+			}
 		}
 	}
 }
