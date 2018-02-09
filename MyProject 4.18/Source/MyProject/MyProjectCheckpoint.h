@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "MyProjectCharacter.h"
 #include "Spawn.h"
+#include "MyEnemySpawnSound.h"
 #include "MyProjectCheckpoint.generated.h"
 
 
@@ -17,12 +18,18 @@ class MYPROJECT_API AMyProjectCheckpoint : public AActor
 	
 	UPROPERTY(VisibleAnywhere, Category = Checkpoint)
 		class UBoxComponent* CollisionComp;
+
+	UPROPERTY(EditAnywhere, Category = Mesh)
+		class USceneComponent* SoundSpawnLocation;
 	/*UPROPERTY(VisibleAnywhere, Category = Checkpoint)
 		class UStaticMeshComponent* spawn;*/
 
 public:	
 	// Sets default values for this actor's properties
 	AMyProjectCheckpoint();
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AMyEnemySpawnSound> EnemySpawnSound;
 
 	//Set Spawn points for enemies
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
@@ -60,6 +67,13 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* CheckpointSoundAudioComponent;
 
+	//Spawn
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* SpawnAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* SpawnAudioComponent;
+
+
 	///** Returns CollisionComp subobject **/
 	FORCEINLINE class UBoxComponent* GetCollisionComp() const { return CollisionComp; }
 
@@ -67,8 +81,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 private:
+
+	class UWorld* world;
+
+	float soundTimeDilation;
 
 	UFUNCTION()
 		void OnOverlap(
