@@ -57,11 +57,18 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	WalkAudioComponent->SetupAttachment(RootComponent);
 
 	//ShootSound
-	static ConstructorHelpers::FObjectFinder<USoundCue> ShootCue(TEXT("'/Game/Sound/SFX/Weapon/sfx_WeaponFire'"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> ShootCue(TEXT("'/Game/Sound/SFX/Weapon/sfx_WeaponFireEnemy'"));
 	ShootAudioCue = ShootCue.Object;
 	ShootAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootAudioComp"));
 	ShootAudioComponent->bAutoActivate = false;
 	ShootAudioComponent->SetupAttachment(RootComponent);
+
+	//Death
+	static ConstructorHelpers::FObjectFinder<USoundCue> DeathCue(TEXT("'/Game/Sound/SFX/Character/Death/sfx_DeathEnemy'"));
+	DeathAudioCue = DeathCue.Object;
+	DeathAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("DeathAudioComp"));
+	DeathAudioComponent->bAutoActivate = false;
+	DeathAudioComponent->SetupAttachment(RootComponent);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -121,12 +128,21 @@ void ATP_ThirdPersonCharacter::PostInitializeComponents()
 	{
 		ShootAudioComponent->SetSound(ShootAudioCue);
 	}
+
+	if (DeathAudioCue->IsValidLowLevelFast())					//ShootSound
+	{
+		DeathAudioComponent->SetSound(DeathAudioCue);
+	}
 }
 
 void ATP_ThirdPersonCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);
+	ShootAudioComponent->SetFloatParameter(FName("sfx_EnemyShootSlowmo"), soundTimeDilation);
+	WalkAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);
+	DeathAudioComponent->SetFloatParameter(FName("sfx_EnemyDeathSlowmo"), soundTimeDilation);
 }
 
 void ATP_ThirdPersonCharacter::Walking()
@@ -194,6 +210,7 @@ void ATP_ThirdPersonCharacter::Damage(int damage)
 		//SetActorEnableCollision(false);
 		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		OnNPCDeathBPEvent();
+		DeathAudioComponent->Play();
 	}
 }
 

@@ -81,6 +81,12 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* ShootAudioComponent;
 
+	//Death
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* DeathAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* DeathAudioComponent;
+
 protected:
 
 	virtual void BeginPlay(); //Executes at Begin+
@@ -121,5 +127,7 @@ protected:
 
 private:
 	class UWorld* world;
+
+	float soundTimeDilation;
 };
 

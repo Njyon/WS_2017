@@ -6,26 +6,37 @@
 // Sets default values
 AMyProjectCheckpoint::AMyProjectCheckpoint()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
-	//LandingCharLarge
+	world = GetWorld();
+
+	static ConstructorHelpers::FClassFinder<AMyEnemySpawnSound> SpawnSoundSound(TEXT("'/Game/Blueprints/Player/Behaviour/EnemySpawnSound'"));
+	if (SpawnSoundSound.Class != NULL)
+	{
+		EnemySpawnSound = SpawnSoundSound.Class;
+	}
+
+	//CheckpointSound
 	static ConstructorHelpers::FObjectFinder<USoundCue> CheckpointSoundCue(TEXT("'/Game/Sound/SFX/other/sfx_Checkpoint'"));
 	CheckpointSoundAudioCue = CheckpointSoundCue.Object;
 	CheckpointSoundAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("CheckpointSoundAudioComp"));
 	CheckpointSoundAudioComponent->bAutoActivate = false;
 	CheckpointSoundAudioComponent->SetupAttachment(RootComponent);
 
+	//Spawn
+	static ConstructorHelpers::FObjectFinder<USoundCue> SpawnCue(TEXT("'/Game/Sound/SFX/other/sfx_EnemySpawn'"));
+	SpawnAudioCue = SpawnCue.Object;
+	SpawnAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("SpawnCueAudioComp"));
+	SpawnAudioComponent->bAutoActivate = false;
+	SpawnAudioComponent->SetupAttachment(RootComponent);
+
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectCheckpoint::OnOverlap);
 
 
-	/*spawn = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Spawn"));
-	spawn->SetOnlyOwnerSee(true);
-	spawn->SetupAttachment(RootComponent);
-	spawn->bCastDynamicShadow = false;
-	spawn->CastShadow = false;*/
+	SoundSpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SoundSpawn"));
+	SoundSpawnLocation->SetupAttachment(RootComponent);
+	SoundSpawnLocation->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	// Set as root component
 	RootComponent = CollisionComp;
@@ -56,6 +67,19 @@ void AMyProjectCheckpoint::PostInitializeComponents()
 	{
 		CheckpointSoundAudioComponent->SetSound(CheckpointSoundAudioCue);
 	}
+	if (SpawnAudioCue->IsValidLowLevelFast())					//WallrunSound
+	{
+		SpawnAudioComponent->SetSound(SpawnAudioCue);
+	}
+}
+
+void AMyProjectCheckpoint::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	soundTimeDilation = FMath::Clamp(UGameplayStatics::GetGlobalTimeDilation(world), 0.0f, 1.0f);
+	SpawnAudioComponent->SetFloatParameter(FName("sfx_EnemySpawnSlowmo"), soundTimeDilation);
+
 }
 
 void AMyProjectCheckpoint::NextCheckpoint()
@@ -69,16 +93,30 @@ void AMyProjectCheckpoint::NextCheckpoint()
   void AMyProjectCheckpoint::OnOverlap(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResult)
 {
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(otherActor);
+
 	if ((otherActor != NULL) && (otherActor != this) && hittedplayer != NULL)
 	{
 		if (!hasUsed)
 		{
 			this->CheckpointSoundAudioComponent->Play();
+			this->SpawnAudioComponent->Play();
 			UE_LOG(LogTemp, Warning, TEXT("success"));
 			this->hasUsed = true;
 			hittedplayer->SetRespawn(vector, rotator);
 			OnCheckpoint();
 			NextCheckpoint();
+
+			/*if (!firstCP)
+			{*/
+				/*FActorSpawnParameters spawnInfo;
+				spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				AMyEnemySpawnSound* soundspawn = world->SpawnActor<AMyEnemySpawnSound>(
+					EnemySpawnSound,
+					SoundSpawnLocation->GetComponentTransform().GetLocation(),
+					FRotator(0, 0, 0),
+					spawnInfo);*/
+			//}
 
 			for (int i = 0; i <= this->lenght + 1; i++)
 			{
