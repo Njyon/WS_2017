@@ -26,6 +26,11 @@ AMyProjectProjectile::AMyProjectProjectile()
 	{
 		HitHead = HitHeadSound.Class;
 	}
+	static ConstructorHelpers::FClassFinder<AMyHitSand> HitSandSound(TEXT("'/Game/Blueprints/Player/Behaviour/HitSounds/HitSand'"));
+	if (HitSandSound.Class != NULL)
+	{
+		HitSand = HitSandSound.Class;
+	}
 
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
@@ -129,17 +134,11 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						FRotator(0,0,0),																
 						spawnInfo);
 				}
-
+				
 				else
 				{
 					OnHitBpEvent();
 					Destroy();
-
-					AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
-						HitWall,
-						SoundSpawn->GetComponentTransform().GetLocation(),
-						FRotator(0, 0, 0),
-						spawnInfo);
 				}
 
 				//ProjectileMovement->bShouldBounce = false;
@@ -151,11 +150,26 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			OnHitBpEvent();
 			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
 
-			AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
-				HitWall,
-				SoundSpawn->GetComponentTransform().GetLocation(),
-				FRotator(0, 0, 0),
-				spawnInfo);
+			if (Hit.IsValidBlockingHit() == true)
+			{
+				if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				{			
+					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
+						HitSand,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
+						HitWall,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+			}
 
 			Destroy();
 			
@@ -164,11 +178,26 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		{
 			OnHitBpEvent();
 
-			AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
-				HitWall,
-				SoundSpawn->GetComponentTransform().GetLocation(),
-				FRotator(0, 0, 0),
-				spawnInfo);
+			if (Hit.IsValidBlockingHit() == true)
+			{
+				if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				{
+					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
+						HitSand,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
+						HitWall,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+			}
 
 			Destroy();
 			
@@ -183,11 +212,26 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		{
 			OtherComp->AddImpulseAtLocation(GetVelocity() * forceImpulse, GetActorLocation());
 
-			AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
-				HitWall,
-				SoundSpawn->GetComponentTransform().GetLocation(),
-				FRotator(0, 0, 0),
-				spawnInfo);
+			if (Hit.IsValidBlockingHit() == true)
+			{
+				if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				{
+					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
+						HitSand,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
+						HitWall,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+			}
 
 			OnHitBpEvent();
 			Destroy();
@@ -205,11 +249,26 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		{
 			OnHitBpEvent();
 
-			AMyHitWall* sound = world->SpawnActor<AMyHitWall>(
-				HitWall,
-				SoundSpawn->GetComponentTransform().GetLocation(),
-				FRotator(0, 0, 0),
-				spawnInfo);
+			if (Hit.IsValidBlockingHit() == true)
+			{
+				if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				{
+					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
+						HitSand,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
+						HitWall,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+			}
 
 			Destroy();
 			
