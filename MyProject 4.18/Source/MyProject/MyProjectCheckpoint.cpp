@@ -98,6 +98,8 @@ void AMyProjectCheckpoint::NextCheckpoint()
 	{
 		if (!hasUsed)
 		{
+			vector = hittedplayer->GetActorLocation();
+
 			this->CheckpointSoundAudioComponent->Play();
 			this->SpawnAudioComponent->Play();
 			UE_LOG(LogTemp, Warning, TEXT("success"));
