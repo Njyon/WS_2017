@@ -54,12 +54,19 @@ public:
 	FRotator rotator;
 	bool hasUsed = false;
 
+	//CheckpointSound
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* CheckpointSoundAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* CheckpointSoundAudioComponent;
+
 	///** Returns CollisionComp subobject **/
 	FORCEINLINE class UBoxComponent* GetCollisionComp() const { return CollisionComp; }
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
 private:
 

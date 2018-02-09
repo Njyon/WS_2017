@@ -342,6 +342,24 @@ public:								////// PUBLIC //////
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* Dialogue_OutroAudioComponent;
 
+	//NormalHit
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* NormalHitAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* NormalHitAudioComponent;
+
+	//LandingCharSmall
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* LandingCharSmallAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* LandingCharSmallAudioComponent;
+
+	//LandingCharLarge
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* LandingCharLargeAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* LandingCharLargeAudioComponent;
+
 										// UFUNCTION //
 	void Damage(int damage, FVector damageCauser);
 	void SetRespawn(FVector spawnVector, FRotator spawnRotator);
@@ -511,6 +529,7 @@ private:								////// PRIVATE //////
 	FTimerHandle losingHealth;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
+	FVector fallingSpeed;
 	///Class
 	class UCharacterMovementComponent* movementComponent; // Movement Component
 	class UCapsuleComponent* capsuleComponent;

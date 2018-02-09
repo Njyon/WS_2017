@@ -167,6 +167,27 @@ AMyProjectCharacter::AMyProjectCharacter()
 	Dialogue_OutroAudioComponent->bAutoActivate = false;
 	Dialogue_OutroAudioComponent->SetupAttachment(RootComponent);
 
+	//NormalHit
+	static ConstructorHelpers::FObjectFinder<USoundCue> NormalHitCue(TEXT("'/Game/Sound/SFX/HIts/sfx_NormalHit'"));
+	NormalHitAudioCue = NormalHitCue.Object;
+	NormalHitAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("NormalHitAudioComp"));
+	NormalHitAudioComponent->bAutoActivate = false;
+	NormalHitAudioComponent->SetupAttachment(RootComponent);
+
+	//LandingCharSmall
+	static ConstructorHelpers::FObjectFinder<USoundCue> LandingCharSmallHitCue(TEXT("'/Game/Sound/SFX/Movement/sfx_LandingCharSmall'"));
+	LandingCharSmallAudioCue = LandingCharSmallHitCue.Object;
+	LandingCharSmallAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LandingCharSmallAudioComp"));
+	LandingCharSmallAudioComponent->bAutoActivate = false;
+	LandingCharSmallAudioComponent->SetupAttachment(RootComponent);
+
+	//LandingCharLarge
+	static ConstructorHelpers::FObjectFinder<USoundCue> LandingCharLargeCue(TEXT("'/Game/Sound/SFX/Movement/sfx_LandingCharLarge'"));
+	LandingCharLargeAudioCue = LandingCharLargeCue.Object;
+	LandingCharLargeAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LandingCharLargeAudioComp"));
+	LandingCharLargeAudioComponent->bAutoActivate = false;
+	LandingCharLargeAudioComponent->SetupAttachment(RootComponent);
+
 
 	
 			////////////End Sounds////////////////
@@ -434,9 +455,21 @@ void AMyProjectCharacter::PostInitializeComponents()
 	{
 		Dialogue_AlmostAudioComponent->SetSound(Dialogue_AlmostAudioCue);
 	}
-	if (Dialogue_OutroAudioCue->IsValidLowLevelFast())					//Dialogue_3
+	if (Dialogue_OutroAudioCue->IsValidLowLevelFast())					//Dialogue_4
 	{
 		Dialogue_OutroAudioComponent->SetSound(Dialogue_OutroAudioCue);
+	}
+	if (NormalHitAudioCue->IsValidLowLevelFast())					//NormalHit
+	{
+		NormalHitAudioComponent->SetSound(NormalHitAudioCue);
+	}
+	if (LandingCharSmallAudioCue->IsValidLowLevelFast())					//landingSmall
+	{
+		LandingCharSmallAudioComponent->SetSound(LandingCharSmallAudioCue);
+	}
+	if (LandingCharLargeAudioCue->IsValidLowLevelFast())					//landingLarge
+	{
+		LandingCharLargeAudioComponent->SetSound(LandingCharLargeAudioCue);
 	}
 }
 
@@ -492,6 +525,15 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			//////////////////////////////////////
 			//////////	Breathing Sound	//////////
 			//////////////////////////////////////
+
+	if (this->movementComponent->IsFalling())
+	{
+		if (this->GetVelocity().Equals(FVector(0, 0, 0), 0.000100f) == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("falling speed: %s"), *this->fallingSpeed.ToString());
+			fallingSpeed = this->GetVelocity();
+		}
+	}
 
 	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) == false)
 	{
@@ -575,6 +617,9 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	JumpAudioComponent->SetFloatParameter(FName("sfx_JumpSlowmo"), soundTimeDilation);			//JumpSound
 	RunningAudioComponent->SetFloatParameter(FName("sfx_RunningSlowmo"), soundTimeDilation);			//JumpSound
 	ReloadAudioComponent->SetFloatParameter(FName("sfx_ReloadSlowmo"), soundTimeDilation);			//JumpSound
+	NormalHitAudioComponent->SetFloatParameter(FName("sfx_NormalHitSlowmo"), soundTimeDilation);			//JumpSound
+	LandingCharSmallAudioComponent->SetFloatParameter(FName("sfx_SmallLandingSlowmo"), soundTimeDilation);			//JumpSound
+	LandingCharLargeAudioComponent->SetFloatParameter(FName("sfx_LargeLandingSlowmo"), soundTimeDilation);			//JumpSound
 
 
 	if (isOnLadder == true && climbingSoundDoOnce == false)													//climbSound gets played and stopped
@@ -1048,6 +1093,7 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 {
 	//Super::Landed(hit);
 
+	UE_LOG(LogTemp, Warning, TEXT("falling speed: %s"), *this->fallingSpeed.ToString());
 	this->MakeNoise(				// Make Noise for AI Perception
 		1.0f,						// Loudness
 		this,						// Instigator (PAWN)
@@ -1055,6 +1101,21 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 		0.0f						// Max Range
 	);
 
+	if (fallingSpeed.Z > -2000)
+	{
+		if (!isOnLadder && !isOnWall)
+		{
+			LandingCharSmallAudioComponent->Play();
+		}
+	}
+
+	if (fallingSpeed.Z <= -2000)
+	{
+		if (!isOnLadder && !isOnWall)
+		{
+			LandingCharLargeAudioComponent->Play();
+		}
+	}
 	
 
 	if (LandingAudioComponent->IsPlaying() == false)
@@ -1132,6 +1193,7 @@ void AMyProjectCharacter::Damage(int damage, FVector damageCauser)
 		hitAngle = FMath::Acos(FVector::DotProduct(damageCauser, playerpos));
 		hitAngle = FMath::RadiansToDegrees(hitAngle);
 		UE_LOG(LogTemp, Warning, TEXT("Hit Angle: %f %"), this->hitAngle);
+		NormalHitAudioComponent->Play();
 		if (Health <= 30.0f)
 		{
 			if (!gothitlessthan30)
