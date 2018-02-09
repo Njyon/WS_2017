@@ -28,7 +28,6 @@ void AMyHitWall::BeginPlay()
 	HitWallAudioComponent->Play();
 
 	world->GetTimerManager().SetTimer(cleanup, this, &AMyHitWall::Cleanup, cleanupDelay, false);
-	UE_LOG(LogTemp, Warning, TEXT("HitWall"));
 	
 }
 

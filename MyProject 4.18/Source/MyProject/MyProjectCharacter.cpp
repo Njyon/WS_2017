@@ -1103,7 +1103,7 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 
 	if (fallingSpeed.Z > -2000)
 	{
-		if (!isOnLadder && !isOnWall)
+		if (!isOnLadder && !isOnWall && !isVaulting)
 		{
 			LandingCharSmallAudioComponent->Play();
 		}
@@ -1111,7 +1111,7 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 
 	if (fallingSpeed.Z <= -2000)
 	{
-		if (!isOnLadder && !isOnWall)
+		if (!isOnLadder && !isOnWall && !isVaulting)
 		{
 			LandingCharLargeAudioComponent->Play();
 		}

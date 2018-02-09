@@ -7,6 +7,7 @@
 #include "MyHitWall.h"
 #include "MyHitHead.h"
 #include "MyHitNPC.h"
+#include "MyHitSand.h"
 #include "MyProjectProjectile.generated.h"
 
 UENUM()
@@ -60,6 +61,8 @@ public:
 		TSubclassOf<class AMyHitNPC> HitNPC;
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AMyHitHead> HitHead;
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AMyHitSand> HitSand;
 
 	virtual void Tick(float DeltaSeconds) override;
 
