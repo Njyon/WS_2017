@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Spawn.h"
+#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 
 
 // Sets default values
@@ -19,8 +20,7 @@ void ASpawn::BeginPlay()
 
 }
 
-
-void ASpawn::Spawnenemy()
+void ASpawn::Spawnenemy(bool first)
 {
 	if (canSpawn == true)
 	{
@@ -32,7 +32,11 @@ void ASpawn::Spawnenemy()
 		FActorSpawnParameters spawnInfo;																		
 		spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		GetWorld()->SpawnActor<ACharacter>(enemyToSpawn, GetActorLocation(), GetActorRotation(), spawnInfo);
+		ATP_ThirdPersonCharacter* enemy = GetWorld()->SpawnActor<ATP_ThirdPersonCharacter>(enemyToSpawn, GetActorLocation(), GetActorRotation(), spawnInfo);
+		if (first)
+		{
+			enemy->SpawnAudio();
+		}
 	}
 	else if (spawnQue > 0 && canSpawn == false)
 	{
@@ -44,6 +48,6 @@ void ASpawn::Reset()
 {
 	canSpawn = true;
 	if (spawnQue > 0)
-		Spawnenemy();
+		Spawnenemy(false);
 }
 
