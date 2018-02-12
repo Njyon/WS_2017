@@ -540,7 +540,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 		if (!isBreathing)
 		{
 			breathingDelay = FMath::RandRange(2.0f, 6.0f);
-			isBreathing = true;
+			/*isBreathing = true;*/
 			world->GetTimerManager().SetTimer(breathing, this, &AMyProjectCharacter::RunningAudioBegin, breathingDelay, false);
 		}
 	}
@@ -1101,7 +1101,7 @@ void AMyProjectCharacter::Landed(const FHitResult& hit)
 		0.0f						// Max Range
 	);
 
-	if (fallingSpeed.Z > -2000)
+	if (fallingSpeed.Z > -2000 && fallingSpeed.Z < -1000)
 	{
 		if (!isOnLadder && !isOnWall && !isVaulting)
 		{
@@ -1279,6 +1279,7 @@ void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
 
 void AMyProjectCharacter::Respawn()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Respawn"));
 	Health = MaxHealth;
 	Reload();
 	this->OnDamageBPEvent();
@@ -1306,7 +1307,6 @@ void AMyProjectCharacter::Healthrecharge()
 {
 	if (this->Health < this->MaxHealth)
 	{
-
 		Health += healthPerDelay;
 		OnHealthRechargeBPEvent();
 
@@ -2187,6 +2187,7 @@ void AMyProjectCharacter::RunningAudioBegin()
 {
 	if (RunningAudioComponent->IsPlaying() == false)
 	{
+		isBreathing = true;
 		RunningAudioComponent->FadeIn(FMath::RandRange(3.0f, 5.0f), 1.0, 0.0);
 	}
 }
