@@ -68,6 +68,7 @@ void AMyProjectCheckpoint::NextCheckpoint()
 
   void AMyProjectCheckpoint::OnOverlap(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResult)
 {
+	bool playOnce = false;
 	AMyProjectCharacter* hittedplayer = Cast<AMyProjectCharacter>(otherActor);
 
 	if ((otherActor != NULL) && (otherActor != this) && hittedplayer != NULL)
@@ -93,8 +94,18 @@ void AMyProjectCheckpoint::NextCheckpoint()
 				}
 				if (amountOfEnemys >= 0)
 				{
-					spawns[i]->spawnQue += 1;
-					spawns[i]->Spawnenemy();
+					if (!playOnce)
+					{
+						playOnce = true;
+
+						spawns[i]->spawnQue += 1;
+						spawns[i]->Spawnenemy(true);
+					}
+					else
+					{
+						spawns[i]->spawnQue += 1;
+						spawns[i]->Spawnenemy(false);
+					}
 				}
 				else if (amountOfEnemys <= 0)
 				{
