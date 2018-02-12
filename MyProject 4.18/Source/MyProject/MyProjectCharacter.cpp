@@ -1307,8 +1307,7 @@ void AMyProjectCharacter::Healthrecharge()
 {
 	if (this->Health < this->MaxHealth)
 	{
-
-		Health = healthPerDelay;
+		Health += healthPerDelay;
 		OnHealthRechargeBPEvent();
 
 		if (this->Health >= this->MaxHealth)
