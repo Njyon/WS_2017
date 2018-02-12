@@ -393,6 +393,8 @@ public:								////// PUBLIC //////
 		void RunningAudioBegin();
 	UFUNCTION()
 		void RunningAudioEnd();
+	UFUNCTION()
+		void RealReload();
 
 	virtual void Landed(const FHitResult& hit) override;						// Character touched the ground event
 
@@ -438,6 +440,8 @@ public:								////// PUBLIC //////
 		void OnCrankDamageBpEvent();
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnHealthMaxed();
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnReload();
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnSlomoOn();
@@ -527,6 +531,7 @@ private:								////// PRIVATE //////
 	FTimerHandle noMoving;
 	FTimerHandle breathing;
 	FTimerHandle losingHealth;
+	FTimerHandle reload;
 	FBodyInstance* camRay;									// RayCast from Camera
 	FVector acceleration;
 	FVector fallingSpeed;

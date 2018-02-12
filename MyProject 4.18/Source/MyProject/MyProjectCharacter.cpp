@@ -660,7 +660,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			}
 			else
 			{
-				Reload();
+				world->GetTimerManager().SetTimer(reload, this, &AMyProjectCharacter::RealReload, 2.0f, false);
 			}
 		}
 
@@ -979,6 +979,18 @@ void AMyProjectCharacter::Reload()
 		{
 			ReloadAudioComponent->Play();
 			isReloading = true;
+			world->GetTimerManager().SetTimer(reload, this, &AMyProjectCharacter::RealReload, 2.0f, false);
+			OnReload();
+		}
+	}
+}
+
+void AMyProjectCharacter::RealReload()
+{
+	if (this->blockInput == false)
+	{
+		if (this->currentAmmo < this->magazineSize)
+		{
 			this->currentAmmo = this->magazineSize;
 			OnAmmoChange();
 		}
@@ -1281,7 +1293,7 @@ void AMyProjectCharacter::Respawn()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Respawn"));
 	Health = MaxHealth;
-	Reload();
+	this->currentAmmo = this->magazineSize;
 	this->OnDamageBPEvent();
 	this->OnHealthRechargeBPEvent();
 	TeleportTo(spawnPoint, spawnRotation, false, true);
