@@ -1279,6 +1279,7 @@ void AMyProjectCharacter::SetRespawn(FVector spawnVector, FRotator spawnRotator)
 
 void AMyProjectCharacter::Respawn()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Respawn"));
 	Health = MaxHealth;
 	Reload();
 	this->OnDamageBPEvent();
@@ -1307,7 +1308,7 @@ void AMyProjectCharacter::Healthrecharge()
 	if (this->Health < this->MaxHealth)
 	{
 
-		Health += healthPerDelay;
+		Health = healthPerDelay;
 		OnHealthRechargeBPEvent();
 
 		if (this->Health >= this->MaxHealth)
