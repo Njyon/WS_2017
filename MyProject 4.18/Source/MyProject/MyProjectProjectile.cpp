@@ -31,6 +31,11 @@ AMyProjectProjectile::AMyProjectProjectile()
 	{
 		HitSand = HitSandSound.Class;
 	}
+	static ConstructorHelpers::FClassFinder<AMyHitMetal> HitMetalSound(TEXT("'/Game/Blueprints/Player/Behaviour/HitSounds/HitMetal'"));
+	if (HitMetalSound.Class != NULL)
+	{
+		HitMetal = HitMetalSound.Class;
+	}
 
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
@@ -152,7 +157,16 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 			if (Hit.IsValidBlockingHit() == true)
 			{
-				if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				if (Hit.GetActor()->ActorHasTag("Metal"))
+				{
+					AMyHitMetal* metalbodysand = world->SpawnActor<AMyHitMetal>(
+						HitMetal,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 				{			
 					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
 						HitSand,
@@ -161,7 +175,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						spawnInfo);
 				}
 
-				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)*/
 				{
 					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
 						HitWall,
@@ -180,7 +194,16 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 			if (Hit.IsValidBlockingHit() == true)
 			{
-				if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				if (Hit.GetActor()->ActorHasTag("Metal"))
+				{
+					AMyHitMetal* metalbodysand = world->SpawnActor<AMyHitMetal>(
+						HitMetal,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 				{
 					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
 						HitSand,
@@ -189,7 +212,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						spawnInfo);
 				}
 
-				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)*/
 				{
 					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
 						HitWall,
@@ -214,7 +237,16 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 			if (Hit.IsValidBlockingHit() == true)
 			{
-				if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				if (Hit.GetActor()->ActorHasTag("Metal"))
+				{
+					AMyHitMetal* metalbodysand = world->SpawnActor<AMyHitMetal>(
+						HitMetal,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 				{
 					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
 						HitSand,
@@ -223,7 +255,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						spawnInfo);
 				}
 
-				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)*/
 				{
 					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
 						HitWall,
@@ -251,7 +283,16 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 			if (Hit.IsValidBlockingHit() == true)
 			{
-				if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				if (Hit.GetActor()->ActorHasTag("Metal"))
+				{
+					AMyHitMetal* metalbodysand = world->SpawnActor<AMyHitMetal>(
+						HitMetal,
+						SoundSpawn->GetComponentTransform().GetLocation(),
+						FRotator(0, 0, 0),
+						spawnInfo);
+				}
+
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
 				{
 					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
 						HitSand,
@@ -260,7 +301,7 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						spawnInfo);
 				}
 
-				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)*/
 				{
 					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
 						HitWall,
