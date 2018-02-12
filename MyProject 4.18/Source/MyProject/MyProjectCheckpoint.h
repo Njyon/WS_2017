@@ -18,18 +18,12 @@ class MYPROJECT_API AMyProjectCheckpoint : public AActor
 	
 	UPROPERTY(VisibleAnywhere, Category = Checkpoint)
 		class UBoxComponent* CollisionComp;
-
-	UPROPERTY(EditAnywhere, Category = Mesh)
-		class USceneComponent* SoundSpawnLocation;
 	/*UPROPERTY(VisibleAnywhere, Category = Checkpoint)
 		class UStaticMeshComponent* spawn;*/
 
 public:	
 	// Sets default values for this actor's properties
 	AMyProjectCheckpoint();
-
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-		TSubclassOf<class AMyEnemySpawnSound> EnemySpawnSound;
 
 	//Set Spawn points for enemies
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawns)
@@ -45,6 +39,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnCheckpoint();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnSpawnSound();
 	
 	UFUNCTION()
 		void NextCheckpoint();
@@ -66,12 +63,6 @@ public:
 		class USoundCue* CheckpointSoundAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* CheckpointSoundAudioComponent;
-
-	//Spawn
-	UPROPERTY(BlueprintReadOnly, Category = Audio)
-		class USoundCue* SpawnAudioCue;
-	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
-		class UAudioComponent* SpawnAudioComponent;
 
 
 	///** Returns CollisionComp subobject **/

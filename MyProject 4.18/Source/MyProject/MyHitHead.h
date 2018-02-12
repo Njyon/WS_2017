@@ -20,18 +20,6 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	//HitWall
-	UPROPERTY(BlueprintReadOnly, Category = Audio)
-		class USoundCue* HitWallAudioCue;
-	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
-		class UAudioComponent* HitWallAudioComponent;
-
-	//HitNPC
-	UPROPERTY(BlueprintReadOnly, Category = Audio)
-		class USoundCue* HitNPCAudioCue;
-	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
-		class UAudioComponent* HitNPCAudioComponent;
-
 	//HitHead
 	UPROPERTY(BlueprintReadOnly, Category = Audio)
 		class USoundCue* HitHeadAudioCue;

@@ -64,6 +64,8 @@ public:
 		void Shooting();
 	UFUNCTION()
 		void EnemyRespawn();
+	UFUNCTION()
+		void SpawnAudio();
 
 	void Damage(int damage);
 
@@ -86,6 +88,12 @@ public:
 		class USoundCue* DeathAudioCue;
 	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
 		class UAudioComponent* DeathAudioComponent;
+
+	//Spawn
+	UPROPERTY(BlueprintReadOnly, Category = Audio)
+		class USoundCue* SpawnAudioCue;
+	UPROPERTY(EditAnywhere, meta = (BlueprintSpawnableComponent), BlueprintReadWrite, Category = Audio)
+		class UAudioComponent* SpawnAudioComponent;
 
 protected:
 
