@@ -23,7 +23,7 @@ public:
 		float spawnDelay = 5.0f;
 
 	UFUNCTION()
-		void Spawnenemy();
+		void Spawnenemy(bool first);
 	UFUNCTION()
 		void Reset();
 
