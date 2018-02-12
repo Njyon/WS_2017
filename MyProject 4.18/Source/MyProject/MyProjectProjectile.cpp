@@ -166,19 +166,19 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						spawnInfo);
 				}
 
-				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
-				{			
-					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
-						HitSand,
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
+				{
+					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
+						HitWall,
 						SoundSpawn->GetComponentTransform().GetLocation(),
 						FRotator(0, 0, 0),
 						spawnInfo);
 				}
 
-				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)*/
+				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)*/
 				{
-					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
-						HitWall,
+					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
+						HitSand,
 						SoundSpawn->GetComponentTransform().GetLocation(),
 						FRotator(0, 0, 0),
 						spawnInfo);
@@ -203,19 +203,19 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						spawnInfo);
 				}
 
-				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
 				{
-					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
-						HitSand,
+					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
+						HitWall,
 						SoundSpawn->GetComponentTransform().GetLocation(),
 						FRotator(0, 0, 0),
 						spawnInfo);
 				}
 
-				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)*/
+				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)*/
 				{
-					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
-						HitWall,
+					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
+						HitSand,
 						SoundSpawn->GetComponentTransform().GetLocation(),
 						FRotator(0, 0, 0),
 						spawnInfo);
@@ -246,19 +246,18 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						spawnInfo);
 				}
 
-				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
 				{
-					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
-						HitSand,
+					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
+						HitWall,
 						SoundSpawn->GetComponentTransform().GetLocation(),
 						FRotator(0, 0, 0),
 						spawnInfo);
 				}
-
-				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)*/
+				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)*/
 				{
-					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
-						HitWall,
+					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
+						HitSand,
 						SoundSpawn->GetComponentTransform().GetLocation(),
 						FRotator(0, 0, 0),
 						spawnInfo);
@@ -292,19 +291,19 @@ void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 						spawnInfo);
 				}
 
-				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)
+				else if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)
 				{
-					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
-						HitSand,
+					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
+						HitWall,
 						SoundSpawn->GetComponentTransform().GetLocation(),
 						FRotator(0, 0, 0),
 						spawnInfo);
 				}
 
-				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType1)*/
+				else /*if (Hit.PhysMaterial->SurfaceType.GetValue() == SurfaceType2)*/
 				{
-					AMyHitWall* soundbodywall = world->SpawnActor<AMyHitWall>(
-						HitWall,
+					AMyHitSand* soundbodysand = world->SpawnActor<AMyHitSand>(
+						HitSand,
 						SoundSpawn->GetComponentTransform().GetLocation(),
 						FRotator(0, 0, 0),
 						spawnInfo);
