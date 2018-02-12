@@ -70,6 +70,13 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	DeathAudioComponent->bAutoActivate = false;
 	DeathAudioComponent->SetupAttachment(RootComponent);
 
+	//Spawn
+	static ConstructorHelpers::FObjectFinder<USoundCue> SpawnCue(TEXT("'/Game/Sound/SFX/other/sfx_EnemySpawn'"));
+	SpawnAudioCue = SpawnCue.Object;
+	SpawnAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("SpawnCueAudioComp"));
+	SpawnAudioComponent->bAutoActivate = false;
+	SpawnAudioComponent->SetupAttachment(RootComponent);
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -133,6 +140,11 @@ void ATP_ThirdPersonCharacter::PostInitializeComponents()
 	{
 		DeathAudioComponent->SetSound(DeathAudioCue);
 	}
+
+	if (SpawnAudioCue->IsValidLowLevelFast())					//WallrunSound
+	{
+		SpawnAudioComponent->SetSound(SpawnAudioCue);
+	}
 }
 
 void ATP_ThirdPersonCharacter::Tick(float DeltaSeconds)
@@ -143,6 +155,7 @@ void ATP_ThirdPersonCharacter::Tick(float DeltaSeconds)
 	ShootAudioComponent->SetFloatParameter(FName("sfx_EnemyShootSlowmo"), soundTimeDilation);
 	WalkAudioComponent->SetFloatParameter(FName("sfx_WalkingSlowmo"), soundTimeDilation);
 	DeathAudioComponent->SetFloatParameter(FName("sfx_EnemyDeathSlowmo"), soundTimeDilation);
+	SpawnAudioComponent->SetFloatParameter(FName("sfx_EnemyDeathSlowmo"), soundTimeDilation);
 }
 
 void ATP_ThirdPersonCharacter::Walking()
@@ -217,6 +230,11 @@ void ATP_ThirdPersonCharacter::Damage(int damage)
 void ATP_ThirdPersonCharacter::EnemyRespawn()
 {
 	TeleportTo(spawnpoint, spawnRotation, false, true);
+}
+
+void ATP_ThirdPersonCharacter::SpawnAudio()
+{
+	SpawnAudioComponent->Play();
 }
 
 
