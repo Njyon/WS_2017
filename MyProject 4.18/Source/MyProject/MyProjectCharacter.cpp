@@ -530,7 +530,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		if (this->GetVelocity().Equals(FVector(0, 0, 0), 0.000100f) == false)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("falling speed: %s"), *this->fallingSpeed.ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("falling speed: %s"), *this->fallingSpeed.ToString());
 			fallingSpeed = this->GetVelocity();
 		}
 	}
@@ -539,9 +539,9 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 	{
 		if (!isBreathing)
 		{
-			breathingDelay = FMath::RandRange(2.0f, 6.0f);
-			/*isBreathing = true;*/
-			world->GetTimerManager().SetTimer(breathing, this, &AMyProjectCharacter::RunningAudioBegin, breathingDelay, false);
+				breathingDelay = FMath::RandRange(2.0f, 6.0f);
+				isBreathing = true;
+				world->GetTimerManager().SetTimer(breathing, this, &AMyProjectCharacter::RunningAudioBegin, breathingDelay, false);
 		}
 	}
 
@@ -2199,7 +2199,6 @@ void AMyProjectCharacter::RunningAudioBegin()
 {
 	if (RunningAudioComponent->IsPlaying() == false)
 	{
-		isBreathing = true;
 		RunningAudioComponent->FadeIn(FMath::RandRange(3.0f, 5.0f), 1.0, 0.0);
 	}
 }
