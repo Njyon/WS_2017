@@ -1259,7 +1259,7 @@ void AMyProjectCharacter::LosingHealth()
 			Health = crankHealthThreshhold;
 			//if (dead == false)
 			//{
-			//	OnCrankDamageBpEvent();
+			OnCrankDamageBpEvent();
 			//	LMBReleased();
 			//	dead = true;
 			//	//this->playerController->UnPossess();
