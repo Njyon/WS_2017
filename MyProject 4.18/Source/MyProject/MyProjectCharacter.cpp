@@ -579,7 +579,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 
 	if (this->movementComponent->GetCurrentAcceleration().Equals(FVector(0, 0, 0), 0.000100f) && sliding == false && isOnWall == false && isOnLadder == false && this->movementComponent->IsMovingOnGround() == true)
 	{
-		if (!ismovingTimer)
+		if (!ismovingTimer && !this->blockInput)
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("notmoving"));
 			ismovingTimer = true;
@@ -660,7 +660,7 @@ void AMyProjectCharacter::Tick(float DeltaSeconds)
 			}
 			else
 			{
-				world->GetTimerManager().SetTimer(reload, this, &AMyProjectCharacter::RealReload, 2.0f, false);
+				Reload();
 			}
 		}
 
@@ -975,7 +975,7 @@ void AMyProjectCharacter::Reload()
 {
 	if (this->blockInput == false)
 	{
-		if (this->currentAmmo < this->magazineSize)
+		if (this->currentAmmo < this->magazineSize &&  !world->GetTimerManager().IsTimerActive(reload))
 		{
 			ReloadAudioComponent->Play();
 			isReloading = true;
