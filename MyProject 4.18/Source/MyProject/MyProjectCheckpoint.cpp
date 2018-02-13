@@ -64,6 +64,10 @@ void AMyProjectCheckpoint::NextCheckpoint()
 	{
 		nextCP->ActivateNextCP();
 	}
+	if (nextCP2 != NULL)
+	{
+		nextCP2->ActivateNextCP();
+	}
 }
 
   void AMyProjectCheckpoint::OnOverlap(class UPrimitiveComponent* hitComp, class AActor* otherActor, class UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult & sweepResult)

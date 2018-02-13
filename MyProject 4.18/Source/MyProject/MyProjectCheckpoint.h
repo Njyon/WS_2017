@@ -37,6 +37,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Checkpoint)
 		class AMyProjectCheckpoint* nextCP;
 
+	//Set the Next Checkpoint to highlight upon entering this Checkpoint
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Checkpoint)
+		class AMyProjectCheckpoint* nextCP2;
+
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnCheckpoint();
 
